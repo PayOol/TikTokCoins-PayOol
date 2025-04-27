@@ -11,6 +11,8 @@ interface SoleasPayParams {
   failureUrl: string;
 }
 
+import { getSecureEnvVariable } from './encryption';
+
 /**
  * Initiates a SoleasPay payment by creating and submitting a form to their checkout page
  * @param params Payment parameters
@@ -39,7 +41,7 @@ export function initiateSoleasPayment(params: SoleasPayParams): Promise<boolean>
     currency: params.currency || 'XAF',
     description: params.description,
     orderId: params.orderId,
-    apiKey: import.meta.env.VITE_SOLEASPAY_API_KEY,
+    apiKey: getSecureEnvVariable('VITE_SOLEASPAY_API_KEY'),
     shopName: 'PayOolTM',
     successUrl: params.successUrl,
     failureUrl: params.failureUrl
