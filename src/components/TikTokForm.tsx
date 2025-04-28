@@ -1,5 +1,6 @@
 import React from 'react';
 import { TikTokForm as TikTokFormData } from '../types';
+import { User, Lock, X } from 'lucide-react';
 
 interface Props {
   onSubmit: (data: TikTokFormData) => void;
@@ -18,54 +19,75 @@ export function TikTokFormModal({ onSubmit, onCancel }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6">Identifiants TikTok</h2>
+    <div className="fixed inset-0 modal-backdrop flex items-center justify-center p-4 z-50 fade-in">
+      <div className="bg-[var(--background-elevated)] rounded-[var(--radius-lg)] w-full max-w-md shadow-[var(--shadow-lg)] overflow-hidden slide-up border border-[var(--border-dark)]">
+        {/* En-tête avec dégradé */}
+        <div className="bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] p-6 relative">
+          <button 
+            onClick={onCancel}
+            className="absolute top-4 right-4 text-white bg-white bg-opacity-20 rounded-full p-1.5 hover:bg-opacity-30 transition-colors"
+          >
+            <X size={20} />
+          </button>
+          
+          <h2 className="text-2xl font-bold text-white mb-1">Identifiants TikTok</h2>
+          <p className="text-white text-opacity-80 text-sm">
+            Entrez vos identifiants TikTok pour continuer
+          </p>
+        </div>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-              Nom d'utilisateur TikTok
+            <label htmlFor="username" className="tiktok-label flex items-center gap-2">
+              <User className="w-4 h-4 text-[var(--tiktok-red)]" />
+              <span>Nom d'utilisateur TikTok</span>
             </label>
-            <input
-              type="text"
-              id="username"
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-              value={formData.username}
-              onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
-            />
+            <div className="relative">
+              <input
+                type="text"
+                id="username"
+                required
+                className="tiktok-input pl-10"
+                value={formData.username}
+                onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                placeholder="Votre nom d'utilisateur"
+              />
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                @
+              </div>
+            </div>
           </div>
 
           <div>
-            <label htmlFor="userId" className="block text-sm font-medium text-gray-700 mb-1">
-              Mot de passe TikTok
+            <label htmlFor="userId" className="tiktok-label flex items-center gap-2">
+              <Lock className="w-4 h-4 text-[var(--tiktok-red)]" />
+              <span>Mot de passe TikTok</span>
             </label>
             <input
               type="password"
               id="userId"
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+              className="tiktok-input"
               value={formData.userId}
               onChange={(e) => setFormData(prev => ({ ...prev, userId: e.target.value }))}
+              placeholder="Votre mot de passe"
             />
           </div>
 
-
-
-          <div className="flex gap-3 mt-6">
+          <div className="pt-4">
+            <button
+              type="submit"
+              className="tiktok-button w-full flex items-center justify-center gap-2"
+            >
+              Continuer
+            </button>
+            
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              className="w-full text-center mt-4 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
             >
               Annuler
-            </button>
-            <button
-              type="submit"
-              className="flex-1 px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600"
-            >
-              Continuer
             </button>
           </div>
         </form>
