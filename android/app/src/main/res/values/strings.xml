@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">TikTok Coins by PayOol</string>
+    <string name="title_activity_main">TikTok Coins by PayOol</string>
+    <string name="package_name">com.payool.tiktokcoin</string>
+    <string name="custom_url_scheme">com.payool.tiktokcoin</string>
+</resources>
