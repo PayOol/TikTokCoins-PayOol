@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Fond circulaire -->
+  <circle cx="256" cy="256" r="256" fill="#000000"/>
+  
+  <!-- Logo TikTok stylisé -->
+  <g transform="translate(100, 100) scale(0.6)">
+    <!-- Note de musique stylisée -->
+    <path d="M355.904 132.214L355.904 211.712C355.904 211.712 318.264 196.855 289.357 212.276C260.45 227.696 254.7 264.866 269.556 294.9C284.413 324.935 328.636 336.415 355.904 309.756V388.69C355.904 388.69 299.144 414.22 242.384 388.69C185.624 363.16 174.144 293.772 196.54 244.034C218.935 194.295 275.695 169.33 355.904 211.712V132.214Z" fill="#FF0050"/>
+    
+    <!-- Lettre D stylisée pour PayOol -->
+    <path d="M120 150 L120 350 L200 350 Q260 350 260 250 Q260 150 200 150 Z M170 200 L200 200 Q210 200 210 250 Q210 300 200 300 L170 300 Z" fill="#00F2EA"/>
+  </g>
+  
+  <!-- Pièce de monnaie (coin) -->
+  <circle cx="350" cy="350" r="80" fill="#FFD700" stroke="#FFA500" stroke-width="8"/>
+  <text x="350" y="380" font-family="Arial" font-size="70" font-weight="bold" text-anchor="middle" fill="#000000">$</text>
+</svg>
