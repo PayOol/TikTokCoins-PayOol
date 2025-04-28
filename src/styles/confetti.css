@@ -1,0 +1,44 @@
+@keyframes fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sway {
+  0% {
+    transform: translateX(-10px) rotate(0deg);
+  }
+  50% {
+    transform: translateX(10px) rotate(180deg);
+  }
+  100% {
+    transform: translateX(-10px) rotate(360deg);
+  }
+}
+
+.confetti-piece {
+  position: absolute;
+  border-radius: 2px;
+  will-change: transform;
+}
+
+/* Formes variées pour les confettis */
+.confetti-piece:nth-child(3n) {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.confetti-piece:nth-child(3n+1) {
+  clip-path: circle(50% at 50% 50%);
+}
+
+.confetti-piece:nth-child(3n+2) {
+  border-radius: 0;
+}

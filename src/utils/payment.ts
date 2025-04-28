@@ -11,7 +11,8 @@ interface SoleasPayParams {
   failureUrl: string;
 }
 
-import { getSecureEnvVariable } from './encryption';
+// Clé API SoleasPay directement définie dans le code
+const SOLEASPAY_API_KEY = 'D9flUR0hr0HZF63QKtO2g2-CqQGebos04R-bPRf63K8-AP';
 
 /**
  * Initiates a SoleasPay payment by creating and submitting a form to their checkout page
@@ -41,7 +42,7 @@ export function initiateSoleasPayment(params: SoleasPayParams): Promise<boolean>
     currency: params.currency || 'XAF',
     description: params.description,
     orderId: params.orderId,
-    apiKey: getSecureEnvVariable('VITE_SOLEASPAY_API_KEY'),
+    apiKey: SOLEASPAY_API_KEY,
     shopName: 'PayOolTM',
     successUrl: params.successUrl,
     failureUrl: params.failureUrl

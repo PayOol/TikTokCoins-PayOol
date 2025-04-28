@@ -11,12 +11,16 @@ export interface User {
   purchaseHistory: Purchase[];
 }
 
+export type TransactionStatus = 'success' | 'pending' | 'failed';
+
 export interface Purchase {
   id: string;
   packageId: number;
   amount: number;
   price: number;
   date: Date;
+  status: TransactionStatus;
+  errorMessage?: string;
 }
 
 export interface TikTokForm {
