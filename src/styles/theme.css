@@ -57,6 +57,12 @@
   100% { background-position: 1000px 0; }
 }
 
+@keyframes glow {
+  0% { box-shadow: 0 0 5px rgba(8, 255, 249, 0); }
+  50% { box-shadow: 0 0 15px rgba(8, 255, 249, 0.3); }
+  100% { box-shadow: 0 0 5px rgba(8, 255, 249, 0); }
+}
+
 /* Classes utilitaires */
 .tiktok-gradient-text {
   background: var(--tiktok-gradient);
@@ -78,6 +84,7 @@
   transition: all var(--transition-normal);
   position: relative;
   overflow: hidden;
+  box-shadow: 0 0 10px rgba(8, 255, 249, 0.1);
 }
 
 .tiktok-button:hover {
@@ -111,7 +118,8 @@
 
 .card-hover-effect:hover {
   transform: translateY(-5px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-lg), 0 0 15px rgba(8, 255, 249, 0.15);
+  border-color: rgba(8, 255, 249, 0.3);
 }
 
 /* Animation pour les éléments qui apparaissent */
@@ -141,9 +149,10 @@
 }
 
 .tiktok-input:focus {
-  border-color: var(--tiktok-red);
-  box-shadow: 0 0 0 3px rgba(255, 0, 80, 0.2);
+  border-color: var(--tiktok-blue);
+  box-shadow: 0 0 0 3px rgba(8, 255, 249, 0.2);
   outline: none;
+  animation: glow 2s infinite;
 }
 
 .tiktok-input::placeholder {
