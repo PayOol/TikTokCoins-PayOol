@@ -6,17 +6,17 @@
   --tiktok-blue: #08fff9;
   --tiktok-gradient: linear-gradient(90deg, var(--tiktok-blue), var(--tiktok-red));
   
-  /* Couleurs du thème sombre */
-  --background-main: #121212;
-  --background-elevated: #1e1e1e;
-  --background-elevated-2: #2a2a2a;
-  --card-bg: #252525;
-  --card-hover: #303030;
+  /* Couleurs du thème sombre bleuté */
+  --background-main: #0d1117;
+  --background-elevated: #161b22;
+  --background-elevated-2: #21262d;
+  --card-bg: #1a2233;
+  --card-hover: #1f2a3e;
   --text-primary: #ffffff;
-  --text-secondary: #a0a0a0;
-  --text-tertiary: #6c6c6c;
-  --border-dark: #333333;
-  --border-light: #3a3a3a;
+  --text-secondary: #8b949e;
+  --text-tertiary: #6e7681;
+  --border-dark: #30363d;
+  --border-light: #383f47;
   
   /* Ombres */
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -125,7 +125,7 @@
 
 /* Styles pour les modales */
 .modal-backdrop {
-  background-color: rgba(0, 0, 0, 0.85);
+  background-color: rgba(13, 17, 23, 0.85);
   backdrop-filter: blur(5px);
 }
 
@@ -168,7 +168,7 @@
 .dark-card:hover {
   background-color: var(--card-hover);
   transform: translateY(-3px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 25px -5px rgba(8, 255, 249, 0.1);
 }
 
 .dark-highlight {
