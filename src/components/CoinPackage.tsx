@@ -1,5 +1,6 @@
 // Suppression de l'import React non utilisé
 import { Coins, Sparkles, TrendingUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { CoinPackage as CoinPackageType } from '../types';
 
 interface Props {
@@ -8,6 +9,8 @@ interface Props {
 }
 
 export function CoinPackage({ package: pkg, onSelect }: Props) {
+  const { t } = useTranslation();
+  
   // Calculer le pourcentage de bonus si présent
   const bonusPercentage = pkg.bonus ? Math.round((pkg.bonus / pkg.amount) * 100) : 0;
   
@@ -22,7 +25,7 @@ export function CoinPackage({ package: pkg, onSelect }: Props) {
       {/* Badge populaire si applicable */}
       {isPopular && (
         <div className="absolute -right-10 top-5 bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] text-white px-10 py-1 rotate-45 text-xs font-bold shadow-md">
-          POPULAIRE
+          {t('popular', 'POPULAIRE')}
         </div>
       )}
       
@@ -47,7 +50,7 @@ export function CoinPackage({ package: pkg, onSelect }: Props) {
             <div className="flex items-center gap-1 mt-1">
               <Sparkles className="w-4 h-4 text-[var(--tiktok-red)]" />
               <span className="text-sm font-medium text-[var(--tiktok-red)]">
-                +{pkg.bonus} coins gratuits
+                +{pkg.bonus} {t('freeCoins', 'coins gratuits')}
               </span>
             </div>
           )}
@@ -64,7 +67,7 @@ export function CoinPackage({ package: pkg, onSelect }: Props) {
       {/* Bouton d'achat qui apparaît au survol */}
       <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
         <button className="w-full py-2 bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] text-white rounded-full font-medium">
-          Acheter maintenant
+          {t('buyNow', 'Acheter maintenant')}
         </button>
       </div>
     </div>

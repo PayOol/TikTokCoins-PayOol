@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { Layout } from '../components/Layout';
 import { CheckCircle, ArrowLeft, Coins } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Confetti } from '../components/Confetti';
 import { Purchase } from '../types';
 import { getPurchaseHistory, updateTransactionStatus } from '../utils/localStorage';
 
 export const PaymentSuccess = () => {
+  const { t, i18n } = useTranslation();
   const [showConfetti, setShowConfetti] = useState(true);
   const [purchaseDetails, setPurchaseDetails] = useState<Purchase | null>(null);
   const location = useLocation();
@@ -46,13 +48,12 @@ export const PaymentSuccess = () => {
             <CheckCircle className="w-10 h-10 text-green-400" />
           </div>
           
-          <h1 className="text-3xl font-bold mb-2">Paiement réussi !</h1>
+          <h1 className="text-3xl font-bold mb-2">{t('paymentSuccessful')}</h1>
           <p className="text-[var(--text-secondary)] max-w-md mb-2">
-            Votre achat de pièces TikTok a été traité avec succès. 
+            {t('thankYou')} 
           </p>
           <p className="text-[var(--text-secondary)] max-w-md mb-4">
-            Si vous avez saisi les identifiants réels de votre compte TikTok, vous recevrez vos pièces dans un délai de 10 minutes. 
-            Si vous ne recevez pas vos pièces dans ce délai, veuillez contacter notre service client sur WhatsApp.
+            {t('successMessage', 'Si vous avez saisi les identifiants réels de votre compte TikTok, vous recevrez vos pièces dans un délai de 10 minutes. Si vous ne recevez pas vos pièces dans ce délai, veuillez contacter notre service client sur WhatsApp.')}
           </p>
           <a 
             href="https://wa.me/message/2TWDCSUY65YGA1" 
@@ -66,22 +67,22 @@ export const PaymentSuccess = () => {
               <path d="M14 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1Z" />
               <path d="M9.5 13.5c.5 1 1.5 1 2.5 1s2-.5 2.5-1" />
             </svg>
-            <span>Contacter le service client</span>
+            <span>{t('contactSupport', 'Contacter le service client')}</span>
           </a>
         </div>
         
         {purchaseDetails && (
           <div className="bg-[var(--background-elevated-2)] rounded-[var(--radius-md)] p-6 mb-8">
-            <h2 className="text-xl font-semibold mb-4">Détails de la transaction</h2>
+            <h2 className="text-xl font-semibold mb-4">{t('transactionDetails', 'Détails de la transaction')}</h2>
             
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-[var(--text-secondary)]">Numéro de commande</span>
+                <span className="text-[var(--text-secondary)]">{t('orderNumber', 'Numéro de commande')}</span>
                 <span className="font-medium">{purchaseDetails.id}</span>
               </div>
               
               <div className="flex justify-between items-center">
-                <span className="text-[var(--text-secondary)]">Pièces achetées</span>
+                <span className="text-[var(--text-secondary)]">{t('purchasedCoins', 'Pièces achetées')}</span>
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[var(--tiktok-blue)] to-[var(--tiktok-red)] flex items-center justify-center">
                     <Coins className="w-3 h-3 text-white" />
@@ -91,13 +92,13 @@ export const PaymentSuccess = () => {
               </div>
               
               <div className="flex justify-between">
-                <span className="text-[var(--text-secondary)]">Montant payé</span>
+                <span className="text-[var(--text-secondary)]">{t('amountPaid', 'Montant payé')}</span>
                 <span className="font-bold">{purchaseDetails.price.toLocaleString()} FCFA</span>
               </div>
               
               <div className="flex justify-between">
-                <span className="text-[var(--text-secondary)]">Date</span>
-                <span>{new Date(purchaseDetails.date).toLocaleString('fr-FR')}</span>
+                <span className="text-[var(--text-secondary)]">{t('date')}</span>
+                <span>{new Date(purchaseDetails.date).toLocaleString(i18n.language.startsWith('fr') ? 'fr-FR' : 'en-US')}</span>
               </div>
             </div>
           </div>
@@ -109,7 +110,7 @@ export const PaymentSuccess = () => {
             className="flex items-center justify-center gap-2 py-3 px-6 rounded-[var(--radius-md)] bg-[var(--background-elevated)] hover:bg-[var(--background-elevated-2)] transition-colors border border-[var(--border-dark)]"
           >
             <ArrowLeft className="w-5 h-5" />
-            <span>Retour à l'accueil</span>
+            <span>{t('backToHome')}</span>
           </Link>
           
           <a 
@@ -118,7 +119,7 @@ export const PaymentSuccess = () => {
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 py-3 px-6 rounded-[var(--radius-md)] bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] text-white font-medium hover:opacity-90 transition-opacity"
           >
-            <span>Ouvrir TikTok</span>
+            <span>{t('openTikTok', 'Ouvrir TikTok')}</span>
           </a>
         </div>
       </div>

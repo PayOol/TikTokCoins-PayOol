@@ -1,8 +1,10 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import { Coins, Menu, X, User, History, LogOut, Home } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getTotalCoins } from '../utils/localStorage';
 import { ThemeToggle } from './ThemeToggle';
+import { LanguageToggle } from './LanguageToggle';
 
 interface LayoutProps {
   children: ReactNode;
@@ -14,6 +16,7 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [balance, setBalance] = useState(propBalance);
   const location = useLocation();
+  const { t } = useTranslation();
   
   // Mettre à jour le solde depuis le localStorage
   useEffect(() => {
@@ -49,6 +52,9 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
             </div>
             
             <div className="flex items-center gap-4">
+              {/* Bouton de basculement de langue */}
+              <LanguageToggle />
+              
               {/* Bouton de basculement de thème */}
               <ThemeToggle />
               
@@ -81,6 +87,10 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
         
         <nav className="p-4">
           <div className="flex items-center justify-between mb-4 pb-2 border-b border-[var(--border-dark)]">
+            <span className="text-sm text-[var(--text-secondary)]">{t('language')}</span>
+            <LanguageToggle />
+          </div>
+          <div className="flex items-center justify-between mb-4 pb-2 border-b border-[var(--border-dark)]">
             <span className="text-sm text-[var(--text-secondary)]">Thème</span>
             <ThemeToggle />
           </div>
@@ -88,19 +98,19 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
             <li>
               <Link to="/" className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--background-elevated-2)] transition-colors">
                 <Home size={20} />
-                <span>Accueil</span>
+                <span>{t('backToHome')}</span>
               </Link>
             </li>
             <li>
               <Link to="/" className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--background-elevated-2)] transition-colors">
                 <User size={20} />
-                <span>Mon compte</span>
+                <span>{t('myAccount', 'Mon compte')}</span>
               </Link>
             </li>
             <li>
               <Link to="/" className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--background-elevated-2)] transition-colors">
                 <History size={20} />
-                <span>Historique</span>
+                <span>{t('purchaseHistory')}</span>
               </Link>
             </li>
             <li>
@@ -115,7 +125,7 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
                 className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--background-elevated-2)] transition-colors text-[var(--tiktok-red)]"
               >
                 <LogOut size={20} />
-                <span>Réinitialiser</span>
+                <span>{t('reset', 'Réinitialiser')}</span>
               </button>
             </li>
           </ul>
@@ -137,7 +147,7 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
             </div>
             
             <div className="text-sm text-[var(--text-secondary)]">
-              © {new Date().getFullYear()} PayOol™. Tous droits réservés.
+              &copy; {new Date().getFullYear()} PayOol™. {t('allRightsReserved', 'Tous droits réservés.')}
             </div>
           </div>
         </div>

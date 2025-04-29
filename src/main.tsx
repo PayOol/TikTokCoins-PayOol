@@ -6,6 +6,9 @@ import { PaymentSuccess } from './pages/PaymentSuccess';
 import { PaymentFailure } from './pages/PaymentFailure';
 import './index.css';
 
+// Import i18n configuration
+import './i18n';
+
 // Enregistrement du service worker pour la PWA
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
