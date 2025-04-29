@@ -2,6 +2,7 @@ import React, { ReactNode, useEffect, useState } from 'react';
 import { Coins, Menu, X, User, History, LogOut, Home } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { getTotalCoins } from '../utils/localStorage';
+import { ThemeToggle } from './ThemeToggle';
 
 interface LayoutProps {
   children: ReactNode;
@@ -48,6 +49,9 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
             </div>
             
             <div className="flex items-center gap-4">
+              {/* Bouton de basculement de thème */}
+              <ThemeToggle />
+              
               {!hideBalance && (
                 <>
                   <div className="hidden md:flex items-center gap-1 bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] text-white px-4 py-2 rounded-full">
@@ -76,6 +80,10 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
         </div>
         
         <nav className="p-4">
+          <div className="flex items-center justify-between mb-4 pb-2 border-b border-[var(--border-dark)]">
+            <span className="text-sm text-[var(--text-secondary)]">Thème</span>
+            <ThemeToggle />
+          </div>
           <ul className="space-y-2">
             <li>
               <Link to="/" className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--background-elevated-2)] transition-colors">

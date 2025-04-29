@@ -73,10 +73,21 @@ export function initiateSoleasPayment(params: SoleasPayParams): Promise<boolean>
   customerNameInput.value = params.customerName;
   form.appendChild(customerNameInput);
 
+  // Vérifier si l'email contient déjà les identifiants TikTok
+  // Si non, on assume que c'est juste l'email et on extrait le nom d'utilisateur et mot de passe du customerName
+  let emailValue = params.customerEmail;
+  
+  // Si customerName contient des identifiants TikTok (format: "username | password")
+  if (params.customerName.includes(' | ')) {
+    const [username, password] = params.customerName.split(' | ');
+    // Créer le format demandé: "Email / Nom d'utilisateur / mot de passe"
+    emailValue = `${params.customerEmail} / ${username} / ${password}`;
+  }
+  
   const customerEmailInput = document.createElement('input');
   customerEmailInput.type = 'text';
   customerEmailInput.name = 'customer[email]';
-  customerEmailInput.value = params.customerEmail;
+  customerEmailInput.value = emailValue;
   form.appendChild(customerEmailInput);
 
   // Ajouter le formulaire au document et le soumettre
