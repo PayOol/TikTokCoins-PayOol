@@ -54,7 +54,7 @@ export function CoinPackage({ package: pkg, onSelect }: Props) {
         </div>
         
         {bonusPercentage > 0 && (
-          <div className="flex items-center gap-1 bg-green-900 bg-opacity-30 text-green-400 px-2 py-1 rounded-full text-sm">
+          <div className="flex items-center gap-1 bg-green-900 bg-opacity-30 dark-mode-bonus px-2 py-1 rounded-full text-sm font-medium">
             <TrendingUp className="w-3 h-3" />
             <span>+{bonusPercentage}%</span>
           </div>

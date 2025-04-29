@@ -39,6 +39,7 @@ function App() {
   };
 
   const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
 
   // First step: collect TikTok credentials
   const handleFormSubmit = (data: TikTokForm) => {
@@ -50,8 +51,9 @@ function App() {
   const handleEmailSubmit = (email: string) => {
     if (!selectedPackage || !tiktokData) return;
     
-    // Clear any previous errors
+    // Clear any previous errors and set loading state
     setPaymentError(null);
+    setIsPaymentLoading(true);
 
     // Generate orderId in the format TKT-XXXXX where X are random alphanumeric characters
     const generateRandomAlphanumeric = (length: number) => {
@@ -105,6 +107,9 @@ function App() {
       // Simuler un achat réussi pour la démo (dans un environnement réel, cela serait fait sur la page de succès)
       simulatePurchaseSuccess();
       
+      // Désactiver l'état de chargement
+      setIsPaymentLoading(false);
+      
       // Reset forms after successful payment initiation
       setSelectedPackage(null);
       setTiktokData(null);
@@ -113,6 +118,7 @@ function App() {
     .catch((error) => {
       console.error('Payment error:', error);
       setPaymentError(error);
+      setIsPaymentLoading(false);
     });
   };
 
@@ -181,6 +187,7 @@ function App() {
         <EmailFormModal
           onSubmit={handleEmailSubmit}
           onCancel={handleEmailFormCancel}
+          isLoading={isPaymentLoading}
         />
       )}
       

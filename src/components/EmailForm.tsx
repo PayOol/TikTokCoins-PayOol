@@ -1,14 +1,16 @@
 import React from 'react';
-import { Mail, ArrowLeft, ArrowRight, X, ShieldCheck } from 'lucide-react';
+import { Mail, ArrowLeft, ArrowRight, X, ShieldCheck, Loader2 } from 'lucide-react';
 
 interface Props {
   onSubmit: (email: string) => void;
   onCancel: () => void;
+  isLoading?: boolean;
 }
 
-export function EmailFormModal({ onSubmit, onCancel }: Props) {
+export function EmailFormModal({ onSubmit, onCancel, isLoading = false }: Props) {
   const [email, setEmail] = React.useState('');
   const [isValid, setIsValid] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -23,7 +25,8 @@ export function EmailFormModal({ onSubmit, onCancel }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isValid) {
+    if (isValid && !isSubmitting && !isLoading) {
+      setIsSubmitting(true);
       onSubmit(email);
     }
   };
@@ -34,8 +37,9 @@ export function EmailFormModal({ onSubmit, onCancel }: Props) {
         {/* En-tête avec dégradé */}
         <div className="bg-gradient-to-r from-[var(--tiktok-red)] to-purple-600 p-6 relative">
           <button 
-            onClick={onCancel}
-            className="absolute top-4 right-4 text-white bg-white bg-opacity-20 rounded-full p-1.5 hover:bg-opacity-30 transition-colors"
+            onClick={isSubmitting || isLoading ? undefined : onCancel}
+            disabled={isSubmitting || isLoading}
+            className={`absolute top-4 right-4 text-white bg-white bg-opacity-20 rounded-full p-1.5 ${(isSubmitting || isLoading) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-opacity-30'} transition-colors`}
           >
             <X size={20} />
           </button>
@@ -72,17 +76,27 @@ export function EmailFormModal({ onSubmit, onCancel }: Props) {
           <div className="pt-4 space-y-3">
             <button
               type="submit"
-              className="tiktok-button w-full flex items-center justify-center gap-2"
-              disabled={!isValid}
+              className="tiktok-button w-full flex items-center justify-center gap-2 relative"
+              disabled={!isValid || isSubmitting || isLoading}
             >
-              <span>Procéder au paiement</span>
-              <ArrowRight className="w-4 h-4" />
+              {(isSubmitting || isLoading) ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Traitement en cours...</span>
+                </>
+              ) : (
+                <>
+                  <span>Procéder au paiement</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
             
             <button
               type="button"
-              onClick={onCancel}
-              className="w-full text-center py-2 flex items-center justify-center gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+              onClick={isSubmitting || isLoading ? undefined : onCancel}
+              disabled={isSubmitting || isLoading}
+              className={`w-full text-center py-2 flex items-center justify-center gap-2 text-[var(--text-secondary)] ${(isSubmitting || isLoading) ? 'opacity-50 cursor-not-allowed' : 'hover:text-[var(--text-primary)]'} transition-colors`}
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Retour</span>
