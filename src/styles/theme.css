@@ -207,3 +207,15 @@
   border-radius: var(--radius-sm);
   padding: 0.5rem 1rem;
 }
+
+/* Style pour les badges de bonus compatible avec les deux thèmes */
+.dark-mode-bonus {
+  color: #4ade80; /* Vert vif visible en mode sombre */
+  border: 1px solid currentColor;
+}
+
+[data-theme="light"] .dark-mode-bonus {
+  background-color: rgba(22, 163, 74, 0.15) !important; /* Fond vert clair en mode clair */
+  color: #16a34a !important; /* Vert plus foncé en mode clair */
+  border: 1px solid rgba(22, 163, 74, 0.3);
+}
