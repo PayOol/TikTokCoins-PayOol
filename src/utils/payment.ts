@@ -20,7 +20,7 @@ const SOLEASPAY_API_KEY = 'D9flUR0hr0HZF63QKtO2g2-CqQGebos04R-bPRf63K8-AP';
  * @returns A promise that resolves with success status or rejects with error message
  */
 export function initiateSoleasPayment(params: SoleasPayParams): Promise<boolean> {
-  return new Promise((resolve, reject) => {
+  return new Promise((_, reject) => {
     // Validate field lengths according to SoleasPay requirements
     if (params.description.length > 50) {
       reject('description : Cette chaîne est trop longue. Elle doit avoir au maximum 50 caractères.');
@@ -82,10 +82,13 @@ export function initiateSoleasPayment(params: SoleasPayParams): Promise<boolean>
 
   // Ajouter le formulaire au document et le soumettre
   document.body.appendChild(form);
-  form.submit();
-  document.body.removeChild(form);
   
-  // Résoudre la promesse avec succès
-  resolve(true);
+  // Ne pas résoudre la promesse immédiatement
+  // La redirection vers SoleasPay va interrompre l'exécution de JavaScript
+  // donc la modale restera ouverte jusqu'à la redirection
+  form.submit();
+  
+  // Ne pas supprimer le formulaire pour éviter d'interférer avec la soumission
+  // La page sera de toute façon redirigée
   });
 }
