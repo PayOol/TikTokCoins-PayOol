@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Sparkles } from 'lucide-react';
 import { CoinPackage as CoinPackageComponent } from './components/CoinPackage';
 import { CustomPackage } from './components/CustomPackage';
@@ -17,6 +18,9 @@ import './styles/theme.css';
 import './styles/confetti.css';
 
 function App() {
+  // Initialiser la traduction
+  const { t } = useTranslation();
+  
   // Charger les données utilisateur depuis le localStorage au démarrage
   const [user, setUser] = useState<User>(getUserData());
 
@@ -148,10 +152,10 @@ function App() {
       {/* Section principale avec les forfaits */}
       <div className="mb-12">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-bold">Forfaits disponibles</h2>
+          <h2 className="text-2xl font-bold">{t('availablePackages')}</h2>
           <div className="flex items-center gap-2 text-sm bg-[var(--background-elevated-2)] px-3 py-1.5 rounded-full">
             <Sparkles className="w-4 h-4 text-[var(--tiktok-red)]" />
-            <span>Paiement sécurisé via SoleasPay</span>
+            <span>{t('securePayment')}</span>
           </div>
         </div>
         
@@ -170,7 +174,7 @@ function App() {
       {/* Section historique des achats */}
       <div className="mt-16">
         <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
-          <span>Historique des achats</span>
+          <span>{t('purchaseHistory')}</span>
           {user.purchaseHistory.length > 0 && (
             <span className="text-sm bg-[var(--background-elevated-2)] text-[var(--text-secondary)] px-2 py-0.5 rounded-full">
               {user.purchaseHistory.length}
@@ -209,7 +213,7 @@ function App() {
                 </svg>
               </div>
               <div>
-                <h3 className="font-medium text-red-400 mb-1">Erreur de paiement</h3>
+                <h3 className="font-medium text-red-400 mb-1">{t('paymentError')}</h3>
                 <p className="text-red-300 text-sm">{paymentError}</p>
               </div>
             </div>
@@ -217,7 +221,7 @@ function App() {
               onClick={() => setPaymentError(null)}
               className="tiktok-button w-full"
             >
-              Fermer
+              {t('close')}
             </button>
           </div>
         </div>
