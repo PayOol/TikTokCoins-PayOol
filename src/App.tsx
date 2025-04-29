@@ -66,7 +66,7 @@ function App() {
     const orderId = `TKT-${generateRandomAlphanumeric(5)}`;
     
     // Créer une description qui inclut les identifiants TikTok (max 50 chars)
-    let description = `${tiktokData.username} / ${tiktokData.userId}`;
+    let description = `Achat de ${selectedPackage.amount} pièces TikTok pour ${tiktokData.username} ${tiktokData.userId}`;
     // S'assurer que la description ne dépasse pas 50 caractères
     if (description.length > 50) {
       description = description.substring(0, 47) + '...';
