@@ -107,13 +107,18 @@ function App() {
       // Simuler un achat réussi pour la démo (dans un environnement réel, cela serait fait sur la page de succès)
       simulatePurchaseSuccess();
       
-      // Désactiver l'état de chargement
-      setIsPaymentLoading(false);
+      // Note: Ne pas désactiver l'état de chargement ni fermer la modale
+      // La redirection vers SoleasPay va interrompre l'exécution de JavaScript
+      // et la modale restera ouverte jusqu'à la redirection
       
-      // Reset forms after successful payment initiation
-      setSelectedPackage(null);
-      setTiktokData(null);
-      setShowEmailForm(false);
+      // Nous ajoutons un délai de sécurité au cas où la redirection ne se produirait pas
+      // Dans ce cas, après 10 secondes, nous réinitialisons l'interface
+      setTimeout(() => {
+        setIsPaymentLoading(false);
+        setSelectedPackage(null);
+        setTiktokData(null);
+        setShowEmailForm(false);
+      }, 10000);
     })
     .catch((error) => {
       console.error('Payment error:', error);
