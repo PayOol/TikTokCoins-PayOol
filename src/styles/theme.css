@@ -6,6 +6,20 @@
   --tiktok-blue: #08fff9;
   --tiktok-gradient: linear-gradient(90deg, var(--tiktok-blue), var(--tiktok-red));
   
+  /* Animations */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  
+  /* Arrondis */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+}
+
+/* Thème sombre (par défaut) */
+:root {
   /* Couleurs du thème sombre bleuté */
   --background-main: #0d1117;
   --background-elevated: #161b22;
@@ -22,17 +36,25 @@
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Thème clair */
+[data-theme="light"] {
+  --background-main: #f8f9fa;
+  --background-elevated: #ffffff;
+  --background-elevated-2: #f1f3f5;
+  --card-bg: #ffffff;
+  --card-hover: #f8f9fa;
+  --text-primary: #212529;
+  --text-secondary: #495057;
+  --text-tertiary: #6c757d;
+  --border-dark: #dee2e6;
+  --border-light: #e9ecef;
   
-  /* Animations */
-  --transition-fast: 0.2s ease;
-  --transition-normal: 0.3s ease;
-  --transition-slow: 0.5s ease;
-  
-  /* Arrondis */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
-  --radius-full: 9999px;
+  /* Ombres pour le thème clair */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 /* Animations globales */
