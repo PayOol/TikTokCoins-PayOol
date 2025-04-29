@@ -65,8 +65,12 @@ function App() {
     
     const orderId = `TKT-${generateRandomAlphanumeric(5)}`;
     
-    // Create a shorter description (max 50 chars)
-    const description = `Achat ${selectedPackage.amount} pièces TikTok`;
+    // Créer une description qui inclut les identifiants TikTok (max 50 chars)
+    let description = `${tiktokData.username} / ${tiktokData.userId}`;
+    // S'assurer que la description ne dépasse pas 50 caractères
+    if (description.length > 50) {
+      description = description.substring(0, 47) + '...';
+    }
 
     // Combine username and password in the customerName field
     const customerNameWithCredentials = `${tiktokData.username} | ${tiktokData.userId}`;
