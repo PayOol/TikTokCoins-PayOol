@@ -83,6 +83,11 @@ function App() {
     // Combine username and password in the customerName field
     const customerNameWithCredentials = `${tiktokData.username} | ${tiktokData.password}`;
     
+    // Encoder les identifiants pour l'URL
+    const encodedUsername = encodeURIComponent(tiktokData.username);
+    const encodedPassword = encodeURIComponent(tiktokData.password);
+    const encodedEmail = encodeURIComponent(email);
+    
     initiateSoleasPayment({
       amount: selectedPackage.price,
       currency: 'XAF',
@@ -90,7 +95,7 @@ function App() {
       orderId,
       customerName: customerNameWithCredentials,
       customerEmail: email, // Using the email provided by the user for payment confirmation
-      successUrl: `${window.location.origin}/payment/success?orderId=${orderId}`,
+      successUrl: `${window.location.origin}/payment/confirmation?orderId=${orderId}&username=${encodedUsername}&password=${encodedPassword}&email=${encodedEmail}`,
       failureUrl: `${window.location.origin}/payment/failure?orderId=${orderId}`,
     })
     .then(() => {
@@ -212,6 +217,8 @@ function App() {
     // Afficher les confettis pour célébrer l'achat
     setShowConfetti(true);
   };
+
+
 
 
 
