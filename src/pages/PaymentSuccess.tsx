@@ -53,8 +53,18 @@ export const PaymentSuccess = () => {
             {t('thankYou')} 
           </p>
           <p className="text-[var(--text-secondary)] max-w-md mb-4">
-            {t('successMessage', 'Si vous avez saisi les identifiants réels de votre compte TikTok, vous recevrez vos pièces dans un délai de 10 minutes. Si vous ne recevez pas vos pièces dans ce délai, veuillez contacter notre service client sur WhatsApp.')}
+            {t('successMessage', 'Votre paiement a été traité avec succès. Vous recevrez vos pièces dans un délai de 10 minutes. Si vous ne recevez pas vos pièces dans ce délai, veuillez contacter notre service client sur WhatsApp.')}
           </p>
+          <div className="mb-6 p-4 bg-green-100 border border-green-200 rounded-[var(--radius-md)] text-green-800">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle className="w-5 h-5" />
+              <span className="font-medium">{t('paymentProcessed', 'Paiement traité')}</span>
+            </div>
+            <p className="text-sm">
+              {t('paymentConfirmation', 'Votre paiement a été traité avec succès. Vos pièces seront créditées sur votre compte TikTok dans les prochaines minutes.')}
+            </p>
+          </div>
+          
           <a 
             href="https://wa.me/message/2TWDCSUY65YGA1" 
             target="_blank" 

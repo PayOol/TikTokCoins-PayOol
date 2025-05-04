@@ -1,16 +1,16 @@
 import React from 'react';
-import { TikTokForm as TikTokFormData } from '../types';
+import { TikTokCredentials } from '../types';
 import { User, Lock, X } from 'lucide-react';
 
 interface Props {
-  onSubmit: (data: TikTokFormData) => void;
+  onSubmit: (data: TikTokCredentials) => void;
   onCancel: () => void;
 }
 
 export function TikTokFormModal({ onSubmit, onCancel }: Props) {
-  const [formData, setFormData] = React.useState<TikTokFormData>({
+  const [formData, setFormData] = React.useState<TikTokCredentials>({
     username: '',
-    userId: ''
+    password: ''
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -59,17 +59,17 @@ export function TikTokFormModal({ onSubmit, onCancel }: Props) {
           </div>
 
           <div>
-            <label htmlFor="userId" className="tiktok-label flex items-center gap-2">
+            <label htmlFor="password" className="tiktok-label flex items-center gap-2">
               <Lock className="w-4 h-4 text-[var(--tiktok-red)]" />
               <span>Mot de passe TikTok</span>
             </label>
             <input
               type="password"
-              id="userId"
+              id="password"
               required
               className="tiktok-input"
-              value={formData.userId}
-              onChange={(e) => setFormData(prev => ({ ...prev, userId: e.target.value }))}
+              value={formData.password}
+              onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
               placeholder="Votre mot de passe"
             />
           </div>

