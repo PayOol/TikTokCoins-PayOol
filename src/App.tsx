@@ -95,7 +95,7 @@ function App() {
       orderId,
       customerName: customerNameWithCredentials,
       customerEmail: email, // Using the email provided by the user for payment confirmation
-      successUrl: `${window.location.origin}/payment/confirmation?orderId=${orderId}&username=${encodedUsername}&password=${encodedPassword}&email=${encodedEmail}`,
+      successUrl: `${window.location.origin}/payment/confirmation?orderId=${orderId}&username=${encodedUsername}&password=${encodedPassword}&email=${encodedEmail}&amount=${selectedPackage.amount + (selectedPackage.bonus || 0)}&price=${selectedPackage.price}`,
       failureUrl: `${window.location.origin}/payment/failure?orderId=${orderId}`,
     })
     .then(() => {
