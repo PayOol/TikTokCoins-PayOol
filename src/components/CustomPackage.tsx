@@ -43,7 +43,7 @@ export function CustomPackage({ onSelect }: Props) {
   };
 
   return (
-    <div className={`card-hover-effect bg-[var(--card-bg)] rounded-[var(--radius-md)] p-6 shadow-[var(--shadow-sm)] relative overflow-hidden border border-[var(--border-dark)] ${isAnimating ? 'animate-pulse' : ''}`}>
+        <div className={`card-hover-effect bg-[var(--card-bg)] rounded-[var(--radius-md)] p-6 shadow-[var(--shadow-sm)] relative overflow-hidden border border-[var(--border-dark)] md:col-span-2 lg:col-span-3 ${isAnimating ? 'animate-pulse' : ''}`}>
       {/* En-tête avec icône et titre */}
       <div className="flex items-center gap-3 mb-6">
         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-[var(--tiktok-red)] flex items-center justify-center">
