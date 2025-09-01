@@ -70,7 +70,59 @@ const translation = {
   // Language
   "language": "Language",
   "english": "English",
-  "french": "French"
+  "french": "French",
+  
+  // Custom Package
+  "customAmount": "Custom Amount",
+  "minimumCoins": "Minimum 70 coins",
+  "pricePerCoin": "Price per coin",
+  "unitPrice": "Unit price",
+  "totalToPay": "Total to pay",
+  "coins": "coins",
+  "enterCustomAmount": "Enter custom amount",
+  "buyNow": "Buy now",
+  
+  // Purchase Instructions
+  "purchaseInstructions": {
+    "title": "Important Instructions",
+    "subtitle": "Please read carefully before continuing",
+    "credentialsTitle": "TikTok Credentials Required",
+    "credentialsText": "Please make sure you have your correct TikTok credentials (username and password) to receive your coins.",
+    "twoFactorTitle": "Two-Factor Authentication (2FA)",
+    "twoFactorText": "If you have enabled two-factor authentication on your TikTok account, please disable it temporarily while receiving your coins.",
+    "confirmText": "I confirm that I have read and understood the above instructions."
+  },
+  
+  // TikTok Form
+  "tiktokForm": {
+    "title": "TikTok Account",
+    "subtitle": "Enter your TikTok account details",
+    "usernameLabel": "TikTok Username",
+    "passwordLabel": "TikTok Password",
+    "usernamePlaceholder": "Enter your TikTok username",
+    "passwordPlaceholder": "Enter your password",
+    "nextButton": "Next"
+  },
+  
+  // Email Form
+  "emailForm": {
+    "title": "Payment Confirmation",
+    "subtitle": "One last step to complete your purchase",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "Enter your email address",
+    "packageInfo": "You are purchasing {{amount}} TikTok Coins for {{price}} FCFA",
+    "submitButton": "Proceed to Payment"
+  },
+  
+  // Common
+  "cancel": "Cancel",
+  "continue": "Continue",
+  "close": "Close",
+  
+  // Payment
+  "payment": {
+    "securityMessage": "Your information is secure and will not be shared."
+  }
 };
 
 export default translation;

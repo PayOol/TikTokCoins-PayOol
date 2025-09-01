@@ -6,6 +6,7 @@ import { CustomPackage } from './components/CustomPackage';
 import { PurchaseHistory } from './components/PurchaseHistory';
 import { TikTokFormModal } from './components/TikTokForm';
 import { EmailFormModal } from './components/EmailForm';
+import { PurchaseInstructionsModal } from './components/PurchaseInstructionsModal';
 import { Layout } from './components/Layout';
 import { Confetti } from './components/Confetti';
 import { coinPackages } from './data/coinPackages';
@@ -27,9 +28,13 @@ function App() {
   const [selectedPackage, setSelectedPackage] = useState<CoinPackage | null>(null);
   const [tiktokData, setTiktokData] = useState<TikTokCredentials | null>(null);
   const [showEmailForm, setShowEmailForm] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
 
   const handlePackageSelect = (pkg: CoinPackage) => {
     setSelectedPackage(pkg);
+    setShowInstructions(true);
+    // Ne pas afficher la modale TikTok pour l'instant
+    setTiktokData(null);
   };
 
   const handleFormCancel = () => {
@@ -270,18 +275,36 @@ function App() {
       </div>
 
       {/* Modales */}
-      {selectedPackage && !showEmailForm && (
+      {selectedPackage && !showEmailForm && tiktokData === null && showInstructions === false && (
         <TikTokFormModal
           onSubmit={handleFormSubmit}
           onCancel={handleFormCancel}
         />
       )}
       
-      {showEmailForm && (
+      {showInstructions && selectedPackage && (
+        <PurchaseInstructionsModal
+          isOpen={showInstructions}
+          onClose={() => {
+            setShowInstructions(false);
+            setSelectedPackage(null);
+          }}
+          onContinue={() => {
+            setShowInstructions(false);
+            // Le formulaire TikTok s'affichera automatiquement car tiktokData est null
+            // et showInstructions est false
+          }}
+        />
+      )}
+      
+      {showEmailForm && selectedPackage && tiktokData && (
         <EmailFormModal
+          packageAmount={selectedPackage.amount}
+          packagePrice={selectedPackage.price}
           onSubmit={handleEmailSubmit}
           onCancel={handleEmailFormCancel}
           isLoading={isPaymentLoading}
+          error={paymentError}
         />
       )}
       
