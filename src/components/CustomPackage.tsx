@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Coins, Edit3, Calculator, ArrowRight } from 'lucide-react';
 import { CoinPackage } from '../types';
 
@@ -13,6 +14,8 @@ export function CustomPackage({ onSelect }: Props) {
   const [price, setPrice] = useState<number>(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
+  const { t } = useTranslation();
+  
   // Mettre à jour le prix lorsque le montant change
   useEffect(() => {
     const coinAmount = parseInt(amount, 10);
@@ -50,16 +53,18 @@ export function CustomPackage({ onSelect }: Props) {
           <Edit3 className="w-6 h-6 text-white" />
         </div>
         <div>
-          <span className="block text-sm text-[var(--text-secondary)]">Montant</span>
-          <span className="block font-bold text-lg">Personnalisé</span>
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">{t('customAmount')}</h3>
+          <p className="text-sm text-[var(--text-secondary)]">{t('customPackage')}</p>
         </div>
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label htmlFor="customAmount" className="tiktok-label flex items-center gap-2">
+            <label htmlFor="custom-amount" className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+              {t('minimumCoins')}
+            </label>
             <Coins className="w-4 h-4 text-[var(--tiktok-red)]" />
-            <span>Nombre de pièces</span>
           </label>
           <div className="relative">
             <input
@@ -69,23 +74,23 @@ export function CustomPackage({ onSelect }: Props) {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               className="tiktok-input pr-12"
-              placeholder="Minimum 70 pièces"
+              placeholder={t('enterCustomAmount')}
               required
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]">
-              coins
+              {t('coins')}
             </div>
           </div>
           <p className="text-xs text-[var(--text-secondary)] mt-1 flex items-center gap-1">
             <Calculator className="w-3 h-3" />
-            <span>Prix unitaire: {PRICE_PER_COIN.toFixed(2)} FCFA / coin</span>
+            <span>{t('unitPrice')}: {PRICE_PER_COIN.toFixed(2)} FCFA / {t('coins')}</span>
           </p>
         </div>
 
         {/* Affichage du prix calculé avec animation */}
         <div className="bg-[var(--background-elevated-2)] p-4 rounded-[var(--radius-md)] transition-all duration-300">
           <div className="flex justify-between items-center">
-            <span className="text-[var(--text-secondary)]">Total à payer:</span>
+            <span className="text-[var(--text-secondary)]">{t('totalToPay')}:</span>
             <span className={`text-2xl font-bold tiktok-gradient-text transition-all duration-300 ${price > 0 ? 'scale-100' : 'scale-95 opacity-50'}`}>
               {price > 0 ? price.toLocaleString() : '0'} FCFA
             </span>
@@ -97,7 +102,7 @@ export function CustomPackage({ onSelect }: Props) {
           className="tiktok-button w-full flex items-center justify-center gap-2"
           disabled={!amount || parseInt(amount, 10) < 70}
         >
-          <span>Acheter maintenant</span>
+          <span>{t('buyNow')}</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </form>

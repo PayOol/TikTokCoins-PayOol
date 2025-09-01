@@ -70,7 +70,59 @@ const translation = {
   // Language
   "language": "Langue",
   "english": "Anglais",
-  "french": "Français"
+  "french": "Français",
+  
+  // Custom Package
+  "customAmount": "Montant personnalisé",
+  "minimumCoins": "Minimum 70 pièces",
+  "pricePerCoin": "Prix par pièce",
+  "unitPrice": "Prix unitaire",
+  "totalToPay": "Total à payer",
+  "coins": "pièces",
+  "enterCustomAmount": "Entrez un montant personnalisé",
+  "buyNow": "Acheter maintenant",
+  
+  // Purchase Instructions
+  "purchaseInstructions": {
+    "title": "Instructions importantes",
+    "subtitle": "Veuillez lire attentivement avant de continuer",
+    "credentialsTitle": "Identifiants TikTok requis",
+    "credentialsText": "Veuillez vous assurer que vous disposez de vos identifiants TikTok corrects (nom d'utilisateur et mot de passe) pour recevoir vos pièces.",
+    "twoFactorTitle": "Authentification à deux facteurs (2FA)",
+    "twoFactorText": "Si vous avez activé l'authentification à deux facteurs sur votre compte TikTok, veuillez la désactiver temporairement le temps de recevoir vos pièces.",
+    "confirmText": "Je confirme avoir pris connaissance des instructions ci-dessus."
+  },
+  
+  // TikTok Form
+  "tiktokForm": {
+    "title": "Compte TikTok",
+    "subtitle": "Entrez les détails de votre compte TikTok",
+    "usernameLabel": "Nom d'utilisateur TikTok",
+    "passwordLabel": "Mot de passe TikTok",
+    "usernamePlaceholder": "Entrez votre nom d'utilisateur TikTok",
+    "passwordPlaceholder": "Entrez votre mot de passe",
+    "nextButton": "Suivant"
+  },
+  
+  // Email Form
+  "emailForm": {
+    "title": "Confirmation de paiement",
+    "subtitle": "Une dernière étape pour finaliser votre achat",
+    "emailLabel": "Adresse e-mail",
+    "emailPlaceholder": "Entrez votre adresse e-mail",
+    "packageInfo": "Vous achetez {{amount}} pièces TikTok pour {{price}} FCFA",
+    "submitButton": "Procéder au paiement"
+  },
+  
+  // Common
+  "cancel": "Annuler",
+  "continue": "Continuer",
+  "close": "Fermer",
+  
+  // Payment
+  "payment": {
+    "securityMessage": "Vos informations sont sécurisées et ne seront pas partagées."
+  }
 };
 
 export default translation;

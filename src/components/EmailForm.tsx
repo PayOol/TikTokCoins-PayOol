@@ -1,13 +1,17 @@
 import React from 'react';
-import { Mail, ArrowLeft, ArrowRight, X, ShieldCheck, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { ArrowLeft, ArrowRight, X, Loader2, ShieldCheck } from 'lucide-react';
 
 interface Props {
   onSubmit: (email: string) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  packageAmount: number;
+  packagePrice: number;
 }
 
-export function EmailFormModal({ onSubmit, onCancel, isLoading = false }: Props) {
+export function EmailFormModal({ onSubmit, onCancel, isLoading = false, packageAmount, packagePrice }: Props) {
+  const { t } = useTranslation();
   const [email, setEmail] = React.useState('');
   const [isValid, setIsValid] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -44,17 +48,16 @@ export function EmailFormModal({ onSubmit, onCancel, isLoading = false }: Props)
             <X size={20} />
           </button>
           
-          <h2 className="text-2xl font-bold text-white mb-1">Confirmation de paiement</h2>
+          <h2 className="text-2xl font-bold text-white mb-1">{t('emailForm.title')}</h2>
           <p className="text-white text-opacity-80 text-sm">
-            Une dernière étape avant de finaliser votre achat
+            {t('emailForm.subtitle')}
           </p>
         </div>
         
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          <div>
-            <label htmlFor="email" className="tiktok-label flex items-center gap-2">
-              <Mail className="w-4 h-4 text-[var(--tiktok-red)]" />
-              <span>Votre adresse email</span>
+          <div className="mb-6">
+            <label htmlFor="email" className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+              {t('emailForm.emailLabel')}
             </label>
             
             <input
@@ -64,13 +67,20 @@ export function EmailFormModal({ onSubmit, onCancel, isLoading = false }: Props)
               className={`tiktok-input ${isValid ? 'border-green-500' : ''}`}
               value={email}
               onChange={handleChange}
-              placeholder="exemple@email.com"
+              placeholder={t('emailForm.emailPlaceholder')}
             />
             
-            <p className="flex items-center gap-1 text-xs text-[var(--text-secondary)] mt-2">
-              <ShieldCheck className="w-3 h-3 text-[var(--text-tertiary)]" />
-              <span>Cet email sera utilisé pour la confirmation de votre recharge</span>
-            </p>
+            <div className="bg-[var(--background-elevated-2)] p-4 rounded-[var(--radius-md)] mb-6">
+              <p className="text-sm text-[var(--text-secondary)] mb-2">
+                {t('emailForm.packageInfo', { amount: packageAmount.toLocaleString(), price: packagePrice.toLocaleString() })}
+              </p>
+              <div className="flex items-start mt-3">
+                <ShieldCheck className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                <span className="text-xs text-[var(--text-secondary)]">
+                  {t('payment.securityMessage')}
+                </span>
+              </div>
+            </div>
           </div>
 
           <div className="pt-4 space-y-3">
@@ -82,11 +92,11 @@ export function EmailFormModal({ onSubmit, onCancel, isLoading = false }: Props)
               {(isSubmitting || isLoading) ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Traitement en cours...</span>
+                  <span>{t('processing')}</span>
                 </>
               ) : (
                 <>
-                  <span>Procéder au paiement</span>
+                  <span>{t('proceedToPayment')} {packagePrice.toLocaleString()} FCFA</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -99,7 +109,7 @@ export function EmailFormModal({ onSubmit, onCancel, isLoading = false }: Props)
               className={`w-full text-center py-2 flex items-center justify-center gap-2 text-[var(--text-secondary)] ${(isSubmitting || isLoading) ? 'opacity-50 cursor-not-allowed' : 'hover:text-[var(--text-primary)]'} transition-colors`}
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Retour</span>
+              <span>{t('cancel')}</span>
             </button>
           </div>
         </form>

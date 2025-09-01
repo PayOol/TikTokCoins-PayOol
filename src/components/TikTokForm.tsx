@@ -1,6 +1,7 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { TikTokCredentials } from '../types';
-import { User, Lock, X } from 'lucide-react';
+import { User, Lock, X, ArrowRight, ArrowLeft } from 'lucide-react';
 
 interface Props {
   onSubmit: (data: TikTokCredentials) => void;
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function TikTokFormModal({ onSubmit, onCancel }: Props) {
+  const { t } = useTranslation();
   const [formData, setFormData] = React.useState<TikTokCredentials>({
     username: '',
     password: ''
@@ -30,9 +32,9 @@ export function TikTokFormModal({ onSubmit, onCancel }: Props) {
             <X size={20} />
           </button>
           
-          <h2 className="text-2xl font-bold text-white mb-1">Identifiants TikTok</h2>
+          <h2 className="text-2xl font-bold text-white mb-1">{t('tiktokForm.title')}</h2>
           <p className="text-white text-opacity-80 text-sm">
-            Entrez vos identifiants TikTok pour continuer
+            {t('tiktokForm.subtitle')}
           </p>
         </div>
         
@@ -40,7 +42,7 @@ export function TikTokFormModal({ onSubmit, onCancel }: Props) {
           <div>
             <label htmlFor="username" className="tiktok-label flex items-center gap-2">
               <User className="w-4 h-4 text-[var(--tiktok-red)]" />
-              <span>Nom d'utilisateur TikTok</span>
+              <span>{t('tiktokForm.usernameLabel')}</span>
             </label>
             <div className="relative">
               <input
@@ -50,7 +52,7 @@ export function TikTokFormModal({ onSubmit, onCancel }: Props) {
                 className="tiktok-input pl-10"
                 value={formData.username}
                 onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
-                placeholder="Votre nom d'utilisateur"
+                placeholder={t('tiktokForm.usernamePlaceholder')}
               />
               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                 @
@@ -61,7 +63,7 @@ export function TikTokFormModal({ onSubmit, onCancel }: Props) {
           <div>
             <label htmlFor="password" className="tiktok-label flex items-center gap-2">
               <Lock className="w-4 h-4 text-[var(--tiktok-red)]" />
-              <span>Mot de passe TikTok</span>
+              <span>{t('tiktokForm.passwordLabel')}</span>
             </label>
             <input
               type="password"
@@ -70,7 +72,7 @@ export function TikTokFormModal({ onSubmit, onCancel }: Props) {
               className="tiktok-input"
               value={formData.password}
               onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-              placeholder="Votre mot de passe"
+              placeholder={t('tiktokForm.passwordPlaceholder')}
             />
           </div>
 
@@ -79,15 +81,17 @@ export function TikTokFormModal({ onSubmit, onCancel }: Props) {
               type="submit"
               className="tiktok-button w-full flex items-center justify-center gap-2"
             >
-              Continuer
+              {t('tiktokForm.nextButton')}
+              <ArrowRight className="w-4 h-4" />
             </button>
             
             <button
               type="button"
               onClick={onCancel}
-              className="w-full text-center mt-4 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+              className="w-full text-center mt-4 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center justify-center gap-2"
             >
-              Annuler
+              <ArrowLeft className="w-4 h-4" />
+              {t('cancel')}
             </button>
           </div>
         </form>
