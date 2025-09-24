@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { getTotalCoins } from '../utils/localStorage';
 import { ThemeToggle } from './ThemeToggle';
 import { LanguageToggle } from './LanguageToggle';
+import { WhatsAppButton } from './WhatsAppButton';
 
 interface LayoutProps {
   children: ReactNode;
@@ -152,6 +153,11 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
           </div>
         </div>
       </footer>
+
+      {/* Bouton WhatsApp flottant */}
+      <WhatsAppButton
+        whatsappUrl="https://wa.me/message/2TWDCSUY65YGA1"
+      />
     </div>
   );
 }
