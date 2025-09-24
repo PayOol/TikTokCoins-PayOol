@@ -214,8 +214,93 @@
   border: 1px solid currentColor;
 }
 
-[data-theme="light"] .dark-mode-bonus {
-  background-color: rgba(22, 163, 74, 0.15) !important; /* Fond vert clair en mode clair */
-  color: #16a34a !important; /* Vert plus foncé en mode clair */
-  border: 1px solid rgba(22, 163, 74, 0.3);
+/* Bouton WhatsApp flottant */
+.whatsapp-float-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+  transition: all var(--transition-normal);
+  z-index: 1000;
+  animation: whatsapp-pulse 2s infinite;
+}
+
+.whatsapp-float-button:hover {
+  transform: translateY(-3px) scale(1.1);
+  box-shadow: 0 6px 25px rgba(37, 211, 102, 0.6);
+}
+
+.whatsapp-float-button:active {
+  transform: translateY(-1px) scale(1.05);
+}
+
+.whatsapp-tooltip {
+  position: absolute;
+  right: 70px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--background-elevated);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all var(--transition-fast);
+  border: 1px solid var(--border-dark);
+  box-shadow: var(--shadow-md);
+}
+
+.whatsapp-float-button:hover .whatsapp-tooltip {
+  opacity: 1;
+  transform: translateY(-50%) translateX(-5px);
+}
+
+.whatsapp-tooltip::after {
+  content: '';
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left: 6px solid var(--background-elevated);
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+}
+
+/* Animation pulse pour WhatsApp */
+@keyframes whatsapp-pulse {
+  0% {
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4), 0 0 0 0 rgba(37, 211, 102, 0.7);
+  }
+  70% {
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4), 0 0 0 10px rgba(37, 211, 102, 0);
+  }
+  100% {
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4), 0 0 0 0 rgba(37, 211, 102, 0);
+  }
+}
+
+/* Responsive pour le bouton WhatsApp */
+@media (max-width: 768px) {
+  .whatsapp-float-button {
+    width: 55px;
+    height: 55px;
+    bottom: 20px;
+    right: 20px;
+  }
+
+  .whatsapp-tooltip {
+    display: none;
+  }
 }
