@@ -230,6 +230,9 @@ function App() {
   // Animation de confettis lorsqu'un achat est réussi
   const [showConfetti, setShowConfetti] = useState(false);
   
+  // État pour gérer l'ouverture de la vidéo en popup
+  const [showVideoPopup, setShowVideoPopup] = useState(false);
+  
   useEffect(() => {
     if (showConfetti) {
       const timer = setTimeout(() => setShowConfetti(false), 3000);
@@ -239,6 +242,44 @@ function App() {
 
   return (
     <Layout balance={user.balance}>
+      {/* Section vidéo d'aide */}
+      <div className="mb-8">
+        <div className="bg-gradient-to-r from-[var(--background-elevated)] to-[var(--background-elevated-2)] rounded-[var(--radius-lg)] p-5 shadow-[var(--shadow-lg)] border border-[var(--border-dark)] overflow-hidden">
+          <div className="flex items-center gap-6">
+            <div className="flex-shrink-0 min-w-[200px]">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-2 rounded-full bg-[var(--tiktok-red)] animate-pulse"></div>
+                <h3 className="text-lg font-bold text-[var(--text-primary)]">
+                  {t('needHelp')}
+                </h3>
+              </div>
+              <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{t('watchVideo')}</p>
+            </div>
+            <div 
+              className="relative flex-1 rounded-[var(--radius-md)] overflow-hidden shadow-xl cursor-pointer hover:scale-[1.02] transition-transform group" 
+              style={{ height: '140px' }}
+              onClick={() => setShowVideoPopup(true)}
+            >
+              <iframe
+                className="absolute top-0 left-0 w-full h-full pointer-events-none"
+                src="https://www.youtube.com/embed/6nJVsHQLQVw"
+                title="Tutoriel d'achat de pièces TikTok"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full bg-white bg-opacity-90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <svg className="w-6 h-6 text-black ml-1" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Section principale avec les forfaits */}
       <div className="mb-12">
         <div className="flex items-center justify-between mb-8">
@@ -337,6 +378,41 @@ function App() {
       
       {/* Animation de confettis pour les achats réussis */}
       {showConfetti && <Confetti duration={4000} />}
+      
+      {/* Modal popup pour la vidéo */}
+      {showVideoPopup && (
+        <div 
+          className="fixed inset-0 modal-backdrop flex items-center justify-center p-4 z-50 fade-in"
+          onClick={() => setShowVideoPopup(false)}
+        >
+          <div 
+            className="bg-[var(--background-elevated)] rounded-[var(--radius-lg)] w-full max-w-4xl shadow-[var(--shadow-lg)] slide-up border border-[var(--border-dark)] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-4 border-b border-[var(--border-dark)]">
+              <h3 className="text-lg font-bold text-[var(--text-primary)]">{t('needHelp')}</h3>
+              <button
+                onClick={() => setShowVideoPopup(false)}
+                className="w-8 h-8 rounded-full hover:bg-[var(--background-elevated-2)] flex items-center justify-center transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                className="absolute top-0 left-0 w-full h-full"
+                src="https://www.youtube.com/embed/6nJVsHQLQVw?autoplay=1"
+                title="Tutoriel d'achat de pièces TikTok"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }

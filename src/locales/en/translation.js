@@ -6,6 +6,8 @@ const translation = {
   "availablePackages": "Available Packages",
   "securePayment": "Secure payment via SoleasPay",
   "purchaseHistory": "Purchase History",
+  "needHelp": "Need help buying your coins?",
+  "watchVideo": "Watch this video",
   
   // Coin packages
   "coins": "coins",
