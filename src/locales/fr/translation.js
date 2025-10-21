@@ -6,6 +6,8 @@ const translation = {
   "availablePackages": "Forfaits disponibles",
   "securePayment": "Paiement sécurisé via SoleasPay",
   "purchaseHistory": "Historique des achats",
+  "needHelp": "Besoin d'aide pour acheter vos pièces ?",
+  "watchVideo": "Regardez cette vidéo",
   
   // Coin packages
   "coins": "pièces",
