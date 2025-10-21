@@ -244,20 +244,19 @@ function App() {
     <Layout balance={user.balance}>
       {/* Section vidéo d'aide */}
       <div className="mb-8">
-        <div className="bg-gradient-to-r from-[var(--background-elevated)] to-[var(--background-elevated-2)] rounded-[var(--radius-lg)] p-5 shadow-[var(--shadow-lg)] border border-[var(--border-dark)] overflow-hidden">
-          <div className="flex items-center gap-6">
-            <div className="flex-shrink-0 min-w-[200px]">
+        <div className="bg-gradient-to-r from-[var(--background-elevated)] to-[var(--background-elevated-2)] rounded-[var(--radius-lg)] p-4 md:p-5 shadow-[var(--shadow-lg)] border border-[var(--border-dark)] overflow-hidden">
+          <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+            <div className="flex-shrink-0 md:min-w-[200px]">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-2 h-2 rounded-full bg-[var(--tiktok-red)] animate-pulse"></div>
-                <h3 className="text-lg font-bold text-[var(--text-primary)]">
+                <h3 className="text-base md:text-lg font-bold text-[var(--text-primary)]">
                   {t('needHelp')}
                 </h3>
               </div>
-              <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{t('watchVideo')}</p>
+              <p className="text-xs md:text-sm text-[var(--text-secondary)] leading-relaxed">{t('watchVideo')}</p>
             </div>
             <div 
-              className="relative flex-1 rounded-[var(--radius-md)] overflow-hidden shadow-xl cursor-pointer hover:scale-[1.02] transition-transform group" 
-              style={{ height: '140px' }}
+              className="relative w-full md:flex-1 rounded-[var(--radius-md)] overflow-hidden shadow-xl cursor-pointer hover:scale-[1.02] transition-transform group h-[70px] md:h-[140px]" 
               onClick={() => setShowVideoPopup(true)}
             >
               <iframe
