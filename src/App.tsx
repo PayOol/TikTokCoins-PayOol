@@ -256,23 +256,26 @@ function App() {
               <p className="text-xs md:text-sm text-[var(--text-secondary)] leading-relaxed">{t('watchVideo')}</p>
             </div>
             <div 
-              className="relative w-full md:flex-1 rounded-[var(--radius-md)] overflow-hidden shadow-xl cursor-pointer hover:scale-[1.02] transition-transform group h-[70px] md:h-[140px]" 
+              className="youtube-frame-wrapper"
               onClick={() => setShowVideoPopup(true)}
             >
-              <iframe
-                className="absolute top-0 left-0 w-full h-full pointer-events-none"
-                src="https://www.youtube.com/embed/6nJVsHQLQVw"
-                title="Tutoriel d'achat de pièces TikTok"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center">
-                <div className="w-12 h-12 rounded-full bg-white bg-opacity-90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <svg className="w-6 h-6 text-black ml-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
+              <div className="youtube-frame">
+                <iframe
+                  className="absolute top-0 left-0 w-full h-full pointer-events-none"
+                  src="https://www.youtube.com/embed/6nJVsHQLQVw"
+                  title="Tutoriel d'achat de pièces TikTok"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+                <div className="youtube-overlay">
+                  <div className="youtube-play-button">
+                    <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </div>
                 </div>
+                <div className="youtube-shine"></div>
               </div>
             </div>
           </div>
@@ -399,15 +402,17 @@ function App() {
                 </svg>
               </button>
             </div>
-            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-              <iframe
-                className="absolute top-0 left-0 w-full h-full"
-                src="https://www.youtube.com/embed/6nJVsHQLQVw?autoplay=1"
-                title="Tutoriel d'achat de pièces TikTok"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+            <div className="youtube-modal-frame-wrapper">
+              <div className="youtube-modal-frame" style={{ paddingBottom: '56.25%' }}>
+                <iframe
+                  className="absolute top-0 left-0 w-full h-full"
+                  src="https://www.youtube.com/embed/6nJVsHQLQVw?autoplay=1"
+                  title="Tutoriel d'achat de pièces TikTok"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
             </div>
           </div>
         </div>
