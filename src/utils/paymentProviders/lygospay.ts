@@ -37,7 +37,7 @@ export class LygosPayProvider implements PaymentProvider {
         },
         body: JSON.stringify({
           amount: params.amount,
-          shop_name: params.shopName || 'PayOolTM',
+          shop_name: params.shopName || 'PayOol™',
           order_id: params.orderId,
           message: params.message || params.description,
           success_url: params.successUrl,
