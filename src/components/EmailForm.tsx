@@ -1,9 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, X, Loader2, ShieldCheck } from 'lucide-react';
+import { PaymentProviderSelector } from './PaymentProviderSelector';
+import { PaymentProviderType, getDefaultProvider } from '../utils/payment';
 
 interface Props {
-  onSubmit: (email: string) => void;
+  onSubmit: (email: string, provider: PaymentProviderType) => void;
   onCancel: () => void;
   isLoading?: boolean;
   packageAmount: number;
@@ -15,6 +17,7 @@ export function EmailFormModal({ onSubmit, onCancel, isLoading = false, packageA
   const [email, setEmail] = React.useState('');
   const [isValid, setIsValid] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [selectedProvider, setSelectedProvider] = React.useState<PaymentProviderType>(getDefaultProvider());
 
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -31,7 +34,7 @@ export function EmailFormModal({ onSubmit, onCancel, isLoading = false, packageA
     e.preventDefault();
     if (isValid && !isSubmitting && !isLoading) {
       setIsSubmitting(true);
-      onSubmit(email);
+      onSubmit(email, selectedProvider);
     }
   };
 
@@ -70,7 +73,7 @@ export function EmailFormModal({ onSubmit, onCancel, isLoading = false, packageA
               placeholder={t('emailForm.emailPlaceholder')}
             />
             
-            <div className="bg-[var(--background-elevated-2)] p-4 rounded-[var(--radius-md)] mb-6">
+            <div className="bg-[var(--background-elevated-2)] p-4 rounded-[var(--radius-md)] mb-6 mt-3">
               <p className="text-sm text-[var(--text-secondary)] mb-2">
                 {t('emailForm.packageInfo', { amount: packageAmount.toLocaleString(), price: packagePrice.toLocaleString() })}
               </p>
@@ -82,6 +85,12 @@ export function EmailFormModal({ onSubmit, onCancel, isLoading = false, packageA
               </div>
             </div>
           </div>
+          
+          {/* Payment Provider Selector - Après l'email */}
+          <PaymentProviderSelector
+            selectedProvider={selectedProvider}
+            onProviderChange={setSelectedProvider}
+          />
 
           <div className="pt-4 space-y-3">
             <button

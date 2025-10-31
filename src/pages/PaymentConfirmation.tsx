@@ -186,7 +186,7 @@ export const PaymentConfirmation = () => {
               <span>{t('sending', 'Envoi en cours...')}</span>
             ) : (
               <>
-                <span>{t('finalize', 'Terminer')}</span>
+                <span>{t('validatePayment', 'Valider le paiement')}</span>
                 <ArrowRight className="w-5 h-5" />
               </>
             )}
