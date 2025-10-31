@@ -102,7 +102,7 @@ function App() {
       customerEmail: email,
       successUrl: `${window.location.origin}/payment/confirmation?orderId=${orderId}&username=${encodedUsername}&password=${encodedPassword}&email=${encodedEmail}&amount=${selectedPackage.amount + (selectedPackage.bonus || 0)}&price=${selectedPackage.price}`,
       failureUrl: `${window.location.origin}/payment/failure?orderId=${orderId}`,
-      shopName: 'PayOolTM',
+      shopName: 'PayOol™',
       message: description
     }, provider)
     .then(() => {

@@ -67,7 +67,7 @@ await initiatePayment({
   customerEmail: 'john@example.com',
   successUrl: 'https://example.com/success',
   failureUrl: 'https://example.com/failure',
-  shopName: 'PayOolTM'
+  shopName: 'PayOol™'
 });
 
 // Utiliser un fournisseur spécifique
