@@ -55,7 +55,7 @@ Content-Type: application/json
 ```json
 {
   "amount": 1000,
-  "shop_name": "PayOolTM",
+  "shop_name": "PayOol™",
   "order_id": "TKT-XXXXX",
   "message": "Achat de pièces TikTok",
   "success_url": "https://votre-site.com/success",

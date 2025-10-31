@@ -61,7 +61,7 @@ export class SoleasPayProvider implements PaymentProvider {
           description: params.description,
           orderId: params.orderId,
           apiKey: this.apiKey,
-          shopName: params.shopName || 'PayOolTM',
+          shopName: params.shopName || 'PayOol™',
           successUrl: params.successUrl,
           failureUrl: params.failureUrl
         };

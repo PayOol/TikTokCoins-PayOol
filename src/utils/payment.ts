@@ -66,7 +66,7 @@ export function initiateSoleasPayment(params: SoleasPayParams): Promise<boolean>
     customerEmail: params.customerEmail,
     successUrl: params.successUrl,
     failureUrl: params.failureUrl,
-    shopName: 'PayOolTM'
+    shopName: 'PayOol™'
   };
   
   // Use SoleasPay provider explicitly
