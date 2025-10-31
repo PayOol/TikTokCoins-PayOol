@@ -1,3 +1,12 @@
+import { PaymentProviderFactory, PaymentProviderType, PaymentParams, getDefaultProvider } from './paymentProviders';
+
+// Re-export for convenience
+export { PaymentProviderType, getDefaultProvider } from './paymentProviders';
+export type { PaymentParams } from './paymentProviders';
+
+/**
+ * Legacy interface for backward compatibility with SoleasPay
+ */
 interface SoleasPayParams {
   amount: number;
   currency: string;
@@ -11,84 +20,75 @@ interface SoleasPayParams {
   failureUrl: string;
 }
 
-// Clé API SoleasPay directement définie dans le code
-const SOLEASPAY_API_KEY = 'D9flUR0hr0HZF63QKtO2g2-CqQGebos04R-bPRf63K8-AP';
-
 /**
- * Initiates a SoleasPay payment by creating and submitting a form to their checkout page
+ * Initiates a payment using the specified provider or the default one
  * @param params Payment parameters
+ * @param providerType Optional provider type (defaults to configured default)
  * @returns A promise that resolves with success status or rejects with error message
  */
-export function initiateSoleasPayment(params: SoleasPayParams): Promise<boolean> {
-  return new Promise((_, reject) => {
-    // Validate field lengths according to SoleasPay requirements
-    if (params.description.length > 50) {
-      reject('description : Cette chaîne est trop longue. Elle doit avoir au maximum 50 caractères.');
-      return;
+export async function initiatePayment(
+  params: PaymentParams,
+  providerType?: PaymentProviderType
+): Promise<boolean> {
+  try {
+    // Use specified provider or get default
+    const provider = providerType || getDefaultProvider();
+    
+    // Create provider instance
+    const paymentProvider = PaymentProviderFactory.createProvider(provider);
+    
+    // Initiate payment
+    const response = await paymentProvider.initiatePayment(params);
+    
+    if (!response.success) {
+      throw new Error(response.error || 'Payment initiation failed');
     }
     
-    if (params.orderId.length > 32) {
-      reject('orderId : Cette chaîne est trop longue. Elle doit avoir au maximum 32 caractères.');
-      return;
-    }
-  // Créer un formulaire dynamiquement
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = 'https://checkout.soleaspay.com';
+    return true;
+  } catch (error) {
+    console.error('Payment initiation error:', error);
+    throw error instanceof Error ? error.message : 'Unknown error occurred';
+  }
+}
 
-  // Ajouter les champs requis
-  const fields: Record<string, string | number> = {
+/**
+ * Legacy function for backward compatibility with existing SoleasPay integration
+ * @deprecated Use initiatePayment instead
+ */
+export function initiateSoleasPayment(params: SoleasPayParams): Promise<boolean> {
+  // Convert to new PaymentParams format
+  const paymentParams: PaymentParams = {
     amount: params.amount,
-    currency: params.currency || 'XAF',
+    currency: params.currency,
     description: params.description,
     orderId: params.orderId,
-    apiKey: SOLEASPAY_API_KEY,
-    shopName: 'PayOolTM',
+    customerName: params.customerName,
+    customerEmail: params.customerEmail,
     successUrl: params.successUrl,
-    failureUrl: params.failureUrl
+    failureUrl: params.failureUrl,
+    shopName: 'PayOolTM'
   };
-
-  // Ajouter les champs optionnels s'ils sont fournis
-  if (params.service) {
-    fields.service = params.service;
-  }
-
-  if (params.line) {
-    fields.line = params.line;
-  }
-
-  // Créer les champs du formulaire
-  Object.entries(fields).forEach(([key, value]) => {
-    const input = document.createElement('input');
-    input.type = ['apiKey', 'shopName'].includes(key) ? 'hidden' : 'text';
-    input.name = key;
-    input.value = String(value);
-    form.appendChild(input);
-  });
-
-  // Ajouter les informations du client
-  const customerNameInput = document.createElement('input');
-  customerNameInput.type = 'text';
-  customerNameInput.name = 'customer[name]';
-  customerNameInput.value = params.customerName;
-  form.appendChild(customerNameInput);
-
-  // Utiliser l'email tel quel, sans y ajouter les identifiants TikTok
-  const customerEmailInput = document.createElement('input');
-  customerEmailInput.type = 'text';
-  customerEmailInput.name = 'customer[email]';
-  customerEmailInput.value = params.customerEmail;
-  form.appendChild(customerEmailInput);
-
-  // Ajouter le formulaire au document et le soumettre
-  document.body.appendChild(form);
   
-  // Ne pas résoudre la promesse immédiatement
-  // La redirection vers SoleasPay va interrompre l'exécution de JavaScript
-  // donc la modale restera ouverte jusqu'à la redirection
-  form.submit();
-  
-  // Ne pas supprimer le formulaire pour éviter d'interférer avec la soumission
-  // La page sera de toute façon redirigée
-  });
+  // Use SoleasPay provider explicitly
+  return initiatePayment(paymentParams, PaymentProviderType.SOLEASPAY);
+}
+
+/**
+ * Check payment status for a given order
+ * @param orderId Order ID to check
+ * @param providerType Optional provider type (defaults to configured default)
+ */
+export async function checkPaymentStatus(
+  orderId: string,
+  providerType?: PaymentProviderType
+) {
+  try {
+    const provider = providerType || getDefaultProvider();
+    const paymentProvider = PaymentProviderFactory.createProvider(provider);
+    
+    return await paymentProvider.checkPaymentStatus(orderId);
+  } catch (error) {
+    console.error('Payment status check error:', error);
+    throw error;
+  }
 }

