@@ -1,7 +1,7 @@
 import { CoinPackage } from '../types';
 
 export const coinPackages: CoinPackage[] = [
-  { id: 1, amount: 100, price: 1124 },
+  { id: 1, amount: 100, price: 1124, disabled: true },
   { id: 2, amount: 350, price: 3900 },
   { id: 3, amount: 700, price: 7900, bonus: 70 },
   { id: 4, amount: 1400, price: 15700, bonus: 140 },
