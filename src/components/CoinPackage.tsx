@@ -19,17 +19,28 @@ export function CoinPackage({ package: pkg, onSelect }: Props) {
   
   return (
     <div 
-      onClick={() => onSelect(pkg)}
-      className="card-hover-effect bg-[var(--card-bg)] rounded-[var(--radius-md)] p-6 shadow-[var(--shadow-sm)] relative overflow-hidden border border-[var(--border-dark)]"
+      onClick={() => !pkg.disabled && onSelect(pkg)}
+      className={`card-hover-effect bg-[var(--card-bg)] rounded-[var(--radius-md)] p-6 shadow-[var(--shadow-sm)] relative overflow-hidden border border-[var(--border-dark)] ${
+        pkg.disabled ? 'cursor-not-allowed' : ''
+      }`}
     >
-      {/* Badge populaire si applicable */}
-      {isPopular && (
+      {/* Badge populaire */}
+      {!pkg.disabled && isPopular && (
         <div className="absolute -right-10 top-5 bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] text-white px-10 py-1 rotate-45 text-xs font-bold shadow-md">
           {t('popular', 'POPULAIRE')}
         </div>
       )}
       
-      <div className="flex items-center justify-between mb-6">
+      {/* Badge indisponible au centre-bas */}
+      {pkg.disabled && (
+        <div className="absolute inset-x-0 bottom-8 pointer-events-none">
+          <div className="bg-gradient-to-r from-red-600 to-red-800 text-white py-2 text-center text-sm font-bold shadow-lg">
+            {t('unavailable', 'INDISPONIBLE')}
+          </div>
+        </div>
+      )}
+      
+      <div className={`flex items-center justify-between mb-6 ${pkg.disabled ? 'opacity-50' : ''}`}>
         <div className="flex items-center gap-2">
           <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--tiktok-blue)] to-[var(--tiktok-red)] flex items-center justify-center">
             <Coins className="w-6 h-6 text-white" />
@@ -43,7 +54,7 @@ export function CoinPackage({ package: pkg, onSelect }: Props) {
       </div>
       
       {/* Prix avec animation au survol */}
-      <div className="mt-6 flex items-end justify-between">
+      <div className={`mt-6 flex items-end justify-between ${pkg.disabled ? 'opacity-50' : ''}`}>
         <div>
           <div className="text-2xl font-bold">{pkg.price.toLocaleString()} FCFA</div>
           {pkg.bonus && pkg.bonus > 0 && (

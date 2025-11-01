@@ -4,6 +4,7 @@ export interface CoinPackage {
   price: number;
   bonus?: number;
   isCustom?: boolean;
+  disabled?: boolean;
 }
 
 export interface User {
