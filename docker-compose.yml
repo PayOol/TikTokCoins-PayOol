@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  tiktokcoins-payool:
+    build: .
+    container_name: tiktokcoins_payool_app
+    restart: unless-stopped
+    ports:
+      - "8085:80"
+    networks:
+      - payool-network
+    environment:
+      - NODE_ENV=production
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.tiktokcoins.rule=Host(`tiktok.payool.net`)"
+      - "traefik.http.services.tiktokcoins.loadbalancer.server.port=80"
+
+networks:
+  payool-network:
+    external: true
