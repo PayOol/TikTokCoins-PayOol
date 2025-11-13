@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  tiktokcoins-app:
+    build: .
+    container_name: tiktokcoins_payool_app
+    ports:
+      - "8085:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    networks:
+      - payool-network
+
+networks:
+  payool-network:
+    external: true
