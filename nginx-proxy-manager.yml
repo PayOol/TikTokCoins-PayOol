@@ -8,7 +8,7 @@ services:
     ports:
       - '80:80'     # HTTP
       - '443:443'   # HTTPS
-      - '81:81'     # Admin Web Port
+      - '8081:81'   # Admin Web Port (changé pour éviter les conflits)
     volumes:
       - nginx_data:/data
       - nginx_letsencrypt:/etc/letsencrypt

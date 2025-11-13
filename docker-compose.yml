@@ -6,7 +6,7 @@ services:
     container_name: tiktokcoins_payool_app
     restart: unless-stopped
     ports:
-      - "8085:80"
+      - "127.0.0.1:8085:80"
     networks:
       - payool-network
     environment:
