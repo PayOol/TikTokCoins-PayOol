@@ -1,3 +1,2 @@
 # Assurer que les scripts shell gardent les fins de ligne LF (Unix)
 *.sh text eol=lf
-deploy.sh text eol=lf
