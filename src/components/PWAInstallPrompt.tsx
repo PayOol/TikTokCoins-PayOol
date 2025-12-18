@@ -64,7 +64,7 @@ export function PWAInstallPrompt() {
     const timer = setTimeout(() => {
       console.log('PWA: Affichage de la modale');
       setShowPrompt(true);
-      localStorage.setItem('pwa-install-prompt-date', today);
+      // Ne pas enregistrer la date ici - seulement quand l'utilisateur clique sur "Installer" ou "Ne plus afficher"
     }, 2000);
 
     return () => {
@@ -74,6 +74,8 @@ export function PWAInstallPrompt() {
   }, []);
 
   const handleInstall = async () => {
+    const today = new Date().toDateString();
+    
     if (deferredPrompt) {
       // Utiliser l'API native d'installation (Chrome, Edge, etc.)
       console.log('PWA: Lancement de l\'installation native');
@@ -85,12 +87,14 @@ export function PWAInstallPrompt() {
         localStorage.setItem('pwa-installed', 'true');
       }
       
+      // Marquer comme vu pour aujourd'hui
+      localStorage.setItem('pwa-install-prompt-date', today);
       setDeferredPrompt(null);
       setShowPrompt(false);
     } else {
-      // L'API native n'est pas disponible, juste fermer la modale
-      // L'utilisateur suivra les instructions manuelles affichées
+      // L'API native n'est pas disponible, marquer comme vu et fermer
       console.log('PWA: API native non disponible, fermeture de la modale');
+      localStorage.setItem('pwa-install-prompt-date', today);
       setShowPrompt(false);
     }
   };
@@ -100,7 +104,9 @@ export function PWAInstallPrompt() {
   };
 
   const handleNeverShow = () => {
+    const today = new Date().toDateString();
     localStorage.setItem('pwa-installed', 'true');
+    localStorage.setItem('pwa-install-prompt-date', today);
     setShowPrompt(false);
   };
 
