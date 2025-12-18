@@ -75,7 +75,7 @@ export function PWAInstallPrompt() {
 
   const handleInstall = async () => {
     if (deferredPrompt) {
-      // Utiliser l'API native d'installation
+      // Utiliser l'API native d'installation (Chrome, Edge, etc.)
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       
@@ -86,7 +86,8 @@ export function PWAInstallPrompt() {
       setDeferredPrompt(null);
       setShowPrompt(false);
     } else {
-      // Fermer la modale (l'utilisateur suivra les instructions manuelles)
+      // Marquer comme installé (l'utilisateur suivra les instructions manuelles)
+      localStorage.setItem('pwa-installed', 'true');
       setShowPrompt(false);
     }
   };
@@ -190,22 +191,13 @@ export function PWAInstallPrompt() {
 
         {/* Boutons */}
         <div className="space-y-3">
-          {deferredPrompt ? (
-            <button
-              onClick={handleInstall}
-              className="tiktok-button w-full flex items-center justify-center gap-2"
-            >
-              <Download className="w-5 h-5" />
-              {t('installNow', 'Installer maintenant')}
-            </button>
-          ) : (
-            <button
-              onClick={handleClose}
-              className="tiktok-button w-full"
-            >
-              {t('understood', 'J\'ai compris')}
-            </button>
-          )}
+          <button
+            onClick={handleInstall}
+            className="tiktok-button w-full flex items-center justify-center gap-2"
+          >
+            <Download className="w-5 h-5" />
+            {t('installNow', 'Installer')}
+          </button>
           
           <button
             onClick={handleNeverShow}
