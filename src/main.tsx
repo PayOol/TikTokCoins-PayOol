@@ -13,7 +13,7 @@ import './i18n';
 // Enregistrement du service worker pour la PWA
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('/TikTokCoins-PayOol/sw.js')
       .then(registration => {
         console.log('Service Worker enregistré avec succès:', registration.scope);
       })
@@ -25,7 +25,7 @@ if ('serviceWorker' in navigator) {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/TikTokCoins-PayOol">
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/payment/confirmation" element={<PaymentConfirmation />} />
