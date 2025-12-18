@@ -76,9 +76,11 @@ export function PWAInstallPrompt() {
   const handleInstall = async () => {
     if (deferredPrompt) {
       // Utiliser l'API native d'installation (Chrome, Edge, etc.)
+      console.log('PWA: Lancement de l\'installation native');
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       
+      console.log('PWA: Résultat installation:', outcome);
       if (outcome === 'accepted') {
         localStorage.setItem('pwa-installed', 'true');
       }
@@ -86,8 +88,9 @@ export function PWAInstallPrompt() {
       setDeferredPrompt(null);
       setShowPrompt(false);
     } else {
-      // Marquer comme installé (l'utilisateur suivra les instructions manuelles)
-      localStorage.setItem('pwa-installed', 'true');
+      // L'API native n'est pas disponible, juste fermer la modale
+      // L'utilisateur suivra les instructions manuelles affichées
+      console.log('PWA: API native non disponible, fermeture de la modale');
       setShowPrompt(false);
     }
   };
