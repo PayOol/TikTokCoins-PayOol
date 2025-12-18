@@ -4,6 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/TikTokCoins-PayOol/',
   plugins: [
     react(),
     VitePWA({
@@ -24,8 +25,8 @@ export default defineConfig({
         background_color: '#000000',
         display: 'standalone',
         orientation: 'portrait',
-        scope: '/',
-        start_url: '/',
+        scope: '/TikTokCoins-PayOol/',
+        start_url: '/TikTokCoins-PayOol/',
         icons: [
           {
             src: 'pwa-192x192.svg',
