@@ -9,6 +9,7 @@ import { EmailFormModal } from './components/EmailForm';
 import { PurchaseInstructionsModal } from './components/PurchaseInstructionsModal';
 import { Layout } from './components/Layout';
 import { Confetti } from './components/Confetti';
+import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { coinPackages } from './data/coinPackages';
 import { Purchase, User, CoinPackage, TikTokCredentials } from './types';
 import { initiatePayment, PaymentProviderType } from './utils/payment';
@@ -337,6 +338,9 @@ function App() {
           </div>
         </div>
       )}
+      
+      {/* Modale d'installation PWA */}
+      <PWAInstallPrompt />
     </Layout>
   );
 }
