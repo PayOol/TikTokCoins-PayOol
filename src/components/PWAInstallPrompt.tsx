@@ -195,8 +195,8 @@ export function PWAInstallPrompt() {
             onClick={handleInstall}
             className="tiktok-button w-full flex items-center justify-center gap-2"
           >
-            <Download className="w-5 h-5" />
-            {t('installNow', 'Installer')}
+            {!isIOS && <Download className="w-5 h-5" />}
+            {isIOS ? t('understood', 'J\'ai compris') : t('installNow', 'Installer')}
           </button>
           
           <button
