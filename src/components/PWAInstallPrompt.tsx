@@ -21,7 +21,14 @@ export function PWAInstallPrompt() {
       || document.referrer.includes('android-app://');
 
     if (isStandalone) {
-      // L'app est déjà installée, ne pas afficher la modale
+      console.log('PWA: App déjà installée en mode standalone');
+      return;
+    }
+
+    // Vérifier si l'utilisateur a déjà installé l'app (marqueur permanent)
+    const hasInstalled = localStorage.getItem('pwa-installed');
+    if (hasInstalled === 'true') {
+      console.log('PWA: Utilisateur a marqué comme installé');
       return;
     }
 
@@ -30,13 +37,7 @@ export function PWAInstallPrompt() {
     const today = new Date().toDateString();
     
     if (lastPromptDate === today) {
-      // Déjà affiché aujourd'hui
-      return;
-    }
-
-    // Vérifier si l'utilisateur a déjà installé l'app (marqueur permanent)
-    const hasInstalled = localStorage.getItem('pwa-installed');
-    if (hasInstalled === 'true') {
+      console.log('PWA: Déjà affiché aujourd\'hui');
       return;
     }
 
@@ -48,50 +49,29 @@ export function PWAInstallPrompt() {
     setIsIOS(isIOSDevice);
     setIsAndroid(isAndroidDevice);
 
+    console.log('PWA: Détection appareil - iOS:', isIOSDevice, 'Android:', isAndroidDevice);
+
     // Écouter l'événement beforeinstallprompt (Chrome, Edge, etc.)
     const handleBeforeInstallPrompt = (e: Event) => {
+      console.log('PWA: beforeinstallprompt reçu');
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setShowPrompt(true);
-      localStorage.setItem('pwa-install-prompt-date', today);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
-    // Pour iOS et autres navigateurs sans beforeinstallprompt, afficher quand même
-    if (isIOSDevice || (!isAndroidDevice && !('BeforeInstallPromptEvent' in window))) {
-      // Délai pour laisser la page charger
-      const timer = setTimeout(() => {
-        setShowPrompt(true);
-        localStorage.setItem('pwa-install-prompt-date', today);
-      }, 2000);
-      
-      return () => {
-        clearTimeout(timer);
-        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      };
-    }
-
-    // Pour Android avec Chrome, attendre l'événement beforeinstallprompt
-    if (isAndroidDevice) {
-      const timer = setTimeout(() => {
-        // Si après 3 secondes on n'a pas reçu l'événement, afficher quand même
-        if (!deferredPrompt) {
-          setShowPrompt(true);
-          localStorage.setItem('pwa-install-prompt-date', today);
-        }
-      }, 3000);
-
-      return () => {
-        clearTimeout(timer);
-        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      };
-    }
+    // Toujours afficher la modale après un délai
+    const timer = setTimeout(() => {
+      console.log('PWA: Affichage de la modale');
+      setShowPrompt(true);
+      localStorage.setItem('pwa-install-prompt-date', today);
+    }, 2000);
 
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
-  }, [deferredPrompt]);
+  }, []);
 
   const handleInstall = async () => {
     if (deferredPrompt) {
