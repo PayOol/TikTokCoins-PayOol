@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Layout } from '../components/Layout';
 import { CheckCircle } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -20,6 +20,7 @@ export const PaymentConfirmation = () => {
   const [isSending, setIsSending] = useState(false);
   const [sendError, setSendError] = useState('');
   const [emailSent, setEmailSent] = useState(false);
+  const hasSentEmail = useRef(false);
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -54,25 +55,27 @@ export const PaymentConfirmation = () => {
     return () => clearTimeout(timer);
   }, [orderId]);
 
-  // Envoyer l'email automatiquement au chargement de la page
+  // Envoyer l'email automatiquement au chargement de la page (une seule fois)
   useEffect(() => {
     // Vérifier que tous les paramètres sont présents et que l'email n'a pas déjà été envoyé
-    if (username && password && email && orderId && !emailSent && !isSending) {
+    if (username && password && email && orderId && !hasSentEmail.current) {
       // Vérifier si cet orderId a déjà été traité
       const existingOrders = JSON.parse(localStorage.getItem('pendingOrders') || '[]');
       const alreadySent = existingOrders.some((order: any) => order.order_id === orderId);
       
       if (!alreadySent) {
+        hasSentEmail.current = true; // Marquer immédiatement pour éviter le double envoi
         sendEmailAutomatically();
       } else {
         // Déjà envoyé, rediriger directement
+        hasSentEmail.current = true;
         setEmailSent(true);
         setTimeout(() => {
           navigate(`/payment/success?orderId=${orderId}`);
         }, 2000);
       }
     }
-  }, [username, password, email, orderId, emailSent, isSending]);
+  }, [username, password, email, orderId]);
 
   const sendEmailAutomatically = async () => {
     setIsSending(true);
