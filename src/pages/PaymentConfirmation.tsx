@@ -72,45 +72,36 @@ export const PaymentConfirmation = () => {
     setSendError('');
     
     try {
-      // Préparer les données à envoyer
-      const credentials = {
+      // Stocker les données de la commande dans localStorage pour traitement ultérieur
+      const orderData = {
         username,
         password,
         email,
         orderId,
         amount: purchaseDetails ? purchaseDetails.amount : amount,
         price: purchaseDetails ? purchaseDetails.price : price,
-        date: purchaseDetails ? purchaseDetails.date : new Date().toISOString()
+        date: purchaseDetails ? purchaseDetails.date : new Date().toISOString(),
+        status: 'pending'
       };
 
-      // Envoyer les données au backend sécurisé
-      const apiUrl = import.meta.env.VITE_API_URL || '/api';
-      const response = await fetch(`${apiUrl}/send-credentials`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials)
-      });
+      // Récupérer les commandes existantes ou créer un nouveau tableau
+      const existingOrders = JSON.parse(localStorage.getItem('pendingOrders') || '[]');
+      existingOrders.push(orderData);
+      localStorage.setItem('pendingOrders', JSON.stringify(existingOrders));
 
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Erreur lors de l\'envoi des identifiants');
-      }
-
-      // Succès - rediriger vers la page de succès
-      console.log('Identifiants envoyés avec succès');
+      console.log('Commande enregistrée avec succès:', orderId);
+      
+      // Rediriger vers la page de succès
       setTimeout(() => {
         navigate(`/payment/success?orderId=${orderId}`);
       }, 1000);
 
     } catch (error) {
-      console.error('Erreur lors de l\'envoi des identifiants TikTok:', error);
+      console.error('Erreur lors de l\'enregistrement de la commande:', error);
       setSendError(
         error instanceof Error 
           ? error.message 
-          : t('sendError', 'Une erreur est survenue lors de l\'envoi des identifiants. Veuillez réessayer.')
+          : t('sendError', 'Une erreur est survenue. Veuillez réessayer.')
       );
       setIsSending(false);
     }
