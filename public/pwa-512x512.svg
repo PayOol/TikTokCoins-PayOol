@@ -1,35 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <!-- Fond circulaire avec dégradé -->
   <defs>
-    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#000000;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#1D1D1D;stop-opacity:1" />
+    <linearGradient id="coinGradient512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700"/>
+      <stop offset="50%" style="stop-color:#FFA500"/>
+      <stop offset="100%" style="stop-color:#FF8C00"/>
+    </linearGradient>
+    <linearGradient id="tiktokGradient512" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00F2EA"/>
+      <stop offset="100%" style="stop-color:#FF0050"/>
     </linearGradient>
   </defs>
-  <circle cx="256" cy="256" r="256" fill="url(#bgGradient)"/>
-  
-  <!-- Logo TikTok stylisé -->
-  <g transform="translate(100, 100) scale(0.6)">
-    <!-- Note de musique stylisée -->
-    <path d="M355.904 132.214L355.904 211.712C355.904 211.712 318.264 196.855 289.357 212.276C260.45 227.696 254.7 264.866 269.556 294.9C284.413 324.935 328.636 336.415 355.904 309.756V388.69C355.904 388.69 299.144 414.22 242.384 388.69C185.624 363.16 174.144 293.772 196.54 244.034C218.935 194.295 275.695 169.33 355.904 211.712V132.214Z" fill="#FF0050"/>
-    
-    <!-- Lettre P stylisée pour PayOol -->
-    <path d="M120 150 L120 350 L170 350 L170 270 L200 270 Q260 270 260 210 Q260 150 200 150 Z M170 200 L200 200 Q210 200 210 220 Q210 240 200 240 L170 240 Z" fill="#00F2EA"/>
-  </g>
-  
-  <!-- Pièce de monnaie (coin) avec effet brillant -->
-  <defs>
-    <radialGradient id="coinGradient" cx="50%" cy="50%" r="50%" fx="30%" fy="30%">
-      <stop offset="0%" style="stop-color:#FFED8A;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#FFD700;stop-opacity:1" />
-    </radialGradient>
-  </defs>
-  <circle cx="350" cy="350" r="80" fill="url(#coinGradient)" stroke="#FFA500" stroke-width="8"/>
-  
-  <!-- Symbole dollar avec effet brillant -->
-  <text x="350" y="380" font-family="Arial" font-size="70" font-weight="bold" text-anchor="middle" fill="#000000">$</text>
-  
-  <!-- Reflet sur la pièce -->
-  <ellipse cx="320" cy="320" rx="25" ry="15" fill="#FFFFFF" opacity="0.3" transform="rotate(-30 320 320)"/>
+  <!-- Pièce dorée -->
+  <circle cx="256" cy="256" r="240" fill="url(#coinGradient512)" stroke="#DAA520" stroke-width="16"/>
+  <circle cx="256" cy="256" r="192" fill="none" stroke="#DAA520" stroke-width="4" opacity="0.5"/>
+  <!-- Note de musique TikTok stylisée -->
+  <path d="M320 144v160c0 35.2-28.8 64-64 64s-64-28.8-64-64 28.8-64 64-64c11.2 0 22.4 3.2 32 8V144h32z" fill="#000" opacity="0.8"/>
+  <circle cx="256" cy="304" r="48" fill="url(#tiktokGradient512)"/>
+  <!-- Reflet -->
+  <ellipse cx="200" cy="180" rx="60" ry="30" fill="#FFFFFF" opacity="0.2" transform="rotate(-30 200 180)"/>
 </svg>
