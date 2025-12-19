@@ -12,7 +12,7 @@ import './i18n';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter basename="/TikTokCoins-PayOol">
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/payment/confirmation" element={<PaymentConfirmation />} />

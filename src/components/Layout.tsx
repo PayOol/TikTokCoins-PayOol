@@ -121,7 +121,7 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
                   localStorage.removeItem('tiktok_user');
                   localStorage.removeItem('purchaseHistory');
                   localStorage.removeItem('totalCoins');
-                  window.location.href = '/';
+                  window.location.href = import.meta.env.BASE_URL || '/';
                 }}
                 className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--background-elevated-2)] transition-colors text-[var(--tiktok-red)]"
               >
