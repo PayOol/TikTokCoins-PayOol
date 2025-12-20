@@ -66,7 +66,7 @@ export const PaymentSuccess = () => {
           </div>
           
           <a 
-            href="https://wa.me/message/2TWDCSUY65YGA1" 
+            href="https://short.prismcard.net/r/whatsapp" 
             target="_blank" 
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 text-sm bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-full transition-colors mb-6 max-w-xs mx-auto"
