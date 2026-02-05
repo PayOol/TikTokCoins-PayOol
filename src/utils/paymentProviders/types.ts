@@ -30,6 +30,7 @@ export interface PaymentResponse {
 export interface PaymentStatusResponse {
   orderId: string;
   status: 'pending' | 'success' | 'failed' | 'cancelled';
+  transactionId?: string;
   error?: string;
 }
 
@@ -60,5 +61,5 @@ export interface PaymentProvider {
  */
 export enum PaymentProviderType {
   SOLEASPAY = 'soleaspay',
-  LYGOSPAY = 'lygospay'
+  BKAPAY = 'bkapay'
 }

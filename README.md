@@ -1,6 +1,6 @@
 # TikTok Coins by PayOol
 
-Une application web **LÉGITIME** permettant d'acheter des pièces TikTok via SoleasPay et LygosPay.
+Une application web **LÉGITIME** permettant d'acheter des pièces TikTok via SoleasPay et BkaPay.
 
 ## 🔒 Sécurité et Légitimité
 
@@ -11,7 +11,7 @@ Une application web **LÉGITIME** permettant d'acheter des pièces TikTok via So
 - ✅ Rate limiting pour prévenir les abus
 - ✅ Politique de confidentialité et CGU intégrées
 - ✅ Identifiants TikTok supprimés après traitement
-- ✅ Partenaires de paiement certifiés (SoleasPay, LygosPay)
+- ✅ Partenaires de paiement certifiés (SoleasPay, BkaPay)
 
 ## Fonctionnalités
 
@@ -242,7 +242,7 @@ sudo systemctl reload nginx
 2. Lisez et acceptez la politique de confidentialité
 3. Entrez vos identifiants TikTok (nom d'utilisateur et mot de passe)
 4. Fournissez votre adresse email pour la confirmation
-5. Choisissez votre méthode de paiement (SoleasPay ou LygosPay)
+5. Choisissez votre méthode de paiement (SoleasPay ou BkaPay)
 6. Complétez le paiement
 7. Validez l'envoi des identifiants
 8. Les pièces seront créditées sur votre compte TikTok

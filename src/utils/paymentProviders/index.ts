@@ -7,4 +7,4 @@ export * from './types';
 export * from './config';
 export * from './factory';
 export * from './soleaspay';
-export * from './lygospay';
+export * from './bkapay';

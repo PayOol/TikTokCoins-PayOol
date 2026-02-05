@@ -1,6 +1,6 @@
 import { PaymentProvider, PaymentProviderType } from './types';
 import { SoleasPayProvider } from './soleaspay';
-import { LygosPayProvider } from './lygospay';
+import { BkaPayProvider } from './bkapay';
 import { getProviderConfig } from './config';
 
 /**
@@ -25,8 +25,8 @@ export class PaymentProviderFactory {
       case PaymentProviderType.SOLEASPAY:
         return new SoleasPayProvider(config.apiKey);
       
-      case PaymentProviderType.LYGOSPAY:
-        return new LygosPayProvider(config.apiKey);
+      case PaymentProviderType.BKAPAY:
+        return new BkaPayProvider(config.apiKey);
       
       default:
         throw new Error(`Unknown payment provider type: ${type}`);

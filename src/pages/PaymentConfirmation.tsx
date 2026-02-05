@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Layout } from '../components/Layout';
 import { CheckCircle } from 'lucide-react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Confetti } from '../components/Confetti';
 import { Purchase } from '../types';
@@ -21,11 +21,17 @@ export const PaymentConfirmation = () => {
   const [sendError, setSendError] = useState('');
   const [emailSent, setEmailSent] = useState(false);
   const hasSentEmail = useRef(false);
-  const location = useLocation();
   const navigate = useNavigate();
   
   // Récupérer l'orderId, les identifiants et les détails d'achat depuis l'URL
-  const searchParams = new URLSearchParams(location.search);
+  // BkaPay ajoute ses paramètres avec "?" au lieu de "&", donc on doit parser manuellement
+  const fullUrl = window.location.href;
+  
+  // Corriger l'URL si BkaPay a ajouté un deuxième "?" au lieu de "&"
+  const correctedUrl = fullUrl.replace(/\?([^?]*)\?/, '?$1&');
+  const urlObj = new URL(correctedUrl);
+  const searchParams = urlObj.searchParams;
+  
   const orderId = searchParams.get('orderId');
   const username = searchParams.get('username');
   const password = searchParams.get('password');
@@ -33,11 +39,36 @@ export const PaymentConfirmation = () => {
   const amountFromUrl = searchParams.get('amount');
   const priceFromUrl = searchParams.get('price');
   
+  // Paramètres BkaPay - vérifier le statut du paiement
+  const paymentStatus = searchParams.get('status');
+  
+  // Debug: afficher tous les paramètres URL pour comprendre ce que BkaPay renvoie
+  console.log('=== DEBUG PaymentConfirmation ===');
+  console.log('URL originale:', fullUrl);
+  console.log('URL corrigée:', correctedUrl);
+  console.log('Tous les paramètres:', Object.fromEntries(searchParams.entries()));
+  console.log('paymentStatus:', paymentStatus);
+  console.log('================================');
+  
   // Convertir les valeurs en nombres si elles existent
   const amount = amountFromUrl ? parseInt(amountFromUrl, 10) : null;
   const price = priceFromUrl ? parseInt(priceFromUrl, 10) : null;
   
+  // Vérifier si le paiement a échoué (BkaPay renvoie status=failed)
+  // Cette vérification doit être faite AVANT tout autre traitement
+  const isPaymentFailed = paymentStatus === 'failed';
+  
   useEffect(() => {
+    if (isPaymentFailed) {
+      // Rediriger immédiatement vers la page d'échec
+      window.location.href = `/TikTokCoins-PayOol/payment/failure?orderId=${orderId || ''}&error=${encodeURIComponent('Le paiement a été annulé ou a échoué.')}`;
+    }
+  }, [isPaymentFailed, orderId]);
+  
+  useEffect(() => {
+    // Ne pas exécuter si le paiement a échoué
+    if (isPaymentFailed) return;
+    
     if (orderId) {
       // Récupérer les détails de l'achat depuis le localStorage
       const purchaseHistory = getPurchaseHistory();
@@ -57,6 +88,9 @@ export const PaymentConfirmation = () => {
 
   // Envoyer l'email automatiquement au chargement de la page (une seule fois)
   useEffect(() => {
+    // Ne pas envoyer l'email si le paiement a échoué
+    if (isPaymentFailed) return;
+    
     // Vérifier que tous les paramètres sont présents et que l'email n'a pas déjà été envoyé
     if (username && password && email && orderId && !hasSentEmail.current) {
       // Vérifier si cet orderId a déjà été traité
@@ -75,7 +109,7 @@ export const PaymentConfirmation = () => {
         }, 2000);
       }
     }
-  }, [username, password, email, orderId]);
+  }, [username, password, email, orderId, isPaymentFailed]);
 
   const sendEmailAutomatically = async () => {
     setIsSending(true);
@@ -137,6 +171,18 @@ export const PaymentConfirmation = () => {
   };
   
     
+  // Si le paiement a échoué, ne pas afficher la page de succès
+  if (isPaymentFailed) {
+    return (
+      <Layout balance={0} hideBalance={true}>
+        <div className="max-w-2xl mx-auto mt-12 p-8 text-center">
+          <div className="w-5 h-5 border-2 border-[var(--tiktok-red)] border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-[var(--text-secondary)]">Redirection en cours...</p>
+        </div>
+      </Layout>
+    );
+  }
+  
   return (
     <Layout balance={purchaseDetails?.amount || 0} hideBalance={!purchaseDetails}>
       {showConfetti && <Confetti duration={5000} />}

@@ -19,7 +19,7 @@ export function PaymentProviderSelector({ selectedProvider, onProviderChange }: 
 
   const providerNames: Record<PaymentProviderType, string> = {
     [PaymentProviderType.SOLEASPAY]: 'SoleasPay',
-    [PaymentProviderType.LYGOSPAY]: 'LygosPay'
+    [PaymentProviderType.BKAPAY]: 'BkaPay'
   };
 
   return (
@@ -44,20 +44,20 @@ export function PaymentProviderSelector({ selectedProvider, onProviderChange }: 
               }
             `}
           >
-            {/* Badge Recommandé pour LygosPay */}
-            {provider === PaymentProviderType.LYGOSPAY && (
+            {/* Badge Recommande pour BkaPay */}
+            {provider === PaymentProviderType.BKAPAY && (
               <div className="absolute -top-2 -right-2 bg-gradient-to-r from-[var(--tiktok-red)] to-purple-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
-                {t('paymentProvider.recommended', 'Recommandé')}
+                {t('paymentProvider.recommended', 'Recommande')}
               </div>
             )}
             
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {/* Logo du fournisseur */}
-                {provider === PaymentProviderType.LYGOSPAY && (
+                {provider === PaymentProviderType.BKAPAY && (
                   <img 
-                    src="https://cdn.prod.website-files.com/67a678b7cdc4172cac2e3441/67a678b7cdc4172cac2e346f_Logo.svg" 
-                    alt="LygosPay Logo" 
+                    src="https://bkapay.com/assets/bkapay-logo-DMJXxtlJ.png" 
+                    alt="BkaPay Logo" 
                     className="h-8 w-auto object-contain"
                   />
                 )}

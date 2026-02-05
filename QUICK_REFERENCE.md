@@ -2,15 +2,15 @@
 
 ## 🚀 Démarrage rapide
 
-### 1. Activer LygosPay (5 minutes)
+### 1. Activer BkaPay (5 minutes)
 
 ```typescript
 // Fichier: src/utils/paymentProviders/config.ts
 
-[PaymentProviderType.LYGOSPAY]: {
-  type: PaymentProviderType.LYGOSPAY,
-  apiKey: 'VOTRE_CLE_API_LYGOSPAY', // ← Ajoutez votre clé ici
-  enabled: true                      // ← Changez à true
+[PaymentProviderType.BKAPAY]: {
+  type: PaymentProviderType.BKAPAY,
+  apiKey: 'pk_live_VOTRE_CLE_PUBLIQUE', // Ajoutez votre clé ici
+  enabled: true                      // Changez à true
 }
 ```
 
@@ -33,7 +33,7 @@ await initiatePayment({
 });
 
 // Utiliser un fournisseur spécifique
-await initiatePayment(params, PaymentProviderType.LYGOSPAY);
+await initiatePayment(params, PaymentProviderType.BKAPAY);
 ```
 
 ### 3. Vérifier le statut d'un paiement
@@ -41,7 +41,7 @@ await initiatePayment(params, PaymentProviderType.LYGOSPAY);
 ```typescript
 import { checkPaymentStatus, PaymentProviderType } from './utils/payment';
 
-const status = await checkPaymentStatus('TKT-12345', PaymentProviderType.LYGOSPAY);
+const status = await checkPaymentStatus('TKT-12345', PaymentProviderType.BKAPAY);
 // { orderId: 'TKT-12345', status: 'success' | 'pending' | 'failed' | 'cancelled' }
 ```
 
@@ -50,18 +50,17 @@ const status = await checkPaymentStatus('TKT-12345', PaymentProviderType.LYGOSPA
 ```
 src/utils/paymentProviders/
 ├── types.ts          → Interfaces et types
-├── config.ts         → Configuration (CLÉ API ICI)
-├── factory.ts        → Création des instances
-├── soleaspay.ts      → Implémentation SoleasPay
-└── lygospay.ts       → Implémentation LygosPay
+├── config.ts         → Configuration (CLE API ICI)
+├── factory.ts        → Creation des instances
+├── soleaspay.ts      → Implementation SoleasPay
+└── bkapay.ts         → Implementation BkaPay
 
 src/components/
-└── PaymentProviderSelector.tsx → UI de sélection
+└── PaymentProviderSelector.tsx → UI de selection
 
 Documentation/
-├── PAYMENT_PROVIDERS.md        → Doc technique complète
-├── CONFIGURATION_LYGOSPAY.md   → Guide config LygosPay
-├── IMPLEMENTATION_SUMMARY.md   → Résumé implémentation
+├── PAYMENT_PROVIDERS.md        → Doc technique complete
+├── IMPLEMENTATION_SUMMARY.md   → Resume implementation
 └── QUICK_REFERENCE.md          → Ce fichier
 ```
 
@@ -72,9 +71,9 @@ Documentation/
 Le premier fournisseur avec `enabled: true` est utilisé par défaut.
 
 ```typescript
-// Pour utiliser LygosPay par défaut, mettez-le en premier
+// Pour utiliser BkaPay par defaut, mettez-le en premier
 export const paymentProvidersConfig = {
-  [PaymentProviderType.LYGOSPAY]: {
+  [PaymentProviderType.BKAPAY]: {
     enabled: true,
     // ...
   },
@@ -121,34 +120,34 @@ console.error('Payment initiation error:', error);
 
 ## 📊 Comparaison rapide
 
-| | SoleasPay | LygosPay |
+| | SoleasPay | BkaPay |
 |---|---|---|
-| **Méthode** | Formulaire POST | API REST |
-| **Statut** | ❌ | ✅ |
-| **Config** | ✅ Prêt | ⚠️ Clé API requise |
+| **Methode** | Formulaire POST | Redirection URL |
+| **Statut** | Actif | Actif |
+| **Config** | Pret | Cle publique requise |
 
 ## 🎯 Cas d'usage
 
-### Cas 1: Utiliser uniquement SoleasPay (par défaut)
+### Cas 1: Utiliser uniquement SoleasPay (par defaut)
 ```typescript
 // config.ts
 [PaymentProviderType.SOLEASPAY]: { enabled: true }
-[PaymentProviderType.LYGOSPAY]: { enabled: false }
+[PaymentProviderType.BKAPAY]: { enabled: false }
 ```
 
-### Cas 2: Utiliser uniquement LygosPay
+### Cas 2: Utiliser uniquement BkaPay
 ```typescript
 // config.ts
 [PaymentProviderType.SOLEASPAY]: { enabled: false }
-[PaymentProviderType.LYGOSPAY]: { enabled: true, apiKey: 'VOTRE_CLE' }
+[PaymentProviderType.BKAPAY]: { enabled: true, apiKey: 'VOTRE_CLE' }
 ```
 
 ### Cas 3: Laisser l'utilisateur choisir
 ```typescript
 // config.ts
 [PaymentProviderType.SOLEASPAY]: { enabled: true }
-[PaymentProviderType.LYGOSPAY]: { enabled: true, apiKey: 'VOTRE_CLE' }
-// → Le sélecteur apparaît automatiquement
+[PaymentProviderType.BKAPAY]: { enabled: true, apiKey: 'VOTRE_CLE' }
+// → Le selecteur apparait automatiquement
 ```
 
 ## 🔐 Sécurité
@@ -166,10 +165,10 @@ console.error('Payment initiation error:', error);
 ```typescript
 // .env
 VITE_SOLEASPAY_API_KEY=votre_cle_soleaspay
-VITE_LYGOSPAY_API_KEY=votre_cle_lygospay
+VITE_BKAPAY_API_KEY=votre_cle_bkapay
 
 // config.ts
-apiKey: import.meta.env.VITE_LYGOSPAY_API_KEY || ''
+apiKey: import.meta.env.VITE_BKAPAY_API_KEY || ''
 ```
 
 ## 🧪 Tests rapides
@@ -179,12 +178,12 @@ apiKey: import.meta.env.VITE_LYGOSPAY_API_KEY || ''
 2. Remplir le formulaire
 3. Vérifier la redirection vers checkout.soleaspay.com
 
-### Test 2: LygosPay
-1. Configurer la clé API
-2. Activer LygosPay
-3. Sélectionner un package
-4. Choisir LygosPay dans le sélecteur
-5. Vérifier la redirection vers LygosPay
+### Test 2: BkaPay
+1. Configurer la cle publique
+2. Activer BkaPay
+3. Selectionner un package
+4. Choisir BkaPay dans le selecteur
+5. Verifier la redirection vers BkaPay
 
 ### Test 3: Sélecteur
 1. Activer les deux fournisseurs
@@ -193,20 +192,20 @@ apiKey: import.meta.env.VITE_LYGOSPAY_API_KEY || ''
 
 ## 📞 Aide rapide
 
-| Besoin | Fichier à consulter |
+| Besoin | Fichier a consulter |
 |--------|---------------------|
-| Configuration | `CONFIGURATION_LYGOSPAY.md` |
+| Configuration | `PAYMENT_PROVIDERS.md` |
 | Architecture | `PAYMENT_PROVIDERS.md` |
-| Résumé complet | `IMPLEMENTATION_SUMMARY.md` |
-| API LygosPay | `Documentation LygosPay.md` |
+| Resume complet | `IMPLEMENTATION_SUMMARY.md` |
+| API BkaPay | Documentation API BkaPay |
 
 ## 💡 Astuces
 
 ### Forcer un fournisseur dans le code
 
 ```typescript
-// Toujours utiliser LygosPay pour ce paiement
-await initiatePayment(params, PaymentProviderType.LYGOSPAY);
+// Toujours utiliser BkaPay pour ce paiement
+await initiatePayment(params, PaymentProviderType.BKAPAY);
 ```
 
 ### Vérifier si un fournisseur est disponible
@@ -214,8 +213,8 @@ await initiatePayment(params, PaymentProviderType.LYGOSPAY);
 ```typescript
 import { isProviderEnabled } from './utils/paymentProviders';
 
-if (isProviderEnabled(PaymentProviderType.LYGOSPAY)) {
-  // LygosPay est disponible
+if (isProviderEnabled(PaymentProviderType.BKAPAY)) {
+  // BkaPay est disponible
 }
 ```
 
@@ -225,7 +224,7 @@ if (isProviderEnabled(PaymentProviderType.LYGOSPAY)) {
 import { getEnabledProviders } from './utils/paymentProviders';
 
 const providers = getEnabledProviders();
-// ['soleaspay', 'lygospay']
+// ['soleaspay', 'bkapay']
 ```
 
 ## ⚡ Commandes utiles
@@ -267,4 +266,4 @@ npm run type-check
 
 ---
 
-**Prêt à commencer?** Configurez votre clé API LygosPay dans `src/utils/paymentProviders/config.ts` ! 🎉
+**Pret a commencer?** Configurez votre cle publique BkaPay dans `src/utils/paymentProviders/config.ts` !

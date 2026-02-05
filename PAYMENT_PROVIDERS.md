@@ -1,6 +1,6 @@
 # Système Multi-API de Paiement
 
-Ce document décrit l'architecture du système multi-API de paiement qui permet de supporter plusieurs fournisseurs de paiement (SoleasPay, LygosPay, etc.).
+Ce document décrit l'architecture du système multi-API de paiement qui permet de supporter plusieurs fournisseurs de paiement (SoleasPay, BkaPay, etc.).
 
 ## Architecture
 
@@ -15,7 +15,7 @@ src/utils/paymentProviders/
 ├── config.ts          # Configuration des fournisseurs
 ├── factory.ts         # Factory pour créer les instances
 ├── soleaspay.ts       # Implémentation SoleasPay
-└── lygospay.ts        # Implémentation LygosPay
+└── bkapay.ts          # Implémentation BkaPay
 ```
 
 ## Fournisseurs supportés
@@ -25,23 +25,23 @@ src/utils/paymentProviders/
 - **Méthode**: Redirection via formulaire POST
 - **Documentation**: https://checkout.soleaspay.com
 
-### 2. LygosPay
+### 2. BkaPay
 - **Status**: Disponible (nécessite configuration)
-- **Méthode**: API REST
-- **Base URL**: https://api.lygosapp.com/v1/
-- **Documentation**: Voir `Documentation LygosPay.md`
+- **Méthode**: Redirection URL
+- **Base URL**: https://bkapay.com/api-pay/
+- **Documentation**: Voir la documentation API BkaPay
 
 ## Configuration
 
-### Activer LygosPay
+### Activer BkaPay
 
 1. Ouvrez le fichier `src/utils/paymentProviders/config.ts`
-2. Ajoutez votre clé API LygosPay :
+2. Ajoutez votre clé publique BkaPay :
 
 ```typescript
-[PaymentProviderType.LYGOSPAY]: {
-  type: PaymentProviderType.LYGOSPAY,
-  apiKey: 'VOTRE_CLE_API_LYGOSPAY', // Remplacez par votre clé
+[PaymentProviderType.BKAPAY]: {
+  type: PaymentProviderType.BKAPAY,
+  apiKey: 'pk_live_VOTRE_CLE_PUBLIQUE', // Remplacez par votre clé
   enabled: true // Changez à true pour activer
 }
 ```
@@ -71,7 +71,7 @@ await initiatePayment({
 });
 
 // Utiliser un fournisseur spécifique
-await initiatePayment(params, PaymentProviderType.LYGOSPAY);
+await initiatePayment(params, PaymentProviderType.BKAPAY);
 ```
 
 ### Vérifier le statut d'un paiement
@@ -79,7 +79,7 @@ await initiatePayment(params, PaymentProviderType.LYGOSPAY);
 ```typescript
 import { checkPaymentStatus, PaymentProviderType } from './utils/payment';
 
-const status = await checkPaymentStatus('TKT-12345', PaymentProviderType.LYGOSPAY);
+const status = await checkPaymentStatus('TKT-12345', PaymentProviderType.BKAPAY);
 console.log(status); // { orderId: 'TKT-12345', status: 'success' }
 ```
 
@@ -139,7 +139,7 @@ Dans `src/utils/paymentProviders/types.ts`, ajoutez :
 ```typescript
 export enum PaymentProviderType {
   SOLEASPAY = 'soleaspay',
-  LYGOSPAY = 'lygospay',
+  BKAPAY = 'bkapay',
   NOUVEAUFOURNISSEUR = 'nouveaufournisseur' // Ajoutez ici
 }
 ```
@@ -173,36 +173,45 @@ Dans `src/utils/paymentProviders/index.ts`, ajoutez :
 export * from './nouveaufournisseur';
 ```
 
-## API LygosPay - Détails
+## API BkaPay - Détails
 
-### Endpoints utilisés
+### URL de redirection
 
-#### Créer un gateway de paiement
 ```
-POST https://api.lygosapp.com/v1/gateway
-Headers: api-key: <votre-clé>
-Body: {
-  amount: number,
-  shop_name: string,
-  order_id: string,
-  message: string,
-  success_url: string,
-  failure_url: string
+https://bkapay.com/api-pay/VOTRE_CLE_PUBLIQUE?amount=MONTANT&description=DESCRIPTION&callback=URL_RETOUR
+```
+
+**Paramètres:**
+- `amount`: Montant minimum 200 (XOF, XAF ou CDF selon votre pays)
+- `description`: Description du paiement (optionnel)
+- `callback`: URL de retour après paiement (optionnel)
+
+### Gestion du retour
+
+Après le paiement, le client est redirigé vers votre URL de callback avec les paramètres suivants:
+
+```
+https://votresite.com/success?status=success&transactionId=xxx&amount=5000
+```
+
+- `status`: "success" ou "failed"
+- `transactionId`: Identifiant unique de la transaction
+- `amount`: Montant payé
+
+### Exemple JavaScript pour gérer le retour
+
+```javascript
+const urlParams = new URLSearchParams(window.location.search);
+const status = urlParams.get("status");
+const transactionId = urlParams.get("transactionId");
+const amount = urlParams.get("amount");
+
+if (status === "success") {
+  console.log("Paiement reussi:", transactionId, amount);
+} else {
+  console.log("Paiement echoue");
 }
 ```
-
-#### Vérifier le statut d'un paiement
-```
-GET https://api.lygosapp.com/v1/gateway/payin/{order_id}
-Headers: api-key: <votre-clé>
-```
-
-### Codes de statut
-
-- **200**: Succès
-- **401**: Non autorisé (clé API invalide)
-- **404**: Ressource non trouvée
-- **422**: Données invalides
 
 ## Tests
 
@@ -225,4 +234,4 @@ Pour tester un nouveau fournisseur :
 
 Pour toute question ou problème :
 - SoleasPay : https://checkout.soleaspay.com
-- LygosPay : https://api.lygosapp.com
+- BkaPay : https://bkapay.com

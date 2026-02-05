@@ -142,7 +142,7 @@
 │         │                                     │                │
 │         ▼                                     ▼                │
 │  ┌─────────────────┐                  ┌─────────────────┐     │
-│  │ SoleasPayProvider│                 │ LygosPayProvider│     │
+│  │ SoleasPayProvider│                 │ BkaPayProvider│     │
 │  │                 │                  │                 │     │
 │  │ implements      │                  │ implements      │     │
 │  │ PaymentProvider │                  │ PaymentProvider │     │
@@ -156,9 +156,9 @@
             │                                    │
             ▼                                    ▼
 ┌─────────────────────┐              ┌─────────────────────┐
-│   SoleasPay API     │              │   LygosPay API      │
+│   SoleasPay API     │              │   BkaPay API      │
 │                     │              │                     │
-│ checkout.soleaspay  │              │ api.lygosapp.com    │
+│ checkout.soleaspay  │              │ bkapay.com    │
 │      .com           │              │                     │
 │                     │              │ POST /v1/gateway    │
 │ Form POST           │              │ GET /v1/gateway/    │
@@ -203,8 +203,8 @@ src/
         │       ├── checkPaymentStatus()
         │       └── isConfigured()
         │
-        └── lygospay.ts              # Implémentation LygosPay
-            └── LygosPayProvider
+        └── bkapay.ts              # Implementation BkaPay
+            └── BkaPayProvider
                 ├── initiatePayment()
                 ├── checkPaymentStatus()
                 └── isConfigured()
@@ -256,7 +256,7 @@ User Action
            │             │             │
            ▼             ▼             ▼
     ┌──────────┐  ┌──────────┐  ┌──────────┐
-    │ SoleasPay│  │ LygosPay │  │ Future   │
+    │ SoleasPay│  │ BkaPay │  │ Future   │
     │          │  │          │  │ Provider │
     └─────┬────┘  └─────┬────┘  └──────────┘
           │             │
@@ -292,7 +292,7 @@ provider.checkPaymentStatus(orderId)
     ├──────────────┬──────────────┐
     │              │              │
     ▼              ▼              ▼
-SoleasPay      LygosPay      Future
+SoleasPay      BkaPay      Future
 (N/A)          API Call      Provider
                │
                ▼
@@ -361,7 +361,7 @@ Application Start
 │     apiKey: "...",                  │
 │     enabled: true                   │
 │   },                                │
-│   LYGOSPAY: {                       │
+│   BKAPAY: {                       │
 │     apiKey: "...",                  │
 │     enabled: false                  │
 │   }                                 │
@@ -446,7 +446,7 @@ Application Start
         │                │
         ▼                ▼
 ┌──────────────┐  ┌──────────────┐
-│ SoleasPay    │  │ LygosPay     │
+│ SoleasPay    │  │ BkaPay     │
 │ Provider     │  │ Provider     │
 ├──────────────┤  ├──────────────┤
 │ - apiKey     │  │ - apiKey     │
@@ -522,7 +522,7 @@ EmailFormModal
 
 ```
 ┌─────────────────────┬──────────────┬──────────────┐
-│ Opération           │ SoleasPay    │ LygosPay     │
+│ Operation           │ SoleasPay    │ BkaPay     │
 ├─────────────────────┼──────────────┼──────────────┤
 │ Initiation          │ ~100ms       │ ~200-500ms   │
 │ Redirection         │ Immédiate    │ Immédiate    │

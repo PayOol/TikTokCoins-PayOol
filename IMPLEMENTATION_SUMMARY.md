@@ -2,13 +2,13 @@
 
 ## 📋 Vue d'ensemble
 
-Un système multi-API de paiement a été implémenté avec succès, permettant de supporter plusieurs fournisseurs de paiement (SoleasPay et LygosPay) de manière flexible et extensible.
+Un système multi-API de paiement a été implémenté avec succès, permettant de supporter plusieurs fournisseurs de paiement (SoleasPay et BkaPay) de manière flexible et extensible.
 
 ## 🎯 Objectifs atteints
 
 ✅ Architecture modulaire basée sur le Factory Pattern
-✅ Support de SoleasPay (existant, refactorisé)
-✅ Support de LygosPay (nouveau)
+✅ Support de SoleasPay (existant, refactorise)
+✅ Support de BkaPay (nouveau)
 ✅ Interface utilisateur pour sélectionner le fournisseur
 ✅ Configuration centralisée des fournisseurs
 ✅ Compatibilité ascendante avec le code existant
@@ -24,7 +24,7 @@ src/utils/paymentProviders/
 ├── config.ts             # Configuration des fournisseurs
 ├── factory.ts            # Factory Pattern pour créer les instances
 ├── soleaspay.ts          # Implémentation SoleasPay
-└── lygospay.ts           # Implémentation LygosPay
+└── bkapay.ts           # Implementation BkaPay
 ```
 
 ### Composants UI
@@ -35,8 +35,7 @@ src/components/
 
 ### Documentation
 ```
-PAYMENT_PROVIDERS.md           # Documentation technique complète
-CONFIGURATION_LYGOSPAY.md      # Guide de configuration LygosPay
+PAYMENT_PROVIDERS.md           # Documentation technique complete
 IMPLEMENTATION_SUMMARY.md      # Ce fichier
 ```
 
@@ -72,9 +71,9 @@ interface PaymentProvider {
   isConfigured(): boolean;
 }
 
-// Implémentations concrètes
+// Implementations concretes
 class SoleasPayProvider implements PaymentProvider { ... }
-class LygosPayProvider implements PaymentProvider { ... }
+class BkaPayProvider implements PaymentProvider { ... }
 
 // Factory pour créer les instances
 class PaymentProviderFactory {
@@ -115,10 +114,10 @@ export const paymentProvidersConfig: Record<PaymentProviderType, ProviderConfig>
     apiKey: 'VOTRE_CLE_API',
     enabled: true  // ← Activer/désactiver
   },
-  [PaymentProviderType.LYGOSPAY]: {
-    type: PaymentProviderType.LYGOSPAY,
-    apiKey: '',    // ← Ajouter votre clé API
-    enabled: false // ← Activer après configuration
+  [PaymentProviderType.BKAPAY]: {
+    type: PaymentProviderType.BKAPAY,
+    apiKey: '',    // Ajouter votre cle publique
+    enabled: false // Activer apres configuration
   }
 };
 ```
@@ -135,35 +134,47 @@ Le composant `PaymentProviderSelector` s'affiche automatiquement dans le formula
 - Traduction i18n
 - Masquage automatique si un seul fournisseur
 
-## 🔌 API LygosPay
+## API BkaPay
 
-### Endpoints implémentés
+### URL de redirection
 
-#### 1. Créer un gateway de paiement
-```http
-POST https://api.lygosapp.com/v1/gateway
-Headers: api-key, Content-Type: application/json
-Body: { amount, shop_name, order_id, message, success_url, failure_url }
-Response: { id, link, ... }
+```
+https://bkapay.com/api-pay/VOTRE_CLE_PUBLIQUE?amount=MONTANT&description=DESCRIPTION&callback=URL_RETOUR
 ```
 
-#### 2. Vérifier le statut
-```http
-GET https://api.lygosapp.com/v1/gateway/payin/{order_id}
-Headers: api-key
-Response: { order_id, status }
+**Paramètres:**
+- `amount`: Montant minimum 200 (XOF, XAF ou CDF selon votre pays)
+- `description`: Description du paiement (optionnel)
+- `callback`: URL de retour après paiement (optionnel)
+
+### Gestion du retour
+
+Apres le paiement, le client est redirige vers votre URL de callback avec les parametres suivants:
+
+```
+https://votresite.com/success?status=success&transactionId=xxx&amount=5000
 ```
 
-### Mapping des statuts
+- `status`: "success" ou "failed"
+- `transactionId`: Identifiant unique de la transaction
+- `amount`: Montant paye
 
-| Statut LygosPay | Statut interne |
-|-----------------|----------------|
-| success, completed, paid | success |
-| fail, error | failed |
-| cancel | cancelled |
-| autres | pending |
+### Exemple JavaScript pour gerer le retour
 
-## 🔄 Compatibilité
+```javascript
+const urlParams = new URLSearchParams(window.location.search);
+const status = urlParams.get("status");
+const transactionId = urlParams.get("transactionId");
+const amount = urlParams.get("amount");
+
+if (status === "success") {
+  console.log("Paiement reussi:", transactionId, amount);
+} else {
+  console.log("Paiement echoue");
+}
+```
+
+## Compatibilité
 
 ### Code existant
 
@@ -181,15 +192,15 @@ await initiateSoleasPayment({
 ### Nouveau code
 
 ```typescript
-// Nouveau code (recommandé)
+// Nouveau code (recommande)
 await initiatePayment({
   amount: 1000,
   currency: 'XAF',
   // ...
-}, PaymentProviderType.LYGOSPAY);
+}, PaymentProviderType.BKAPAY);
 ```
 
-## 🚀 Ajouter un nouveau fournisseur
+## Ajouter un nouveau fournisseur
 
 ### Étapes simples
 
@@ -213,17 +224,17 @@ await initiatePayment({
    - Fichier: `src/utils/paymentProviders/index.ts`
    - Exporter le nouveau provider
 
-## 📊 Comparaison des fournisseurs
+## Comparaison des fournisseurs
 
-| Caractéristique | SoleasPay | LygosPay |
+| Caracteristique | SoleasPay | BkaPay |
 |----------------|-----------|----------|
-| Méthode | Formulaire POST | API REST |
-| Vérification statut | ❌ Non disponible | ✅ Disponible |
-| Redirection | ✅ Oui | ✅ Oui |
-| Webhooks | ⚠️ Via callbacks | ✅ Supporté |
-| Documentation | Limitée | Complète |
+| Methode | Formulaire POST | Redirection URL |
+| Verification statut | Non disponible | Disponible |
+| Redirection | Oui | Oui |
+| Webhooks | Via callbacks | Supporte |
+| Documentation | Limitee | Complete |
 
-## ⚠️ Points d'attention
+## Points d'attention
 
 ### Sécurité
 - 🔒 Les clés API sont actuellement dans le code
@@ -240,7 +251,7 @@ await initiatePayment({
 - 👤 État de chargement pendant l'initiation
 - 👤 Messages d'erreur clairs
 
-## 🧪 Tests recommandés
+## Tests recommandés
 
 ### Tests à effectuer
 
@@ -249,10 +260,10 @@ await initiatePayment({
    - Vérifier la redirection
    - Tester success/failure URLs
 
-2. ⏳ **Test LygosPay** (après configuration)
-   - Créer un paiement
-   - Vérifier la redirection
-   - Tester la vérification de statut
+2. ⏳ **Test BkaPay** (apres configuration)
+   - Creer un paiement
+   - Verifier la redirection
+   - Tester la verification de statut
    - Tester success/failure URLs
 
 3. ⏳ **Test multi-fournisseur**
@@ -261,26 +272,21 @@ await initiatePayment({
    - Basculer entre les fournisseurs
    - Vérifier que chaque fournisseur fonctionne
 
-## 📚 Documentation
+## Documentation
 
 ### Fichiers de documentation
 
 1. **PAYMENT_PROVIDERS.md**
-   - Architecture complète
+   - Architecture complete
    - Guide d'utilisation
    - Comment ajouter un fournisseur
 
-2. **CONFIGURATION_LYGOSPAY.md**
-   - Configuration rapide LygosPay
-   - Résolution des problèmes
-   - Exemples d'utilisation
-
-3. **Documentation LygosPay.md**
+2. **Documentation API BkaPay**
    - Documentation API officielle
-   - Endpoints disponibles
-   - Codes de réponse
+   - Parametres de redirection
+   - Gestion du retour
 
-## 🎓 Bonnes pratiques implémentées
+## Bonnes pratiques implémentées
 
 ✅ **Separation of Concerns**: Chaque fournisseur dans son propre fichier
 ✅ **Factory Pattern**: Création centralisée des instances
@@ -291,12 +297,12 @@ await initiatePayment({
 ✅ **Error Handling**: Gestion des erreurs à tous les niveaux
 ✅ **Documentation**: Documentation complète et exemples
 
-## 🔮 Améliorations futures possibles
+## Améliorations futures possibles
 
 ### Court terme
-- [ ] Migrer les clés API vers des variables d'environnement
+- [ ] Migrer les cles API vers des variables d'environnement
 - [ ] Ajouter des tests unitaires
-- [ ] Implémenter les webhooks LygosPay
+- [ ] Implementer les webhooks BkaPay
 
 ### Moyen terme
 - [ ] Ajouter un backend pour sécuriser les paiements
@@ -308,14 +314,13 @@ await initiatePayment({
 - [ ] Système de fallback automatique
 - [ ] Dashboard d'administration des paiements
 
-## 📞 Support
+## Support
 
 Pour toute question ou problème :
 - Consulter `PAYMENT_PROVIDERS.md` pour la documentation technique
-- Consulter `CONFIGURATION_LYGOSPAY.md` pour la configuration
 - Vérifier les logs de la console pour les erreurs
 
-## ✨ Conclusion
+## Conclusion
 
 Le système multi-API de paiement est maintenant opérationnel et prêt à l'emploi. Il offre :
 - ✅ Flexibilité pour supporter plusieurs fournisseurs
@@ -324,4 +329,4 @@ Le système multi-API de paiement est maintenant opérationnel et prêt à l'emp
 - ✅ Documentation complète
 - ✅ Compatibilité avec le code existant
 
-**Prochaine étape**: Configurer votre clé API LygosPay dans `src/utils/paymentProviders/config.ts` pour commencer à utiliser LygosPay !
+**Prochaine étape**: Configurez votre cle publique BkaPay dans `src/utils/paymentProviders/config.ts` pour commencer à utiliser BkaPay !

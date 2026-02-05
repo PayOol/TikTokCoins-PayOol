@@ -13,10 +13,10 @@ export interface ProviderConfig {
  * Configuration for all payment providers
  */
 export const paymentProvidersConfig: Record<PaymentProviderType, ProviderConfig> = {
-  [PaymentProviderType.LYGOSPAY]: {
-    type: PaymentProviderType.LYGOSPAY,
-    apiKey: 'lygosapp-dde954b5-7b9f-49db-a028-8c58c645bf3a',
-    enabled: true // ✅ Premier dans la liste = Recommandé par défaut
+  [PaymentProviderType.BKAPAY]: {
+    type: PaymentProviderType.BKAPAY,
+    apiKey: 'pk_live_0ce8acd1-ee69-4787-993e-180668077821',
+    enabled: true // Premier dans la liste = Recommande par defaut
   },
   [PaymentProviderType.SOLEASPAY]: {
     type: PaymentProviderType.SOLEASPAY,

