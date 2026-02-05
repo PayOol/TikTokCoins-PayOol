@@ -10,6 +10,7 @@ import { PurchaseInstructionsModal } from './components/PurchaseInstructionsModa
 import { Layout } from './components/Layout';
 import { Confetti } from './components/Confetti';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
+import { ServiceWorkerUpdate } from './components/ServiceWorkerUpdate';
 import { coinPackages } from './data/coinPackages';
 import { Purchase, User, CoinPackage, TikTokCredentials } from './types';
 import { initiatePayment, PaymentProviderType } from './utils/payment';
@@ -341,6 +342,9 @@ function App() {
       
       {/* Modale d'installation PWA */}
       <PWAInstallPrompt />
+      
+      {/* Gestionnaire de mise à jour du Service Worker */}
+      <ServiceWorkerUpdate />
     </Layout>
   );
 }
