@@ -16,7 +16,7 @@ export const paymentProvidersConfig: Record<PaymentProviderType, ProviderConfig>
   [PaymentProviderType.BKAPAY]: {
     type: PaymentProviderType.BKAPAY,
     apiKey: 'pk_live_0ce8acd1-ee69-4787-993e-180668077821',
-    enabled: true // Premier dans la liste = Recommande par defaut
+    enabled: false // Désactivé
   },
   [PaymentProviderType.SOLEASPAY]: {
     type: PaymentProviderType.SOLEASPAY,
