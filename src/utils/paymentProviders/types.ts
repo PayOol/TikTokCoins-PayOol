@@ -60,6 +60,7 @@ export interface PaymentProvider {
  * Payment provider types
  */
 export enum PaymentProviderType {
+  LEEKPAY = 'leekpay',
   SOLEASPAY = 'soleaspay',
   BKAPAY = 'bkapay'
 }

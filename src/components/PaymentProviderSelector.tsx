@@ -18,6 +18,7 @@ export function PaymentProviderSelector({ selectedProvider, onProviderChange }: 
   }
 
   const providerNames: Record<PaymentProviderType, string> = {
+    [PaymentProviderType.LEEKPAY]: 'LeekPay',
     [PaymentProviderType.SOLEASPAY]: 'SoleasPay',
     [PaymentProviderType.BKAPAY]: 'BkaPay'
   };
@@ -44,20 +45,20 @@ export function PaymentProviderSelector({ selectedProvider, onProviderChange }: 
               }
             `}
           >
-            {/* Badge Recommande pour BkaPay */}
-            {provider === PaymentProviderType.BKAPAY && (
+            {/* Badge Recommandé pour LeekPay */}
+            {provider === PaymentProviderType.LEEKPAY && (
               <div className="absolute -top-2 -right-2 bg-gradient-to-r from-[var(--tiktok-red)] to-purple-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
-                {t('paymentProvider.recommended', 'Recommande')}
+                {t('paymentProvider.recommended', 'Recommandé')}
               </div>
             )}
             
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {/* Logo du fournisseur */}
-                {provider === PaymentProviderType.BKAPAY && (
+                {provider === PaymentProviderType.LEEKPAY && (
                   <img 
-                    src="https://bkapay.com/assets/bkapay-logo-DMJXxtlJ.png" 
-                    alt="BkaPay Logo" 
+                    src="https://www.leekpay.me/_nuxt/Logo_de_LeekPay_png_sans_arri%C3%A8re-plan.X8ssEAW3.png" 
+                    alt="LeekPay Logo" 
                     className="h-8 w-auto object-contain"
                   />
                 )}
@@ -65,6 +66,13 @@ export function PaymentProviderSelector({ selectedProvider, onProviderChange }: 
                   <img 
                     src="https://soleaspay.com/images/Logo/sopay.png" 
                     alt="SoleasPay Logo" 
+                    className="h-8 w-auto object-contain"
+                  />
+                )}
+                {provider === PaymentProviderType.BKAPAY && (
+                  <img 
+                    src="https://bkapay.com/assets/bkapay-logo-DMJXxtlJ.png" 
+                    alt="BkaPay Logo" 
                     className="h-8 w-auto object-contain"
                   />
                 )}

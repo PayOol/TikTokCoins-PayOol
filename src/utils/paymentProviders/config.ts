@@ -7,21 +7,28 @@ export interface ProviderConfig {
   type: PaymentProviderType;
   apiKey: string;
   enabled: boolean;
+  recommended?: boolean; // Indique si ce provider est recommandé
 }
 
 /**
  * Configuration for all payment providers
  */
 export const paymentProvidersConfig: Record<PaymentProviderType, ProviderConfig> = {
-  [PaymentProviderType.BKAPAY]: {
-    type: PaymentProviderType.BKAPAY,
-    apiKey: 'pk_live_0ce8acd1-ee69-4787-993e-180668077821',
-    enabled: false // Désactivé
+  [PaymentProviderType.LEEKPAY]: {
+    type: PaymentProviderType.LEEKPAY,
+    apiKey: 'pk_live_JcwtlgVYFEBMRbAb2Mpd2o4DX1U6z9oy', // Remplacer par votre clé publique LeekPay
+    enabled: true,
+    recommended: true // Provider recommandé
   },
   [PaymentProviderType.SOLEASPAY]: {
     type: PaymentProviderType.SOLEASPAY,
     apiKey: 'D9flUR0hr0HZF63QKtO2g2-CqQGebos04R-bPRf63K8-AP',
     enabled: true
+  },
+  [PaymentProviderType.BKAPAY]: {
+    type: PaymentProviderType.BKAPAY,
+    apiKey: 'pk_live_0ce8acd1-ee69-4787-993e-180668077821',
+    enabled: false // Désactivé
   }
 };
 

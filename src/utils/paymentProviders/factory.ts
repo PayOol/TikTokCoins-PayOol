@@ -1,4 +1,5 @@
 import { PaymentProvider, PaymentProviderType } from './types';
+import { LeekPayProvider } from './leekpay';
 import { SoleasPayProvider } from './soleaspay';
 import { BkaPayProvider } from './bkapay';
 import { getProviderConfig } from './config';
@@ -22,6 +23,9 @@ export class PaymentProviderFactory {
     }
 
     switch (type) {
+      case PaymentProviderType.LEEKPAY:
+        return new LeekPayProvider(config.apiKey);
+      
       case PaymentProviderType.SOLEASPAY:
         return new SoleasPayProvider(config.apiKey);
       
