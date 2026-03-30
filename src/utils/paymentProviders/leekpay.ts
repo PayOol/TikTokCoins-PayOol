@@ -123,7 +123,9 @@ export class LeekPayProvider implements PaymentProvider {
             const redirectUrl = new URL(successUrlWithParams.toString());
             redirectUrl.searchParams.set('payment_id', data.payment_id);
             redirectUrl.searchParams.set('status', data.status);
-            redirectUrl.searchParams.set('amount', data.amount.toString());
+            // Ne pas écraser 'amount' qui contient déjà le nombre de pièces
+            // Utiliser 'paid_amount' pour le montant payé retourné par LeekPay
+            redirectUrl.searchParams.set('paid_amount', data.amount.toString());
             redirectUrl.searchParams.set('currency', data.currency);
             
             window.location.href = redirectUrl.toString();
