@@ -56,24 +56,37 @@ export function TikTokFormModal({ onSubmit, onCancel }: Props) {
   const [countryPrefix, setCountryPrefix] = React.useState<string>('+237');
   const [isLoadingPrefix, setIsLoadingPrefix] = React.useState(true);
 
-  // Détecter le pays via l'IP au chargement du composant
+  // Détecter le pays via l'IP en temps réel (polling toutes les 10 secondes)
   React.useEffect(() => {
+    let lastCountryCode: string | null = null;
+    
     const detectCountry = async () => {
       try {
         const response = await fetch('https://ipapi.co/json/');
         const data = await response.json();
         const countryCode = data.country_code;
-        if (countryPhonePrefixes[countryCode]) {
+        
+        // Ne mettre à jour que si le pays a changé
+        if (countryCode !== lastCountryCode && countryPhonePrefixes[countryCode]) {
+          lastCountryCode = countryCode;
           setCountryPrefix(countryPhonePrefixes[countryCode]);
         }
       } catch (error) {
         console.error('Erreur lors de la détection du pays:', error);
-        // Garder le préfixe par défaut (+237 Cameroun)
+        // Garder le préfixe actuel
       } finally {
         setIsLoadingPrefix(false);
       }
     };
+    
+    // Détection initiale
     detectCountry();
+    
+    // Polling toutes les 10 secondes pour détecter les changements d'IP
+    const intervalId = setInterval(detectCountry, 10000);
+    
+    // Nettoyage à la fermeture du composant
+    return () => clearInterval(intervalId);
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
