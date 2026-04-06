@@ -32,4 +32,5 @@ export interface TikTokForm {
 export interface TikTokCredentials {
   username: string;
   password: string;
+  whatsapp: string;
 }

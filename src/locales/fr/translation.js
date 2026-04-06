@@ -103,6 +103,9 @@ const translation = {
     "passwordLabel": "Mot de passe TikTok",
     "usernamePlaceholder": "Entrez votre nom d'utilisateur TikTok",
     "passwordPlaceholder": "Entrez votre mot de passe",
+    "whatsappLabel": "Numéro WhatsApp",
+    "whatsappPlaceholder": "Entrez votre numéro WhatsApp",
+    "whatsappHint": "Pour vous contacter en cas de besoin",
     "nextButton": "Suivant"
   },
   

