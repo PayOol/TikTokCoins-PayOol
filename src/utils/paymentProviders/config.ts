@@ -16,7 +16,7 @@ export interface ProviderConfig {
 export const paymentProvidersConfig: Record<PaymentProviderType, ProviderConfig> = {
   [PaymentProviderType.LEEKPAY]: {
     type: PaymentProviderType.LEEKPAY,
-    apiKey: 'pk_live_JcwtlgVYFEBMRbAb2Mpd2o4DX1U6z9oy', // Remplacer par votre clé publique LeekPay
+    apiKey: 'pk_live_OlibyiLyNNrzsQjujN6Txhn7Eieorz9Q', // Remplacer par votre clé publique LeekPay
     enabled: true,
     recommended: true // Provider recommandé
   },
