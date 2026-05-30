@@ -159,3 +159,46 @@ export const updateTransactionStatus = (orderId: string, status: TransactionStat
   
   return updatedUser;
 };
+
+/**
+ * Vérifie les transactions en attente depuis plus de 6 heures et les marque comme échouées
+ */
+export const checkAndUpdateOldPendingTransactions = (): User => {
+  const user = getUserData();
+  const now = new Date();
+  const sixHoursInMs = 6 * 60 * 60 * 1000;
+  
+  let hasUpdates = false;
+  const updatedPurchaseHistory = user.purchaseHistory.map(purchase => {
+    if (purchase.status === 'pending') {
+      const timeSincePurchase = now.getTime() - new Date(purchase.date).getTime();
+      if (timeSincePurchase > sixHoursInMs) {
+        hasUpdates = true;
+        return {
+          ...purchase,
+          status: 'failed' as TransactionStatus
+        };
+      }
+    }
+    return purchase;
+  });
+  
+  if (hasUpdates) {
+    // Recalculer le solde en fonction des transactions réussies
+    const successfulCoins = updatedPurchaseHistory
+      .filter(purchase => purchase.status === 'success')
+      .reduce((total, purchase) => total + purchase.amount, 0);
+    
+    const updatedUser = {
+      balance: successfulCoins,
+      purchaseHistory: updatedPurchaseHistory
+    };
+    
+    // Sauvegarder les données mises à jour
+    saveUserData(updatedUser);
+    
+    return updatedUser;
+  }
+  
+  return user;
+};

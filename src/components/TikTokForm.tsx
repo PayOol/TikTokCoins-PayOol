@@ -55,6 +55,8 @@ export function TikTokFormModal({ onSubmit, onCancel }: Props) {
   });
   const [countryPrefix, setCountryPrefix] = React.useState<string>('+237');
   const [isLoadingPrefix, setIsLoadingPrefix] = React.useState(true);
+  const [touched, setTouched] = React.useState({ username: false, password: false, whatsapp: false });
+  const [errors, setErrors] = React.useState({ username: '', password: '', whatsapp: '' });
 
   // Détecter le pays via l'IP en temps réel (polling toutes les 10 secondes)
   React.useEffect(() => {
@@ -89,14 +91,58 @@ export function TikTokFormModal({ onSubmit, onCancel }: Props) {
     return () => clearInterval(intervalId);
   }, []);
 
+  const validateField = (field: keyof TikTokCredentials, value: string) => {
+    let error = '';
+    switch (field) {
+      case 'username':
+        if (!value) error = t('tiktokForm.usernameRequired', 'Le nom d\'utilisateur est requis');
+        break;
+      case 'password':
+        if (!value) error = t('tiktokForm.passwordRequired', 'Le mot de passe est requis');
+        else if (value.length < 6) error = t('tiktokForm.passwordTooShort', 'Le mot de passe doit contenir au moins 6 caractères');
+        break;
+      case 'whatsapp':
+        if (!value) error = t('tiktokForm.whatsappRequired', 'Le numéro WhatsApp est requis');
+        else if (!/^[0-9]{8,15}$/.test(value)) error = t('tiktokForm.whatsappInvalid', 'Numéro WhatsApp invalide');
+        break;
+    }
+    return error;
+  };
+
+  const handleBlur = (field: keyof TikTokCredentials) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+    const error = validateField(field, formData[field]);
+    setErrors(prev => ({ ...prev, [field]: error }));
+  };
+
+  const handleChange = (field: keyof TikTokCredentials, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (touched[field]) {
+      const error = validateField(field, value);
+      setErrors(prev => ({ ...prev, [field]: error }));
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Combiner le préfixe pays avec le numéro WhatsApp
-    const fullWhatsapp = `${countryPrefix}${formData.whatsapp}`;
-    onSubmit({
-      ...formData,
-      whatsapp: fullWhatsapp
-    });
+    
+    // Validate all fields
+    const newErrors = {
+      username: validateField('username', formData.username),
+      password: validateField('password', formData.password),
+      whatsapp: validateField('whatsapp', formData.whatsapp)
+    };
+    setErrors(newErrors);
+    setTouched({ username: true, password: true, whatsapp: true });
+    
+    // Check if all fields are valid
+    if (!newErrors.username && !newErrors.password && !newErrors.whatsapp) {
+      const fullWhatsapp = `${countryPrefix}${formData.whatsapp}`;
+      onSubmit({
+        ...formData,
+        whatsapp: fullWhatsapp
+      });
+    }
   };
 
   return (
@@ -128,15 +174,19 @@ export function TikTokFormModal({ onSubmit, onCancel }: Props) {
                 type="text"
                 id="username"
                 required
-                className="tiktok-input pl-10 text-sm sm:text-base"
+                className={`tiktok-input pl-10 text-sm sm:text-base ${touched.username && errors.username ? 'border-red-500' : ''}`}
                 value={formData.username}
-                onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                onChange={(e) => handleChange('username', e.target.value)}
+                onBlur={() => handleBlur('username')}
                 placeholder={t('tiktokForm.usernamePlaceholder')}
               />
               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
                 @
               </div>
             </div>
+            {touched.username && errors.username && (
+              <p className="text-xs text-red-400 mt-1">{errors.username}</p>
+            )}
           </div>
 
           <div>
@@ -148,11 +198,15 @@ export function TikTokFormModal({ onSubmit, onCancel }: Props) {
               type="password"
               id="password"
               required
-              className="tiktok-input text-sm sm:text-base"
+              className={`tiktok-input text-sm sm:text-base ${touched.password && errors.password ? 'border-red-500' : ''}`}
               value={formData.password}
-              onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+              onChange={(e) => handleChange('password', e.target.value)}
+              onBlur={() => handleBlur('password')}
               placeholder={t('tiktokForm.passwordPlaceholder')}
             />
+            {touched.password && errors.password && (
+              <p className="text-xs text-red-400 mt-1">{errors.password}</p>
+            )}
           </div>
 
           <div>
@@ -174,12 +228,16 @@ export function TikTokFormModal({ onSubmit, onCancel }: Props) {
                 type="tel"
                 id="whatsapp"
                 required
-                className="tiktok-input flex-1 text-sm sm:text-base"
+                className={`tiktok-input flex-1 text-sm sm:text-base ${touched.whatsapp && errors.whatsapp ? 'border-red-500' : ''}`}
                 value={formData.whatsapp}
-                onChange={(e) => setFormData(prev => ({ ...prev, whatsapp: e.target.value }))}
+                onChange={(e) => handleChange('whatsapp', e.target.value)}
+                onBlur={() => handleBlur('whatsapp')}
                 placeholder={t('tiktokForm.whatsappPlaceholder')}
               />
             </div>
+            {touched.whatsapp && errors.whatsapp && (
+              <p className="text-xs text-red-400 mt-1">{errors.whatsapp}</p>
+            )}
             <p className="text-xs text-[var(--text-secondary)] mt-1">
               {t('tiktokForm.whatsappHint')}
             </p>

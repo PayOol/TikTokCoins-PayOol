@@ -14,7 +14,8 @@ import { ServiceWorkerUpdate } from './components/ServiceWorkerUpdate';
 import { coinPackages } from './data/coinPackages';
 import { Purchase, User, CoinPackage, TikTokCredentials } from './types';
 import { initiatePayment, PaymentProviderType } from './utils/payment';
-import { getUserData, addPurchase } from './utils/localStorage';
+import { getUserData, addPurchase, checkAndUpdateOldPendingTransactions } from './utils/localStorage';
+import { RefreshCw } from 'lucide-react';
 
 // Importer les fichiers de style
 import './styles/theme.css';
@@ -47,6 +48,11 @@ function App() {
 
   const handleEmailFormCancel = () => {
     setShowEmailForm(false);
+  };
+
+  const handleRefreshHistory = () => {
+    const updatedUser = checkAndUpdateOldPendingTransactions();
+    setUser(updatedUser);
   };
 
   const [paymentError, setPaymentError] = useState<string | null>(null);
@@ -231,6 +237,13 @@ function App() {
       {/* Section historique des achats */}
       <div className="mt-12 sm:mt-16">
         <h2 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 flex items-center gap-2">
+          <button
+            onClick={handleRefreshHistory}
+            className="p-2 rounded-full hover:bg-[var(--background-hover)] transition-colors text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+            title="Actualiser l'historique"
+          >
+            <RefreshCw className="w-5 h-5" />
+          </button>
           <span>{t('purchaseHistory')}</span>
           {user.purchaseHistory.length > 0 && (
             <span className="text-xs sm:text-sm bg-[var(--background-elevated-2)] text-[var(--text-secondary)] px-2 py-0.5 rounded-full">

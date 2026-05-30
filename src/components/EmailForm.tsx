@@ -18,6 +18,7 @@ export function EmailFormModal({ onSubmit, onCancel, isLoading = false, packageA
   const [isValid, setIsValid] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [selectedProvider, setSelectedProvider] = React.useState<PaymentProviderType>(getDefaultProvider());
+  const [touched, setTouched] = React.useState(false);
 
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -28,6 +29,10 @@ export function EmailFormModal({ onSubmit, onCancel, isLoading = false, packageA
     const value = e.target.value;
     setEmail(value);
     setIsValid(validateEmail(value));
+  };
+
+  const handleBlur = () => {
+    setTouched(true);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -67,11 +72,19 @@ export function EmailFormModal({ onSubmit, onCancel, isLoading = false, packageA
               type="email"
               id="email"
               required
-              className={`tiktok-input text-sm sm:text-base ${isValid ? 'border-green-500' : ''}`}
+              className={`tiktok-input text-sm sm:text-base ${isValid ? 'border-green-500' : (touched && email && !isValid ? 'border-red-500' : '')}`}
               value={email}
               onChange={handleChange}
+              onBlur={handleBlur}
               placeholder={t('emailForm.emailPlaceholder')}
             />
+            
+            {touched && !email && (
+              <p className="text-xs text-red-400 mt-1">{t('emailForm.emailRequired', 'L\'email est requis')}</p>
+            )}
+            {touched && email && !isValid && (
+              <p className="text-xs text-red-400 mt-1">{t('emailForm.invalidEmail', 'Veuillez entrer une adresse email valide')}</p>
+            )}
             
             <div className="bg-[var(--background-elevated-2)] p-3 sm:p-4 rounded-[var(--radius-md)] mb-4 sm:mb-6 mt-3">
               <p className="text-xs sm:text-sm text-[var(--text-secondary)] mb-2">
