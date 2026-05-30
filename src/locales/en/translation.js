@@ -4,7 +4,7 @@ const translation = {
   
   // Main sections
   "availablePackages": "Available Packages",
-  "securePayment": "Secure payment via SoleasPay",
+  "securePayment": "Secure payment via Mobile Money",
   "purchaseHistory": "Purchase History",
   "needHelp": "Need help buying your coins?",
   "watchVideo": "Watch this video",

@@ -4,7 +4,7 @@ const translation = {
   
   // Main sections
   "availablePackages": "Forfaits disponibles",
-  "securePayment": "Paiement sécurisé via SoleasPay",
+  "securePayment": "Paiement sécurisé via Mobile Money",
   "purchaseHistory": "Historique des achats",
   "needHelp": "Besoin d'aide pour acheter vos pièces ?",
   "watchVideo": "Regardez cette vidéo",
