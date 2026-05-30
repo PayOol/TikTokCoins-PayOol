@@ -20,13 +20,13 @@ export function CoinPackage({ package: pkg, onSelect }: Props) {
   return (
     <div 
       onClick={() => !pkg.disabled && onSelect(pkg)}
-      className={`card-hover-effect bg-[var(--card-bg)] rounded-[var(--radius-md)] p-6 shadow-[var(--shadow-sm)] relative overflow-hidden border border-[var(--border-dark)] ${
-        pkg.disabled ? 'cursor-not-allowed' : ''
+      className={`card-hover-effect bg-[var(--card-bg)] rounded-[var(--radius-md)] p-4 sm:p-6 shadow-[var(--shadow-sm)] relative overflow-hidden border border-[var(--border-dark)] group ${
+        pkg.disabled ? 'cursor-not-allowed' : 'cursor-pointer'
       }`}
     >
       {/* Badge populaire */}
       {!pkg.disabled && isPopular && (
-        <div className="absolute -right-10 top-5 bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] text-white px-10 py-1 rotate-45 text-xs font-bold shadow-md">
+        <div className="absolute -right-8 sm:-right-10 top-4 sm:top-5 bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] text-white px-6 sm:px-10 py-0.5 sm:py-1 rotate-45 text-xs font-bold shadow-md">
           {t('popular', 'POPULAIRE')}
         </div>
       )}
@@ -40,27 +40,27 @@ export function CoinPackage({ package: pkg, onSelect }: Props) {
         </div>
       )}
       
-      <div className={`flex items-center justify-between mb-6 ${pkg.disabled ? 'opacity-50' : ''}`}>
+      <div className={`flex items-center justify-between mb-4 sm:mb-6 ${pkg.disabled ? 'opacity-50' : ''}`}>
         <div className="flex items-center gap-2">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--tiktok-blue)] to-[var(--tiktok-red)] flex items-center justify-center">
-            <Coins className="w-6 h-6 text-white" />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-[var(--tiktok-blue)] to-[var(--tiktok-red)] flex items-center justify-center">
+            <Coins className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
           <div>
-            <span className="block text-sm text-[var(--text-secondary)]">TikTok</span>
-            <span className="block font-bold">Coins</span>
+            <span className="block text-xs sm:text-sm text-[var(--text-secondary)]">TikTok</span>
+            <span className="block text-sm sm:text-base font-bold">Coins</span>
           </div>
         </div>
-        <span className="text-3xl font-extrabold tiktok-gradient-text">{pkg.amount.toLocaleString()}</span>
+        <span className="text-2xl sm:text-3xl font-extrabold tiktok-gradient-text">{pkg.amount.toLocaleString()}</span>
       </div>
       
       {/* Prix avec animation au survol */}
-      <div className={`mt-6 flex items-end justify-between ${pkg.disabled ? 'opacity-50' : ''}`}>
+      <div className={`mt-4 sm:mt-6 flex flex-col sm:flex-row sm:items-end justify-between gap-2 ${pkg.disabled ? 'opacity-50' : ''}`}>
         <div>
-          <div className="text-2xl font-bold">{pkg.price.toLocaleString()} FCFA</div>
+          <div className="text-xl sm:text-2xl font-bold">{pkg.price.toLocaleString()} FCFA</div>
           {pkg.bonus && pkg.bonus > 0 && (
             <div className="flex items-center gap-1 mt-1">
-              <Sparkles className="w-4 h-4 text-[var(--tiktok-red)]" />
-              <span className="text-sm font-medium text-[var(--tiktok-red)]">
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--tiktok-red)]" />
+              <span className="text-xs sm:text-sm font-medium text-[var(--tiktok-red)]">
                 +{pkg.bonus} {t('freeCoins', 'coins gratuits')}
               </span>
             </div>
@@ -68,16 +68,16 @@ export function CoinPackage({ package: pkg, onSelect }: Props) {
         </div>
         
         {bonusPercentage > 0 && (
-          <div className="flex items-center gap-1 bg-green-900 bg-opacity-30 dark-mode-bonus px-2 py-1 rounded-full text-sm font-medium">
+          <div className="flex items-center gap-1 bg-green-900 bg-opacity-30 dark-mode-bonus px-2 py-1 rounded-full text-xs sm:text-sm font-medium">
             <TrendingUp className="w-3 h-3" />
             <span>+{bonusPercentage}%</span>
           </div>
         )}
       </div>
       
-      {/* Bouton d'achat qui apparaît au survol */}
-      <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button className="w-full py-2 bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] text-white rounded-full font-medium">
+      {/* Bouton d'achat */}
+      <div className="mt-3 sm:mt-4">
+        <button className="w-full py-2 bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] text-white rounded-full font-medium text-sm sm:text-base">
           {t('buyNow', 'Acheter maintenant')}
         </button>
       </div>

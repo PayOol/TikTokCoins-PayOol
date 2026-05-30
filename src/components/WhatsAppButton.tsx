@@ -1,4 +1,3 @@
-import { MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 
 interface WhatsAppButtonProps {
@@ -22,7 +21,11 @@ export function WhatsAppButton({ whatsappUrl }: WhatsAppButtonProps) {
         aria-label="Contacter sur WhatsApp"
       >
         <div className="whatsapp-icon-wrapper">
-          <MessageCircle className="w-7 h-7" strokeWidth={2.5} />
+          <img 
+            src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
+            alt="WhatsApp" 
+            className="w-7 h-7"
+          />
         </div>
         <span className={`whatsapp-tooltip ${isHovered ? 'visible' : ''}`}>
           💬 Besoin d'aide ?

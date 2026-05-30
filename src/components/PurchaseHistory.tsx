@@ -71,12 +71,12 @@ export const PurchaseHistory = ({ purchases }: PurchaseHistoryProps) => {
 
   if (purchases.length === 0) {
     return (
-      <div className="bg-[var(--card-bg)] rounded-[var(--radius-md)] p-8 text-center shadow-[var(--shadow-sm)] border border-[var(--border-dark)]">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--background-elevated-2)] flex items-center justify-center">
-          <CalendarDays className="w-8 h-8 text-[var(--text-tertiary)]" />
+      <div className="bg-[var(--card-bg)] rounded-[var(--radius-md)] p-6 sm:p-8 text-center shadow-[var(--shadow-sm)] border border-[var(--border-dark)]">
+        <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 rounded-full bg-[var(--background-elevated-2)] flex items-center justify-center">
+          <CalendarDays className="w-7 h-7 sm:w-8 sm:h-8 text-[var(--text-tertiary)]" />
         </div>
-        <h3 className="text-lg font-medium mb-1">Aucun historique</h3>
-        <p className="text-[var(--text-secondary)] text-sm max-w-xs mx-auto">
+        <h3 className="text-base sm:text-lg font-medium mb-1">Aucun historique</h3>
+        <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-xs mx-auto">
           Vous n'avez pas encore effectué d'achat de pièces TikTok.
         </p>
       </div>
@@ -84,25 +84,25 @@ export const PurchaseHistory = ({ purchases }: PurchaseHistoryProps) => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {purchases.map((purchase) => (
-        <div key={purchase.id} className={`bg-[var(--card-bg)] rounded-[var(--radius-md)] shadow-[var(--shadow-sm)] p-4 flex justify-between items-center border ${getStatusBorderColor(purchase.status)}`}>
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getStatusBackgroundColor(purchase.status)}`}>
-              <Coins className="w-5 h-5 text-white" />
+        <div key={purchase.id} className={`bg-[var(--card-bg)] rounded-[var(--radius-md)] shadow-[var(--shadow-sm)] p-3 sm:p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-3 border ${getStatusBorderColor(purchase.status)}`}>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${getStatusBackgroundColor(purchase.status)}`}>
+              <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-medium">{purchase.amount} pièces</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm sm:text-base font-medium">{purchase.amount} pièces</span>
                 {getStatusBadge(purchase.status)}
               </div>
-              <div className="text-sm text-[var(--text-secondary)]">{formatDate(purchase.date)}</div>
+              <div className="text-xs sm:text-sm text-[var(--text-secondary)]">{formatDate(purchase.date)}</div>
               {purchase.status === 'failed' && purchase.errorMessage && (
                 <div className="text-xs text-red-400 mt-1">{purchase.errorMessage}</div>
               )}
             </div>
           </div>
-          <span className="font-bold">{purchase.price.toLocaleString()} FCFA</span>
+          <span className="text-sm sm:text-base font-bold text-right">{purchase.price.toLocaleString()} FCFA</span>
         </div>
       ))}
     </div>

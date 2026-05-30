@@ -24,10 +24,10 @@ export function PaymentProviderSelector({ selectedProvider, onProviderChange }: 
   };
 
   return (
-    <div className="mb-6 p-4 bg-[var(--background-elevated)] rounded-[var(--radius-lg)] border border-[var(--border-dark)]">
+    <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-[var(--background-elevated)] rounded-[var(--radius-lg)] border border-[var(--border-dark)]">
       <div className="flex items-center gap-2 mb-3">
-        <CreditCard className="w-5 h-5 text-[var(--tiktok-red)]" />
-        <h3 className="text-lg font-semibold text-[var(--text-primary)]">
+        <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--tiktok-red)]" />
+        <h3 className="text-base sm:text-lg font-semibold text-[var(--text-primary)]">
           {t('paymentProvider.title', 'Méthode de paiement')}
         </h3>
       </div>
@@ -38,7 +38,7 @@ export function PaymentProviderSelector({ selectedProvider, onProviderChange }: 
             key={provider}
             onClick={() => onProviderChange(provider)}
             className={`
-              p-4 rounded-[var(--radius-md)] border-2 transition-all duration-200 relative
+              p-3 sm:p-4 rounded-[var(--radius-md)] border-2 transition-all duration-200 relative
               ${selectedProvider === provider
                 ? 'border-[var(--tiktok-red)] bg-[var(--background-elevated-2)] shadow-md'
                 : 'border-[var(--border-dark)] bg-[var(--background-elevated)] hover:border-[var(--tiktok-red)] hover:shadow-sm'
@@ -53,39 +53,39 @@ export function PaymentProviderSelector({ selectedProvider, onProviderChange }: 
             )}
             
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 {/* Logo du fournisseur */}
                 {provider === PaymentProviderType.LEEKPAY && (
                   <img 
                     src="https://www.leekpay.me/_nuxt/Logo_de_LeekPay_png_sans_arri%C3%A8re-plan.X8ssEAW3.png" 
                     alt="LeekPay Logo" 
-                    className="h-8 w-auto object-contain"
+                    className="h-6 sm:h-8 w-auto object-contain"
                   />
                 )}
                 {provider === PaymentProviderType.SOLEASPAY && (
                   <img 
                     src="https://soleaspay.com/images/Logo/sopay.png" 
                     alt="SoleasPay Logo" 
-                    className="h-8 w-auto object-contain"
+                    className="h-6 sm:h-8 w-auto object-contain"
                   />
                 )}
                 {provider === PaymentProviderType.BKAPAY && (
                   <img 
                     src="https://bkapay.com/assets/bkapay-logo-DMJXxtlJ.png" 
                     alt="BkaPay Logo" 
-                    className="h-8 w-auto object-contain"
+                    className="h-6 sm:h-8 w-auto object-contain"
                   />
                 )}
                 
-                <span className={`font-medium ${
+                <span className={`text-sm sm:text-base font-medium ${
                   selectedProvider === provider ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'
                 }`}>
                   {providerNames[provider]}
                 </span>
               </div>
               {selectedProvider === provider && (
-                <div className="w-5 h-5 rounded-full bg-[var(--tiktok-red)] flex items-center justify-center">
-                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[var(--tiktok-red)] flex items-center justify-center">
+                  <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
@@ -95,7 +95,7 @@ export function PaymentProviderSelector({ selectedProvider, onProviderChange }: 
         ))}
       </div>
       
-      <p className="mt-3 text-sm text-[var(--text-secondary)]">
+      <p className="mt-3 text-xs sm:text-sm text-[var(--text-secondary)]">
         {t('paymentProvider.description', 'Sélectionnez votre méthode de paiement préférée')}
       </p>
     </div>

@@ -46,25 +46,25 @@ export function CustomPackage({ onSelect }: Props) {
   };
 
   return (
-        <div className={`card-hover-effect bg-[var(--card-bg)] rounded-[var(--radius-md)] p-6 shadow-[var(--shadow-sm)] relative overflow-hidden border border-[var(--border-dark)] md:col-span-2 lg:col-span-3 ${isAnimating ? 'animate-pulse' : ''}`}>
+        <div className={`card-hover-effect bg-[var(--card-bg)] rounded-[var(--radius-md)] p-4 sm:p-6 shadow-[var(--shadow-sm)] relative overflow-hidden border border-[var(--border-dark)] col-span-2 md:col-span-2 lg:col-span-3 ${isAnimating ? 'animate-pulse' : ''}`}>
       {/* En-tête avec icône et titre */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-[var(--tiktok-red)] flex items-center justify-center">
-          <Edit3 className="w-6 h-6 text-white" />
+      <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-purple-500 to-[var(--tiktok-red)] flex items-center justify-center">
+          <Edit3 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-[var(--text-primary)]">{t('customAmount')}</h3>
-          <p className="text-sm text-[var(--text-secondary)]">{t('customPackage')}</p>
+          <h3 className="text-base sm:text-lg font-semibold text-[var(--text-primary)]">{t('customAmount')}</h3>
+          <p className="text-xs sm:text-sm text-[var(--text-secondary)]">{t('customPackage')}</p>
         </div>
       </div>
       
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
         <div>
           <label htmlFor="customAmount" className="tiktok-label flex items-center gap-2">
-            <label htmlFor="custom-amount" className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+            <label htmlFor="custom-amount" className="block text-xs sm:text-sm font-medium text-[var(--text-secondary)] mb-2">
               {t('minimumCoins')}
             </label>
-            <Coins className="w-4 h-4 text-[var(--tiktok-red)]" />
+            <Coins className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--tiktok-red)]" />
           </label>
           <div className="relative">
             <input
@@ -73,11 +73,11 @@ export function CustomPackage({ onSelect }: Props) {
               min="70"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="tiktok-input pr-12"
+              className="tiktok-input pr-12 text-sm sm:text-base"
               placeholder={t('enterCustomAmount')}
               required
             />
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]">
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)] text-xs sm:text-sm">
               {t('coins')}
             </div>
           </div>
@@ -88,10 +88,10 @@ export function CustomPackage({ onSelect }: Props) {
         </div>
 
         {/* Affichage du prix calculé avec animation */}
-        <div className="bg-[var(--background-elevated-2)] p-4 rounded-[var(--radius-md)] transition-all duration-300">
+        <div className="bg-[var(--background-elevated-2)] p-3 sm:p-4 rounded-[var(--radius-md)] transition-all duration-300">
           <div className="flex justify-between items-center">
-            <span className="text-[var(--text-secondary)]">{t('totalToPay')}:</span>
-            <span className={`text-2xl font-bold tiktok-gradient-text transition-all duration-300 ${price > 0 ? 'scale-100' : 'scale-95 opacity-50'}`}>
+            <span className="text-xs sm:text-sm text-[var(--text-secondary)]">{t('totalToPay')}:</span>
+            <span className={`text-xl sm:text-2xl font-bold tiktok-gradient-text transition-all duration-300 ${price > 0 ? 'scale-100' : 'scale-95 opacity-50'}`}>
               {price > 0 ? price.toLocaleString() : '0'} FCFA
             </span>
           </div>
@@ -99,11 +99,11 @@ export function CustomPackage({ onSelect }: Props) {
 
         <button
           type="submit"
-          className="tiktok-button w-full flex items-center justify-center gap-2"
+          className="tiktok-button w-full flex items-center justify-center gap-2 text-sm sm:text-base py-2.5 sm:py-3"
           disabled={!amount || parseInt(amount, 10) < 70}
         >
           <span>{t('buyNow')}</span>
-          <ArrowRight className="w-4 h-4" />
+          <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
         </button>
       </form>
     </div>

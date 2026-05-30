@@ -100,27 +100,27 @@ export function TikTokFormModal({ onSubmit, onCancel }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 modal-backdrop flex items-center justify-center p-4 z-50 fade-in">
+    <div className="fixed inset-0 modal-backdrop flex items-center justify-center p-3 sm:p-4 z-50 fade-in">
       <div className="bg-[var(--background-elevated)] rounded-[var(--radius-lg)] w-full max-w-md shadow-[var(--shadow-lg)] overflow-hidden slide-up border border-[var(--border-dark)]">
         {/* En-tête avec dégradé */}
-        <div className="bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] p-6 relative">
+        <div className="bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] p-4 sm:p-6 relative">
           <button 
             onClick={onCancel}
-            className="absolute top-4 right-4 text-white bg-white bg-opacity-20 rounded-full p-1.5 hover:bg-opacity-30 transition-colors"
+            className="absolute top-3 sm:top-4 right-3 sm:right-4 text-white bg-white bg-opacity-20 rounded-full p-1.5 hover:bg-opacity-30 transition-colors"
           >
             <X size={20} />
           </button>
           
-          <h2 className="text-2xl font-bold text-white mb-1">{t('tiktokForm.title')}</h2>
-          <p className="text-white text-opacity-80 text-sm">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">{t('tiktokForm.title')}</h2>
+          <p className="text-white text-opacity-80 text-xs sm:text-sm">
             {t('tiktokForm.subtitle')}
           </p>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5">
           <div>
-            <label htmlFor="username" className="tiktok-label flex items-center gap-2">
-              <User className="w-4 h-4 text-[var(--tiktok-red)]" />
+            <label htmlFor="username" className="tiktok-label flex items-center gap-2 text-xs sm:text-sm">
+              <User className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--tiktok-red)]" />
               <span>{t('tiktokForm.usernameLabel')}</span>
             </label>
             <div className="relative">
@@ -128,27 +128,27 @@ export function TikTokFormModal({ onSubmit, onCancel }: Props) {
                 type="text"
                 id="username"
                 required
-                className="tiktok-input pl-10"
+                className="tiktok-input pl-10 text-sm sm:text-base"
                 value={formData.username}
                 onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
                 placeholder={t('tiktokForm.usernamePlaceholder')}
               />
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
                 @
               </div>
             </div>
           </div>
 
           <div>
-            <label htmlFor="password" className="tiktok-label flex items-center gap-2">
-              <Lock className="w-4 h-4 text-[var(--tiktok-red)]" />
+            <label htmlFor="password" className="tiktok-label flex items-center gap-2 text-xs sm:text-sm">
+              <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--tiktok-red)]" />
               <span>{t('tiktokForm.passwordLabel')}</span>
             </label>
             <input
               type="password"
               id="password"
               required
-              className="tiktok-input"
+              className="tiktok-input text-sm sm:text-base"
               value={formData.password}
               onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
               placeholder={t('tiktokForm.passwordPlaceholder')}
@@ -156,15 +156,15 @@ export function TikTokFormModal({ onSubmit, onCancel }: Props) {
           </div>
 
           <div>
-            <label htmlFor="whatsapp" className="tiktok-label flex items-center gap-2">
-              <Phone className="w-4 h-4 text-[var(--tiktok-red)]" />
+            <label htmlFor="whatsapp" className="tiktok-label flex items-center gap-2 text-xs sm:text-sm">
+              <Phone className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--tiktok-red)]" />
               <span>{t('tiktokForm.whatsappLabel')}</span>
             </label>
             <div className="flex gap-2">
               <input
                 type="text"
                 id="countryPrefix"
-                className="tiktok-input w-24 text-center"
+                className="tiktok-input w-20 sm:w-24 text-center text-sm sm:text-base"
                 value={countryPrefix}
                 onChange={(e) => setCountryPrefix(e.target.value)}
                 disabled={isLoadingPrefix}
@@ -174,7 +174,7 @@ export function TikTokFormModal({ onSubmit, onCancel }: Props) {
                 type="tel"
                 id="whatsapp"
                 required
-                className="tiktok-input flex-1"
+                className="tiktok-input flex-1 text-sm sm:text-base"
                 value={formData.whatsapp}
                 onChange={(e) => setFormData(prev => ({ ...prev, whatsapp: e.target.value }))}
                 placeholder={t('tiktokForm.whatsappPlaceholder')}
@@ -188,18 +188,18 @@ export function TikTokFormModal({ onSubmit, onCancel }: Props) {
           <div className="pt-4">
             <button
               type="submit"
-              className="tiktok-button w-full flex items-center justify-center gap-2"
+              className="tiktok-button w-full flex items-center justify-center gap-2 text-sm sm:text-base py-2.5 sm:py-3"
             >
               {t('tiktokForm.nextButton')}
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
             </button>
             
             <button
               type="button"
               onClick={onCancel}
-              className="w-full text-center mt-4 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center justify-center gap-2"
+              className="w-full text-center mt-4 text-xs sm:text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center justify-center gap-2"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
               {t('cancel')}
             </button>
           </div>

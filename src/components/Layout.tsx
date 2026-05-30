@@ -45,10 +45,10 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
                 {menuOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
               
-              <Link to="/" className="text-2xl font-bold flex items-center gap-2">
-                <Coins className="w-7 h-7 text-[var(--tiktok-red)]" />
+              <Link to="/" className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                <Coins className="w-6 h-6 sm:w-7 sm:h-7 text-[var(--tiktok-red)]" />
                 <span className="tiktok-gradient-text">TikTok Coins</span>
-                <span className="text-sm font-normal text-[var(--text-secondary)]">by PayOol™</span>
+                <span className="text-xs sm:text-sm font-normal text-[var(--text-secondary)] hidden sm:inline">by PayOol™</span>
               </Link>
             </div>
             
@@ -81,7 +81,7 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
         onClick={toggleMenu}>
       </div>
       
-      <div className={`fixed top-0 left-0 h-full w-64 bg-[var(--background-elevated)] shadow-lg z-50 transform transition-transform duration-300 lg:hidden ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div className={`fixed top-0 left-0 h-full w-72 sm:w-64 bg-[var(--background-elevated)] shadow-lg z-50 transform transition-transform duration-300 lg:hidden ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-4 border-b border-[var(--border-dark)]">
           <h2 className="text-xl font-bold tiktok-gradient-text">TikTok Coins</h2>
         </div>
@@ -134,20 +134,20 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
       </div>
       
       {/* Contenu principal */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
         {children}
       </main>
       
       {/* Footer */}
-      <footer className="bg-[var(--background-elevated)] border-t border-[var(--border-dark)] mt-12 py-6">
+      <footer className="bg-[var(--background-elevated)] border-t border-[var(--border-dark)] mt-8 sm:mt-12 py-4 sm:py-6">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
             <div className="flex items-center gap-2">
-              <Coins className="w-5 h-5 text-[var(--tiktok-red)]" />
-              <span className="font-medium">TikTok Coins by PayOol™</span>
+              <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--tiktok-red)]" />
+              <span className="text-sm sm:text-base font-medium">TikTok Coins by PayOol™</span>
             </div>
             
-            <div className="text-sm text-[var(--text-secondary)]">
+            <div className="text-xs sm:text-sm text-[var(--text-secondary)]">
               &copy; {new Date().getFullYear()} PayOol™. {t('allRightsReserved', 'Tous droits réservés.')}
             </div>
           </div>

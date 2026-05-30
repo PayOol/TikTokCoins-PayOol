@@ -167,17 +167,17 @@ function App() {
   return (
     <Layout balance={user.balance}>
       {/* Section vidéo d'aide */}
-      <div className="mb-8">
-        <div className="bg-gradient-to-r from-[var(--background-elevated)] to-[var(--background-elevated-2)] rounded-[var(--radius-lg)] p-4 md:p-5 shadow-[var(--shadow-lg)] border border-[var(--border-dark)] overflow-hidden">
-          <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+      <div className="mb-6 sm:mb-8">
+        <div className="bg-gradient-to-r from-[var(--background-elevated)] to-[var(--background-elevated-2)] rounded-[var(--radius-lg)] p-3 sm:p-4 md:p-5 shadow-[var(--shadow-lg)] border border-[var(--border-dark)] overflow-hidden">
+          <div className="flex flex-col md:flex-row md:items-center gap-3 sm:gap-4 md:gap-6">
             <div className="flex-shrink-0 md:min-w-[200px]">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-2 h-2 rounded-full bg-[var(--tiktok-red)] animate-pulse"></div>
-                <h3 className="text-base md:text-lg font-bold text-[var(--text-primary)]">
+                <h3 className="text-sm sm:text-base md:text-lg font-bold text-[var(--text-primary)]">
                   {t('needHelp')}
                 </h3>
               </div>
-              <p className="text-xs md:text-sm text-[var(--text-secondary)] leading-relaxed">{t('watchVideo')}</p>
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">{t('watchVideo')}</p>
             </div>
             <div 
               className="youtube-frame-wrapper"
@@ -207,16 +207,16 @@ function App() {
       </div>
 
       {/* Section principale avec les forfaits */}
-      <div className="mb-12">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-bold">{t('availablePackages')}</h2>
-          <div className="flex items-center gap-2 text-sm bg-[var(--background-elevated-2)] px-3 py-1.5 rounded-full">
-            <Sparkles className="w-4 h-4 text-[var(--tiktok-red)]" />
+      <div className="mb-8 sm:mb-12">
+        <div className="flex items-center justify-between gap-2 sm:gap-3 mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold">{t('availablePackages')}</h2>
+          <div className="flex items-center gap-2 text-xs sm:text-sm bg-[var(--background-elevated-2)] px-2 sm:px-3 py-1.5 rounded-full whitespace-nowrap">
+            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--tiktok-red)]" />
             <span>{t('securePayment')}</span>
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
           {coinPackages.map((pkg) => (
             <CoinPackageComponent
               key={pkg.id}
@@ -229,11 +229,11 @@ function App() {
       </div>
 
       {/* Section historique des achats */}
-      <div className="mt-16">
-        <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
+      <div className="mt-12 sm:mt-16">
+        <h2 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 flex items-center gap-2">
           <span>{t('purchaseHistory')}</span>
           {user.purchaseHistory.length > 0 && (
-            <span className="text-sm bg-[var(--background-elevated-2)] text-[var(--text-secondary)] px-2 py-0.5 rounded-full">
+            <span className="text-xs sm:text-sm bg-[var(--background-elevated-2)] text-[var(--text-secondary)] px-2 py-0.5 rounded-full">
               {user.purchaseHistory.length}
             </span>
           )}
@@ -276,8 +276,8 @@ function App() {
       
       {/* Affichage des erreurs de paiement */}
       {paymentError && (
-        <div className="fixed inset-0 modal-backdrop flex items-center justify-center p-4 z-50 fade-in">
-          <div className="bg-[var(--background-elevated)] rounded-[var(--radius-lg)] p-6 w-full max-w-md shadow-[var(--shadow-lg)] slide-up border border-[var(--border-dark)]">
+        <div className="fixed inset-0 modal-backdrop flex items-center justify-center p-3 sm:p-4 z-50 fade-in">
+          <div className="bg-[var(--background-elevated)] rounded-[var(--radius-lg)] p-4 sm:p-6 w-full max-w-md shadow-[var(--shadow-lg)] slide-up border border-[var(--border-dark)]">
             <div className="bg-red-900 bg-opacity-20 p-4 rounded-[var(--radius-md)] mb-4 flex items-start gap-3">
               <div className="w-8 h-8 rounded-full bg-red-900 bg-opacity-30 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-5 h-5 text-red-500">
@@ -307,15 +307,15 @@ function App() {
       {/* Modal popup pour la vidéo */}
       {showVideoPopup && (
         <div 
-          className="fixed inset-0 modal-backdrop flex items-center justify-center p-4 z-50 fade-in"
+          className="fixed inset-0 modal-backdrop flex items-center justify-center p-3 sm:p-4 z-50 fade-in"
           onClick={() => setShowVideoPopup(false)}
         >
           <div 
             className="bg-[var(--background-elevated)] rounded-[var(--radius-lg)] w-full max-w-4xl shadow-[var(--shadow-lg)] slide-up border border-[var(--border-dark)] overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-4 border-b border-[var(--border-dark)]">
-              <h3 className="text-lg font-bold text-[var(--text-primary)]">{t('needHelp')}</h3>
+            <div className="flex items-center justify-between p-3 sm:p-4 border-b border-[var(--border-dark)]">
+              <h3 className="text-base sm:text-lg font-bold text-[var(--text-primary)]">{t('needHelp')}</h3>
               <button
                 onClick={() => setShowVideoPopup(false)}
                 className="w-8 h-8 rounded-full hover:bg-[var(--background-elevated-2)] flex items-center justify-center transition-colors"
