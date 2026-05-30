@@ -17,8 +17,8 @@ export default defineConfig({
         'pwa-512x512.png'
       ],
       manifest: {
-        name: 'PayOol - Achat de TikTok Coins en Afrique',
-        short_name: 'PayOol',
+        name: 'TikTokCoins',
+        short_name: 'TikTokCoins',
         description: 'Achetez des TikTok Coins facilement et en toute sécurité avec PayOol. Paiement par Mobile Money (Orange Money, MTN Mobile Money, Wave) en Afrique.',
         theme_color: '#000000',
         background_color: '#000000',
