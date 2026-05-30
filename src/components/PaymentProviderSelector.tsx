@@ -32,7 +32,7 @@ export function PaymentProviderSelector({ selectedProvider, onProviderChange }: 
         </h3>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         {enabledProviders.map((provider) => (
           <button
             key={provider}
