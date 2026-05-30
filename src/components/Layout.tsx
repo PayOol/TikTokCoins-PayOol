@@ -156,7 +156,7 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
 
       {/* Bouton WhatsApp flottant */}
       <WhatsAppButton
-        whatsappUrl="https://short.prismcard.net/r/whatsapp"
+        whatsappUrl="https://wa.me/237658314543"
       />
     </div>
   );
