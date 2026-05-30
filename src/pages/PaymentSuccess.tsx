@@ -12,34 +12,37 @@ export const PaymentSuccess = () => {
   const [showConfetti, setShowConfetti] = useState(true);
   const [purchaseDetails, setPurchaseDetails] = useState<Purchase | null>(null);
   const location = useLocation();
-  
+  const searchParams = new URLSearchParams(location.search);
+  const orderId = searchParams.get('orderId');
+  const urlType = searchParams.get('type');
+  const [isAccount, setIsAccount] = useState(false);
+
   useEffect(() => {
-    // Récupérer l'orderId depuis l'URL
-    const searchParams = new URLSearchParams(location.search);
-    const orderId = searchParams.get('orderId');
-    
     if (orderId) {
       // Mettre à jour le statut de la transaction à 'success'
       updateTransactionStatus(orderId, 'success');
-      
+
       // Récupérer les détails de l'achat depuis le localStorage
       const purchaseHistory = getPurchaseHistory();
       const purchase = purchaseHistory.find(p => p.id === orderId);
       if (purchase) {
         setPurchaseDetails(purchase);
+        setIsAccount(purchase.serviceType === 'accounts');
+      } else if (urlType) {
+        setIsAccount(urlType === 'account');
       }
     }
-    
+
     // Arrêter les confettis après 5 secondes
     const timer = setTimeout(() => {
       setShowConfetti(false);
     }, 5000);
-    
+
     return () => clearTimeout(timer);
   }, [location.search]);
   
   return (
-    <Layout balance={purchaseDetails?.amount || 0} hideBalance={!purchaseDetails}>
+    <Layout balance={purchaseDetails?.amount || 0} hideBalance={!purchaseDetails || isAccount}>
       {showConfetti && <Confetti duration={5000} />}
       
       <div className="max-w-2xl mx-auto mt-12 p-8 bg-[var(--card-bg)] rounded-[var(--radius-lg)] shadow-[var(--shadow-md)] border border-[var(--border-dark)]">
@@ -53,7 +56,10 @@ export const PaymentSuccess = () => {
             {t('thankYou')} 
           </p>
           <p className="text-[var(--text-secondary)] max-w-md mb-4">
-            {t('successMessage', 'Votre paiement a été traité avec succès. Vous recevrez vos pièces dans un délai de 10 minutes. Si vous ne recevez pas vos pièces dans ce délai, veuillez contacter notre service client sur WhatsApp.')}
+            {isAccount
+              ? t('successMessageAccount', 'Votre paiement a été traité avec succès. Vous recevrez les identifiants de votre compte TikTok par email dans un délai de 2-4h. Si vous ne recevez pas vos identifiants dans ce délai, veuillez contacter notre service client sur WhatsApp.')
+              : t('successMessage', 'Votre paiement a été traité avec succès. Vous recevrez vos pièces dans un délai de 10 minutes. Si vous ne recevez pas vos pièces dans ce délai, veuillez contacter notre service client sur WhatsApp.')
+            }
           </p>
           <div className="mb-6 p-4 bg-green-100 border border-green-200 rounded-[var(--radius-md)] text-green-800">
             <div className="flex items-center gap-2 mb-2">
@@ -61,7 +67,10 @@ export const PaymentSuccess = () => {
               <span className="font-medium">{t('paymentProcessed', 'Paiement traité')}</span>
             </div>
             <p className="text-sm">
-              {t('paymentConfirmation', 'Votre paiement a été traité avec succès. Vos pièces seront créditées sur votre compte TikTok dans les prochaines minutes.')}
+              {isAccount
+                ? t('paymentConfirmationAccount', 'Votre paiement a été traité avec succès. Votre compte TikTok sera créé et les identifiants vous seront envoyés par email.')
+                : t('paymentConfirmation', 'Votre paiement a été traité avec succès. Vos pièces seront créditées sur votre compte TikTok dans les prochaines minutes.')
+              }
             </p>
           </div>
           
@@ -91,16 +100,18 @@ export const PaymentSuccess = () => {
                 <span className="font-medium">{purchaseDetails.id}</span>
               </div>
               
-              <div className="flex justify-between items-center">
-                <span className="text-[var(--text-secondary)]">{t('purchasedCoins', 'Pièces achetées')}</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[var(--tiktok-blue)] to-[var(--tiktok-red)] flex items-center justify-center">
-                    <Coins className="w-3 h-3 text-white" />
+              {!isAccount && (
+                <div className="flex justify-between items-center">
+                  <span className="text-[var(--text-secondary)]">{t('purchasedCoins', 'Pièces achetées')}</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[var(--tiktok-blue)] to-[var(--tiktok-red)] flex items-center justify-center">
+                      <Coins className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="font-bold">{purchaseDetails.amount.toLocaleString()}</span>
                   </div>
-                  <span className="font-bold">{purchaseDetails.amount.toLocaleString()}</span>
                 </div>
-              </div>
-              
+              )}
+
               <div className="flex justify-between">
                 <span className="text-[var(--text-secondary)]">{t('amountPaid', 'Montant payé')}</span>
                 <span className="font-bold">{purchaseDetails.price.toLocaleString()} FCFA</span>
@@ -114,23 +125,25 @@ export const PaymentSuccess = () => {
           </div>
         )}
         
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Link 
-            to="/" 
+        <div className={`flex gap-4 ${isAccount ? 'justify-center' : 'flex-col sm:flex-row'}`}>
+          <Link
+            to="/"
             className="flex items-center justify-center gap-2 py-3 px-6 rounded-[var(--radius-md)] bg-[var(--background-elevated)] hover:bg-[var(--background-elevated-2)] transition-colors border border-[var(--border-dark)]"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>{t('backToHome')}</span>
           </Link>
-          
-          <a 
-            href="https://www.tiktok.com" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 py-3 px-6 rounded-[var(--radius-md)] bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] text-white font-medium hover:opacity-90 transition-opacity"
-          >
-            <span>{t('openTikTok', 'Ouvrir TikTok')}</span>
-          </a>
+
+          {!isAccount && (
+            <a
+              href="https://www.tiktok.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 py-3 px-6 rounded-[var(--radius-md)] bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] text-white font-medium hover:opacity-90 transition-opacity"
+            >
+              <span>{t('openTikTok', 'Ouvrir TikTok')}</span>
+            </a>
+          )}
         </div>
       </div>
     </Layout>

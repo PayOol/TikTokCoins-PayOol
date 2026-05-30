@@ -1,6 +1,6 @@
-import React from 'react';
+import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ArrowRight, X, Loader2, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ArrowRight, X, Loader2 } from 'lucide-react';
 import { PaymentProviderSelector } from './PaymentProviderSelector';
 import { PaymentProviderType, getDefaultProvider } from '../utils/payment';
 
@@ -10,22 +10,34 @@ interface Props {
   isLoading?: boolean;
   packageAmount: number;
   packagePrice: number;
+  serviceType?: 'coins' | 'accounts';
+  packageLabel?: string;
+  packageTranslationKey?: string;
+  defaultEmail?: string;
 }
 
-export function EmailFormModal({ onSubmit, onCancel, isLoading = false, packageAmount, packagePrice }: Props) {
+export function EmailFormModal({ onSubmit, onCancel, isLoading = false, packageAmount, packagePrice, serviceType = 'coins', packageLabel, packageTranslationKey, defaultEmail = '' }: Props) {
   const { t } = useTranslation();
-  const [email, setEmail] = React.useState('');
-  const [isValid, setIsValid] = React.useState(false);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [selectedProvider, setSelectedProvider] = React.useState<PaymentProviderType>(getDefaultProvider());
-  const [touched, setTouched] = React.useState(false);
+  const [email, setEmail] = useState(defaultEmail);
+  const [isValid, setIsValid] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedProvider, setSelectedProvider] = useState<PaymentProviderType>(getDefaultProvider());
+  const [touched, setTouched] = useState(false);
+
+  useEffect(() => {
+    if (defaultEmail) {
+      setEmail(defaultEmail);
+      setIsValid(validateEmail(defaultEmail));
+      setTouched(true);
+    }
+  }, [defaultEmail]);
 
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEmail(value);
     setIsValid(validateEmail(value));
@@ -35,7 +47,7 @@ export function EmailFormModal({ onSubmit, onCancel, isLoading = false, packageA
     setTouched(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (isValid && !isSubmitting && !isLoading) {
       setIsSubmitting(true);
@@ -87,15 +99,15 @@ export function EmailFormModal({ onSubmit, onCancel, isLoading = false, packageA
             )}
             
             <div className="bg-[var(--background-elevated-2)] p-3 sm:p-4 rounded-[var(--radius-md)] mb-4 sm:mb-6 mt-3">
-              <p className="text-xs sm:text-sm text-[var(--text-secondary)] mb-2">
-                {t('emailForm.packageInfo', { amount: packageAmount.toLocaleString(), price: packagePrice.toLocaleString() })}
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
+                {packageTranslationKey
+                  ? `${t(`accountPackagesList.${packageTranslationKey}.name`)} — ${packagePrice.toLocaleString()} FCFA`
+                  : (packageLabel || (serviceType === 'accounts'
+                    ? t('emailForm.packageInfoAccount', `Commande: {{amount}} pour {{price}} FCFA`, { amount: packageAmount.toLocaleString(), price: packagePrice.toLocaleString() })
+                    : t('emailForm.packageInfo', { amount: packageAmount.toLocaleString(), price: packagePrice.toLocaleString() })
+                  ))
+                }
               </p>
-              <div className="flex items-start mt-3">
-                <ShieldCheck className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                <span className="text-xs text-[var(--text-secondary)]">
-                  {t('payment.securityMessage')}
-                </span>
-              </div>
             </div>
           </div>
           

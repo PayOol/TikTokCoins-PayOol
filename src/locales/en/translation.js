@@ -124,9 +124,77 @@ const translation = {
   "continue": "Continue",
   "close": "Close",
   
+  // Service tabs
+  "services": {
+    "coins": "TikTok Coins",
+    "accounts": "Monetizable TikTok Accounts"
+  },
+
+  // Account packages
+  "accountPackages": "European TikTok Accounts",
+
+  "accountPackagesList": {
+    "virgin": {
+      "name": "Blank European TikTok Account",
+      "description": "Blank European TikTok account, eligible for monetization",
+      "features": [
+        "Blank European TikTok account",
+        "Eligible for monetization",
+        "Email & phone verified",
+        "Works worldwide",
+        "Delivery in 2h"
+      ]
+    },
+    "liveAccess": {
+      "name": "Live Access",
+      "description": "European TikTok account with live access already enabled",
+      "features": [
+        "European TikTok account",
+        "LIVE access already enabled",
+        "Eligible for monetization",
+        "Email & phone verified",
+        "Works worldwide",
+        "Delivery in 3h"
+      ]
+    },
+    "followers": {
+      "name": "+1000 Followers",
+      "description": "European TikTok account with 1000+ fake followers for appearance",
+      "features": [
+        "European TikTok account",
+        "+1000 followers (fake)",
+        "Eligible for monetization",
+        "LIVE access enabled",
+        "Email & phone verified",
+        "Works worldwide",
+        "Delivery in 4h"
+      ]
+    }
+  },
+
+  // Account Instructions
+  "accountInstructions": {
+    "title": "Important Instructions",
+    "subtitle": "Please read carefully before ordering",
+    "important": "Important",
+    "importantText_virgin": "This account is BLANK — it contains no videos, no followers and no views. You must create your own content to reach the monetization thresholds (1000 followers + 10,000 views). The account is delivered with credentials (email + password) and verified phone.",
+    "importantText_liveAccess": "This account is BLANK but LIVE ACCESS is ALREADY ENABLED. It contains no videos, no followers and no views. You must create your own content to reach the monetization thresholds (1000 followers + 10,000 views). The account is delivered with credentials (email + password) and verified phone.",
+    "importantText_followers": "This account contains +1000 FAKE followers and LIVE ACCESS is already enabled. It contains no videos and no views — the followers are for appearance only. You must create your own content to reach the monetization thresholds (1000 followers + 10,000 views). The account is delivered with credentials (email + password) and verified phone.",
+    "confirmText": "I confirm that I have read and understood the above instructions and understand that the account is blank."
+  },
+
+  // Account Form
+  "accountForm": {
+    "title": "Account Creation",
+    "subtitle": "Package",
+    "desiredUsername": "Desired username (optional)",
+    "desiredUsernamePlaceholder": "Ex: @myTikTokAccount",
+    "submit": "Place order",
+    "whatsappRequired": "WhatsApp number required"
+  },
+
   // Payment
   "payment": {
-    "securityMessage": "Your information is secure and will not be shared."
   }
 };
 

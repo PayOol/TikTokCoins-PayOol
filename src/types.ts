@@ -22,6 +22,7 @@ export interface Purchase {
   date: Date;
   status: TransactionStatus;
   errorMessage?: string;
+  serviceType?: 'coins' | 'accounts';
 }
 
 export interface TikTokForm {
@@ -33,4 +34,20 @@ export interface TikTokCredentials {
   username: string;
   password: string;
   whatsapp: string;
+}
+
+export interface AccountPackage {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  features: string[];
+  popular?: boolean;
+  translationKey: string;
+}
+
+export interface MonetizableAccountForm {
+  email: string;
+  whatsapp: string;
+  desiredUsername?: string;
 }

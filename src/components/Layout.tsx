@@ -47,8 +47,8 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
               
               <Link to="/" className="text-xl sm:text-2xl font-bold flex items-center gap-2">
                 <Coins className="w-6 h-6 sm:w-7 sm:h-7 text-[var(--tiktok-red)]" />
-                <span className="tiktok-gradient-text">TikTok Coins</span>
-                <span className="text-xs sm:text-sm font-normal text-[var(--text-secondary)] hidden sm:inline">by PayOol™</span>
+                <span className="tiktok-gradient-text">PayOol™</span>
+                <span className="text-xs sm:text-sm font-normal text-[var(--text-secondary)] hidden sm:inline">TikTok Services</span>
               </Link>
             </div>
             
@@ -83,7 +83,7 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
       
       <div className={`fixed top-0 left-0 h-full w-72 sm:w-64 bg-[var(--background-elevated)] shadow-lg z-50 transform transition-transform duration-300 lg:hidden ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-4 border-b border-[var(--border-dark)]">
-          <h2 className="text-xl font-bold tiktok-gradient-text">TikTok Coins</h2>
+          <h2 className="text-xl font-bold tiktok-gradient-text">PayOol™</h2>
         </div>
         
         <nav className="p-4">
@@ -144,7 +144,7 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
           <div className="flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
             <div className="flex items-center gap-2">
               <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--tiktok-red)]" />
-              <span className="text-sm sm:text-base font-medium">TikTok Coins by PayOol™</span>
+              <span className="text-sm sm:text-base font-medium">PayOol™ TikTok Services</span>
             </div>
             
             <div className="text-xs sm:text-sm text-[var(--text-secondary)]">

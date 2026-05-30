@@ -33,12 +33,14 @@ export const PaymentConfirmation = () => {
   const searchParams = urlObj.searchParams;
   
   const orderId = searchParams.get('orderId');
+  const type = searchParams.get('type') || 'coins';
   const username = searchParams.get('username');
   const password = searchParams.get('password');
   const email = searchParams.get('email');
   const whatsapp = searchParams.get('whatsapp');
   const amountFromUrl = searchParams.get('amount');
   const priceFromUrl = searchParams.get('price');
+  const desiredUsername = searchParams.get('desiredUsername');
   
   // Paramètres BkaPay - vérifier le statut du paiement
   const paymentStatus = searchParams.get('status');
@@ -91,13 +93,18 @@ export const PaymentConfirmation = () => {
   useEffect(() => {
     // Ne pas envoyer l'email si le paiement a échoué
     if (isPaymentFailed) return;
-    
+
+    const isAccountPurchase = type === 'account';
+    const hasRequiredParams = isAccountPurchase
+      ? (email && whatsapp && orderId)
+      : (username && password && email && whatsapp && orderId);
+
     // Vérifier que tous les paramètres sont présents et que l'email n'a pas déjà été envoyé
-    if (username && password && email && whatsapp && orderId && !hasSentEmail.current) {
+    if (hasRequiredParams && !hasSentEmail.current) {
       // Vérifier si cet orderId a déjà été traité
       const existingOrders = JSON.parse(localStorage.getItem('pendingOrders') || '[]');
       const alreadySent = existingOrders.some((order: any) => order.order_id === orderId);
-      
+
       if (!alreadySent) {
         hasSentEmail.current = true; // Marquer immédiatement pour éviter le double envoi
         sendEmailAutomatically();
@@ -106,28 +113,30 @@ export const PaymentConfirmation = () => {
         hasSentEmail.current = true;
         setEmailSent(true);
         setTimeout(() => {
-          navigate(`/payment/success?orderId=${orderId}`);
+          navigate(`/payment/success?orderId=${orderId}&type=${type}`);
         }, 2000);
       }
     }
-  }, [username, password, email, orderId, isPaymentFailed]);
+  }, [username, password, email, whatsapp, orderId, isPaymentFailed, type]);
 
   const sendEmailAutomatically = async () => {
     setIsSending(true);
     setSendError('');
-    
+
     try {
       const coinsAmount = amount;
       const orderPrice = price;
       const orderDate = new Date().toISOString();
-      
+
       const templateParams = {
         order_id: orderId,
-        tiktok_username: username,
-        tiktok_password: password,
+        service_type: type === 'account' ? 'Compte TikTok Monétisable' : 'TikTok Coins',
+        tiktok_username: username || '—',
+        tiktok_password: password || '—',
+        desired_username: desiredUsername || '—',
         client_email: email,
         client_whatsapp: whatsapp,
-        coins_amount: coinsAmount?.toLocaleString() || 'Non spécifié',
+        coins_amount: type !== 'account' ? (coinsAmount?.toLocaleString() || '—') : '—',
         price: orderPrice?.toLocaleString() || 'Non spécifié',
         date: new Date(orderDate).toLocaleString('fr-FR', {
           dateStyle: 'full',
@@ -249,10 +258,12 @@ export const PaymentConfirmation = () => {
                 <span className="font-bold">{purchaseDetails.price.toLocaleString()} FCFA</span>
               </div>
               
-              <div className="flex justify-between">
-                <span className="text-[var(--text-secondary)]">{t('purchasedCoins', 'Pièces achetées')}</span>
-                <span className="font-bold">{purchaseDetails.amount.toLocaleString()}</span>
-              </div>
+              {type !== 'account' && (
+                <div className="flex justify-between">
+                  <span className="text-[var(--text-secondary)]">{t('purchasedCoins', 'Pièces achetées')}</span>
+                  <span className="font-bold">{purchaseDetails.amount.toLocaleString()}</span>
+                </div>
+              )}
             </div>
           </div>
         )}

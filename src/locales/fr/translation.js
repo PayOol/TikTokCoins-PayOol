@@ -124,9 +124,77 @@ const translation = {
   "continue": "Continuer",
   "close": "Fermer",
   
+  // Service tabs
+  "services": {
+    "coins": "Pièces TikTok",
+    "accounts": "Compte TikTok Monétisables"
+  },
+
+  // Account packages
+  "accountPackages": "Comptes TikTok Européens",
+
+  "accountPackagesList": {
+    "virgin": {
+      "name": "Compte Vierge EU",
+      "description": "Compte TikTok européen vierge, éligible à la monétisation",
+      "features": [
+        "Compte TikTok européen vierge",
+        "Éligible à la monétisation",
+        "Email & téléphone vérifiés",
+        "Fonctionne partout dans le monde",
+        "Livraison en 2h"
+      ]
+    },
+    "liveAccess": {
+      "name": "Live Accès",
+      "description": "Compte TikTok européen avec accès aux lives déjà activé",
+      "features": [
+        "Compte TikTok européen",
+        "Accès aux LIVES déjà activé",
+        "Éligible à la monétisation",
+        "Email & téléphone vérifiés",
+        "Fonctionne partout dans le monde",
+        "Livraison en 3h"
+      ]
+    },
+    "followers": {
+      "name": "+1000 Followers",
+      "description": "Compte TikTok européen avec plus de 1000 faux abonnés pour l'apparence",
+      "features": [
+        "Compte TikTok européen",
+        "+1000 followers (faux abonnés)",
+        "Éligible à la monétisation",
+        "Accès aux LIVES activé",
+        "Email & téléphone vérifiés",
+        "Fonctionne partout dans le monde",
+        "Livraison en 4h"
+      ]
+    }
+  },
+
+  // Account Instructions
+  "accountInstructions": {
+    "title": "Instructions importantes",
+    "subtitle": "Veuillez lire attentivement avant de commander",
+    "important": "Important",
+    "importantText_virgin": "Ce compte est VIERGE — il ne contient aucune vidéo, aucun follower et aucune vue. Vous devez créer votre propre contenu pour atteindre les seuils de monétisation (1000 abonnés + 10 000 vues). Le compte est livré avec identifiants (email + mot de passe) et téléphone vérifié.",
+    "importantText_liveAccess": "Ce compte est VIERGE mais l'accès aux LIVES est DÉJÀ ACTIVÉ. Il ne contient aucune vidéo, aucun follower et aucune vue. Vous devez créer votre propre contenu pour atteindre les seuils de monétisation (1000 abonnés + 10 000 vues). Le compte est livré avec identifiants (email + mot de passe) et téléphone vérifié.",
+    "importantText_followers": "Ce compte contient +1000 FAUX abonnés et l'accès aux LIVES est déjà activé. Il ne contient aucune vidéo et aucune vue — les followers sont uniquement pour l'apparence. Vous devez créer votre propre contenu pour atteindre les seuils de monétisation (1000 abonnés + 10 000 vues). Le compte est livré avec identifiants (email + mot de passe) et téléphone vérifié.",
+    "confirmText": "Je confirme avoir pris connaissance des instructions ci-dessus et comprends que le compte est vierge."
+  },
+
+  // Account Form
+  "accountForm": {
+    "title": "Création de compte",
+    "subtitle": "Forfait",
+    "desiredUsername": "Pseudo souhaité (optionnel)",
+    "desiredUsernamePlaceholder": "Ex: @monCompteTikTok",
+    "submit": "Passer commande",
+    "whatsappRequired": "Numéro WhatsApp requis"
+  },
+
   // Payment
   "payment": {
-    "securityMessage": "Vos informations sont sécurisées et ne seront pas partagées."
   }
 };
 

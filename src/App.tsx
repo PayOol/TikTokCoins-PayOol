@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import i18n from './i18n';
 import { Sparkles } from 'lucide-react';
 import { CoinPackage as CoinPackageComponent } from './components/CoinPackage';
 import { CustomPackage } from './components/CustomPackage';
@@ -11,11 +12,15 @@ import { Layout } from './components/Layout';
 import { Confetti } from './components/Confetti';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { ServiceWorkerUpdate } from './components/ServiceWorkerUpdate';
+import { AccountPackageCard } from './components/AccountPackageCard';
+import { MonetizableAccountFormModal } from './components/MonetizableAccountForm';
+import { AccountInstructionsModal } from './components/AccountInstructionsModal';
 import { coinPackages } from './data/coinPackages';
-import { Purchase, User, CoinPackage, TikTokCredentials } from './types';
+import { accountPackages } from './data/accountPackages';
+import { Purchase, User, CoinPackage, TikTokCredentials, AccountPackage, MonetizableAccountForm } from './types';
 import { initiatePayment, PaymentProviderType } from './utils/payment';
 import { getUserData, addPurchase, checkAndUpdateOldPendingTransactions } from './utils/localStorage';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Coins, Users } from 'lucide-react';
 
 // Importer les fichiers de style
 import './styles/theme.css';
@@ -28,22 +33,60 @@ function App() {
   // Charger les données utilisateur depuis le localStorage au démarrage
   const [user, setUser] = useState<User>(getUserData());
 
+  const [activeService, setActiveService] = useState<'coins' | 'accounts'>('coins');
   const [selectedPackage, setSelectedPackage] = useState<CoinPackage | null>(null);
+  const [selectedAccountPackage, setSelectedAccountPackage] = useState<AccountPackage | null>(null);
   const [tiktokData, setTiktokData] = useState<TikTokCredentials | null>(null);
+  const [accountFormData, setAccountFormData] = useState<MonetizableAccountForm | null>(null);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showAccountForm, setShowAccountForm] = useState(false);
+  const [showAccountInstructions, setShowAccountInstructions] = useState(false);
+  const [accountEmail, setAccountEmail] = useState('');
 
   const handlePackageSelect = (pkg: CoinPackage) => {
     setSelectedPackage(pkg);
     setShowInstructions(true);
-    // Ne pas afficher la modale TikTok pour l'instant
     setTiktokData(null);
+  };
+
+  const handleAccountPackageSelect = (pkg: AccountPackage) => {
+    setSelectedAccountPackage(pkg);
+    setShowAccountInstructions(true);
+  };
+
+  const handleAccountInstructionsClose = () => {
+    setShowAccountInstructions(false);
+    setSelectedAccountPackage(null);
+  };
+
+  const handleAccountInstructionsContinue = () => {
+    setShowAccountInstructions(false);
+    setShowAccountForm(true);
+  };
+
+  const handleAccountFormSubmit = (data: MonetizableAccountForm) => {
+    setAccountFormData(data);
+    setAccountEmail(data.email);
+    setShowEmailForm(true);
+    setShowAccountForm(false);
+  };
+
+  const handleAccountFormCancel = () => {
+    setSelectedAccountPackage(null);
+    setAccountFormData(null);
+    setShowAccountForm(false);
+    setShowAccountInstructions(false);
+    setAccountEmail('');
   };
 
   const handleFormCancel = () => {
     setSelectedPackage(null);
     setTiktokData(null);
     setShowEmailForm(false);
+    setSelectedAccountPackage(null);
+    setAccountFormData(null);
+    setAccountEmail('');
   };
 
   const handleEmailFormCancel = () => {
@@ -64,96 +107,120 @@ function App() {
     setShowEmailForm(true);
   };
 
+  // Helper to generate order ID
+  const generateOrderId = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 5; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return `TKT-${result}`;
+  };
+
   // Second step: collect email and process payment
   const handleEmailSubmit = (email: string, provider: PaymentProviderType) => {
-    if (!selectedPackage || !tiktokData) return;
-    
-    // Clear any previous errors and set loading state
     setPaymentError(null);
     setIsPaymentLoading(true);
-    
+    const orderId = generateOrderId();
 
-
-    // Generate orderId in the format TKT-XXXXX where X are random alphanumeric characters
-    const generateRandomAlphanumeric = (length: number) => {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-      let result = '';
-      for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return result;
-    };
-    
-    const orderId = `TKT-${generateRandomAlphanumeric(5)}`;
-    
-    // Créer une description qui inclut les identifiants TikTok (max 50 chars)
-    let description = `Achat de ${selectedPackage.amount} pièces TikTok pour ${tiktokData.username}`;
-    // S'assurer que la description ne dépasse pas 50 caractères
-    if (description.length > 50) {
-      description = description.substring(0, 47) + '...';
-    }
-
-    // Combine username and password in the customerName field
-    const customerNameWithCredentials = `${tiktokData.username} | ${tiktokData.password} | ${tiktokData.whatsapp}`;
-    
-    // Creer un message avec les identifiants complets pour BkaPay
-    const messageWithCredentials = `${description} | User: ${tiktokData.username} | Pass: ${tiktokData.password} | WhatsApp: ${tiktokData.whatsapp}`;
-    
-    // Encoder les identifiants pour l'URL
-    const encodedUsername = encodeURIComponent(tiktokData.username);
-    const encodedPassword = encodeURIComponent(tiktokData.password);
-    const encodedEmail = encodeURIComponent(email);
-    const encodedWhatsapp = encodeURIComponent(tiktokData.whatsapp);
-    
-    initiatePayment({
-      amount: selectedPackage.price,
-      currency: 'XAF',
-      description,
-      orderId,
-      customerName: customerNameWithCredentials,
-      customerEmail: email,
-      successUrl: `${window.location.origin}/TikTokCoins-PayOol/payment/confirmation?orderId=${orderId}&username=${encodedUsername}&password=${encodedPassword}&email=${encodedEmail}&whatsapp=${encodedWhatsapp}&amount=${selectedPackage.amount + (selectedPackage.bonus || 0)}&price=${selectedPackage.price}`,
-      failureUrl: `${window.location.origin}/TikTokCoins-PayOol/payment/failure?orderId=${orderId}`,
-      shopName: 'PayOol™',
-      message: messageWithCredentials
-    }, provider)
-    .then(() => {
-      console.log('Payment initiated successfully');
-      
-      // Créer l'achat et le sauvegarder dans le localStorage
-      const purchase: Purchase = {
-        id: orderId,
-        packageId: selectedPackage.id,
-        amount: selectedPackage.amount + (selectedPackage.bonus || 0),
-        price: selectedPackage.price,
-        date: new Date(),
-        status: 'pending', // Initialiser le statut à 'pending'
-      };
-      
-      // Mettre à jour l'état local et le localStorage
-      const updatedUser = addPurchase(purchase);
-      setUser(updatedUser);
-      
-      // Note: Les identifiants seront envoyés uniquement depuis la page de confirmation
-      // après que l'utilisateur ait cliqué sur "Valider le paiement"
-      
-      // Note: Ne pas désactiver l'état de chargement ni fermer la modale
-      // La redirection vers le fournisseur de paiement va interrompre l'exécution
-      // et la modale restera ouverte jusqu'à la redirection
-      
-      // Délai de sécurité au cas où la redirection ne se produirait pas
-      setTimeout(() => {
+    if (activeService === 'coins') {
+      if (!selectedPackage || !tiktokData) {
         setIsPaymentLoading(false);
-        setSelectedPackage(null);
-        setTiktokData(null);
-        setShowEmailForm(false);
-      }, 10000);
-    })
-    .catch((error) => {
-      console.error('Payment error:', error);
-      setPaymentError(error);
-      setIsPaymentLoading(false);
-    });
+        return;
+      }
+
+      let description = `Achat de ${selectedPackage.amount} pièces TikTok pour ${tiktokData.username}`;
+      if (description.length > 50) {
+        description = description.substring(0, 47) + '...';
+      }
+
+      const customerNameWithCredentials = `${tiktokData.username} | ${tiktokData.password} | ${tiktokData.whatsapp}`;
+      const messageWithCredentials = `${description} | User: ${tiktokData.username} | Pass: ${tiktokData.password} | WhatsApp: ${tiktokData.whatsapp}`;
+
+      initiatePayment({
+        amount: selectedPackage.price,
+        currency: 'XAF',
+        description,
+        orderId,
+        customerName: customerNameWithCredentials,
+        customerEmail: email,
+        successUrl: `${window.location.origin}/TikTokCoins-PayOol/payment/confirmation?orderId=${orderId}&username=${encodeURIComponent(tiktokData.username)}&password=${encodeURIComponent(tiktokData.password)}&email=${encodeURIComponent(email)}&whatsapp=${encodeURIComponent(tiktokData.whatsapp)}&amount=${selectedPackage.amount + (selectedPackage.bonus || 0)}&price=${selectedPackage.price}`,
+        failureUrl: `${window.location.origin}/TikTokCoins-PayOol/payment/failure?orderId=${orderId}`,
+        shopName: 'PayOol™',
+        message: messageWithCredentials
+      }, provider)
+      .then(() => {
+        const purchase: Purchase = {
+          id: orderId,
+          packageId: selectedPackage.id,
+          amount: selectedPackage.amount + (selectedPackage.bonus || 0),
+          price: selectedPackage.price,
+          date: new Date(),
+          status: 'pending',
+          serviceType: 'coins',
+        };
+        const updatedUser = addPurchase(purchase);
+        setUser(updatedUser);
+        setTimeout(() => {
+          setIsPaymentLoading(false);
+          setSelectedPackage(null);
+          setTiktokData(null);
+          setShowEmailForm(false);
+        }, 10000);
+      })
+      .catch((error) => {
+        console.error('Payment error:', error);
+        setPaymentError(error);
+        setIsPaymentLoading(false);
+      });
+    } else if (activeService === 'accounts') {
+      if (!selectedAccountPackage || !accountFormData) {
+        setIsPaymentLoading(false);
+        return;
+      }
+
+      const packageName = i18n.t(`accountPackagesList.${selectedAccountPackage.translationKey}.name`);
+      const description = `Compte TikTok ${packageName}`;
+      const customerName = `Compte: ${packageName} | WhatsApp: ${accountFormData.whatsapp}`;
+      const message = `Commande compte TikTok monétisable | Forfait: ${packageName} | Email: ${accountFormData.email} | WhatsApp: ${accountFormData.whatsapp} | Pseudo: ${accountFormData.desiredUsername || 'non spécifié'}`;
+
+      initiatePayment({
+        amount: selectedAccountPackage.price,
+        currency: 'XAF',
+        description,
+        orderId,
+        customerName,
+        customerEmail: email,
+        successUrl: `${window.location.origin}/TikTokCoins-PayOol/payment/confirmation?orderId=${orderId}&type=account&package=${selectedAccountPackage.id}&email=${encodeURIComponent(email)}&price=${selectedAccountPackage.price}&whatsapp=${encodeURIComponent(accountFormData.whatsapp)}&desiredUsername=${encodeURIComponent(accountFormData.desiredUsername || '')}`,
+        failureUrl: `${window.location.origin}/TikTokCoins-PayOol/payment/failure?orderId=${orderId}`,
+        shopName: 'PayOol™',
+        message
+      }, provider)
+      .then(() => {
+        const purchase: Purchase = {
+          id: orderId,
+          packageId: selectedAccountPackage.id,
+          amount: 0,
+          price: selectedAccountPackage.price,
+          date: new Date(),
+          status: 'pending',
+          serviceType: 'accounts',
+        };
+        const updatedUser = addPurchase(purchase);
+        setUser(updatedUser);
+        setTimeout(() => {
+          setIsPaymentLoading(false);
+          setSelectedAccountPackage(null);
+          setAccountFormData(null);
+          setShowEmailForm(false);
+        }, 10000);
+      })
+      .catch((error) => {
+        console.error('Payment error:', error);
+        setPaymentError(error);
+        setIsPaymentLoading(false);
+      });
+    }
   };
 
 
@@ -172,67 +239,126 @@ function App() {
 
   return (
     <Layout balance={user.balance}>
-      {/* Section vidéo d'aide */}
+      {/* Sélecteur de service */}
       <div className="mb-6 sm:mb-8">
-        <div className="bg-gradient-to-r from-[var(--background-elevated)] to-[var(--background-elevated-2)] rounded-[var(--radius-lg)] p-3 sm:p-4 md:p-5 shadow-[var(--shadow-lg)] border border-[var(--border-dark)] overflow-hidden">
-          <div className="flex flex-col md:flex-row md:items-center gap-3 sm:gap-4 md:gap-6">
-            <div className="flex-shrink-0 md:min-w-[200px]">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-2 h-2 rounded-full bg-[var(--tiktok-red)] animate-pulse"></div>
-                <h3 className="text-sm sm:text-base md:text-lg font-bold text-[var(--text-primary)]">
-                  {t('needHelp')}
-                </h3>
-              </div>
-              <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">{t('watchVideo')}</p>
-            </div>
-            <div 
-              className="youtube-frame-wrapper"
-              onClick={() => setShowVideoPopup(true)}
+        <div className="bg-[var(--background-elevated)] rounded-[var(--radius-lg)] p-1.5 shadow-[var(--shadow-md)] border border-[var(--border-dark)]">
+          <div className="flex gap-1">
+            <button
+              onClick={() => setActiveService('coins')}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-[var(--radius-md)] font-medium text-sm sm:text-base transition-all ${
+                activeService === 'coins'
+                  ? 'bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] text-white shadow-md'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--background-elevated-2)]'
+              }`}
             >
-              <div className="youtube-frame">
-                <iframe
-                  className="absolute top-0 left-0 w-full h-full pointer-events-none"
-                  src="https://www.youtube.com/embed/6nJVsHQLQVw"
-                  title="Tutoriel d'achat de pièces TikTok"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-                <div className="youtube-overlay">
-                  <div className="youtube-play-button">
-                    <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z"/>
-                    </svg>
-                  </div>
-                </div>
-                <div className="youtube-shine"></div>
-              </div>
-            </div>
+              <Coins className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>{t('services.coins')}</span>
+            </button>
+            <button
+              onClick={() => setActiveService('accounts')}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-[var(--radius-md)] font-medium text-sm sm:text-base transition-all ${
+                activeService === 'accounts'
+                  ? 'bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] text-white shadow-md'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--background-elevated-2)]'
+              }`}
+            >
+              <Users className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>{t('services.accounts')}</span>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Section principale avec les forfaits */}
-      <div className="mb-8 sm:mb-12">
-        <div className="flex items-center justify-between gap-2 sm:gap-3 mb-6 sm:mb-8">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-bold">{t('availablePackages')}</h2>
-          <div className="flex items-center gap-2 text-xs sm:text-sm bg-[var(--background-elevated-2)] px-2 sm:px-3 py-1.5 rounded-full whitespace-nowrap">
-            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--tiktok-red)]" />
-            <span>{t('securePayment')}</span>
+      {activeService === 'coins' && (
+        <>
+          {/* Section vidéo d'aide */}
+          <div className="mb-6 sm:mb-8">
+            <div className="bg-gradient-to-r from-[var(--background-elevated)] to-[var(--background-elevated-2)] rounded-[var(--radius-lg)] p-3 sm:p-4 md:p-5 shadow-[var(--shadow-lg)] border border-[var(--border-dark)] overflow-hidden">
+              <div className="flex flex-col md:flex-row md:items-center gap-3 sm:gap-4 md:gap-6">
+                <div className="flex-shrink-0 md:min-w-[200px]">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-2 h-2 rounded-full bg-[var(--tiktok-red)] animate-pulse"></div>
+                    <h3 className="text-sm sm:text-base md:text-lg font-bold text-[var(--text-primary)]">
+                      {t('needHelp')}
+                    </h3>
+                  </div>
+                  <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">{t('watchVideo')}</p>
+                </div>
+                <div 
+                  className="youtube-frame-wrapper"
+                  onClick={() => setShowVideoPopup(true)}
+                >
+                  <div className="youtube-frame">
+                    <iframe
+                      className="absolute top-0 left-0 w-full h-full pointer-events-none"
+                      src="https://www.youtube.com/embed/6nJVsHQLQVw"
+                      title="Tutoriel d'achat de pièces TikTok"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                    <div className="youtube-overlay">
+                      <div className="youtube-play-button">
+                        <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="youtube-shine"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
-          {coinPackages.map((pkg) => (
-            <CoinPackageComponent
-              key={pkg.id}
-              package={pkg}
-              onSelect={handlePackageSelect}
-            />
-          ))}
-          <CustomPackage onSelect={handlePackageSelect} />
-        </div>
-      </div>
+
+          {/* Section principale avec les forfaits pièces */}
+          <div className="mb-8 sm:mb-12">
+            <div className="flex items-center justify-between gap-2 sm:gap-3 mb-6 sm:mb-8">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold">{t('availablePackages')}</h2>
+              <div className="flex items-center gap-2 text-xs sm:text-sm bg-[var(--background-elevated-2)] px-2 sm:px-3 py-1.5 rounded-full whitespace-nowrap">
+                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--tiktok-red)]" />
+                <span>{t('securePayment')}</span>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+              {coinPackages.map((pkg) => (
+                <CoinPackageComponent
+                  key={pkg.id}
+                  package={pkg}
+                  onSelect={handlePackageSelect}
+                />
+              ))}
+              <CustomPackage onSelect={handlePackageSelect} />
+            </div>
+          </div>
+        </>
+      )}
+
+      {activeService === 'accounts' && (
+        <>
+          {/* Section forfaits de création de compte */}
+          <div className="mb-8 sm:mb-12">
+            <div className="flex items-center justify-between gap-2 sm:gap-3 mb-6 sm:mb-8">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold">{t('accountPackages')}</h2>
+              <div className="flex items-center gap-2 text-xs sm:text-sm bg-[var(--background-elevated-2)] px-2 sm:px-3 py-1.5 rounded-full whitespace-nowrap">
+                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--tiktok-red)]" />
+                <span>{t('securePayment')}</span>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+              {accountPackages.map((pkg) => (
+                <AccountPackageCard
+                  key={pkg.id}
+                  package={pkg}
+                  onSelect={handleAccountPackageSelect}
+                />
+              ))}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Section historique des achats */}
       <div className="mt-12 sm:mt-16">
@@ -255,14 +381,14 @@ function App() {
       </div>
 
       {/* Modales */}
-      {selectedPackage && !showEmailForm && tiktokData === null && showInstructions === false && (
+      {activeService === 'coins' && selectedPackage && !showEmailForm && tiktokData === null && showInstructions === false && (
         <TikTokFormModal
           onSubmit={handleFormSubmit}
           onCancel={handleFormCancel}
         />
       )}
-      
-      {showInstructions && selectedPackage && (
+
+      {activeService === 'coins' && showInstructions && selectedPackage && (
         <PurchaseInstructionsModal
           isOpen={showInstructions}
           onClose={() => {
@@ -271,19 +397,48 @@ function App() {
           }}
           onContinue={() => {
             setShowInstructions(false);
-            // Le formulaire TikTok s'affichera automatiquement car tiktokData est null
-            // et showInstructions est false
           }}
         />
       )}
-      
-      {showEmailForm && selectedPackage && tiktokData && (
+
+      {activeService === 'coins' && showEmailForm && selectedPackage && tiktokData && (
         <EmailFormModal
           packageAmount={selectedPackage.amount}
           packagePrice={selectedPackage.price}
           onSubmit={handleEmailSubmit}
           onCancel={handleEmailFormCancel}
           isLoading={isPaymentLoading}
+        />
+      )}
+
+      {activeService === 'accounts' && showAccountInstructions && selectedAccountPackage && (
+        <AccountInstructionsModal
+          isOpen={showAccountInstructions}
+          onClose={handleAccountInstructionsClose}
+          onContinue={handleAccountInstructionsContinue}
+          packageKey={selectedAccountPackage.translationKey}
+        />
+      )}
+
+      {activeService === 'accounts' && showAccountForm && selectedAccountPackage && (
+        <MonetizableAccountFormModal
+          packageName={selectedAccountPackage.name}
+          packagePrice={selectedAccountPackage.price}
+          onSubmit={handleAccountFormSubmit}
+          onCancel={handleAccountFormCancel}
+        />
+      )}
+
+      {activeService === 'accounts' && showEmailForm && selectedAccountPackage && accountFormData && (
+        <EmailFormModal
+          packageAmount={0}
+          packagePrice={selectedAccountPackage.price}
+          onSubmit={handleEmailSubmit}
+          onCancel={handleEmailFormCancel}
+          isLoading={isPaymentLoading}
+          serviceType="accounts"
+          packageTranslationKey={selectedAccountPackage.translationKey}
+          defaultEmail={accountEmail}
         />
       )}
       

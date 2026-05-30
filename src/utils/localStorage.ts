@@ -13,7 +13,7 @@ const STORAGE_KEYS = {
 export const saveUserData = (user: User): void => {
   // Ne compter que les transactions réussies pour le solde total
   const successfulCoins = user.purchaseHistory
-    .filter(purchase => purchase.status === 'success')
+    .filter(purchase => purchase.status === 'success' && (!purchase.serviceType || purchase.serviceType === 'coins'))
     .reduce((total, purchase) => total + purchase.amount, 0);
   
   localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
@@ -58,8 +58,8 @@ export const getUserData = (): User => {
 export const addPurchase = (purchase: Purchase): User => {
   const user = getUserData();
   
-  // Mettre à jour le solde uniquement si la transaction est réussie
-  const updatedBalance = purchase.status === 'success' 
+  // Mettre à jour le solde uniquement si la transaction est réussie et de type coins
+  const updatedBalance = (purchase.status === 'success' && (!purchase.serviceType || purchase.serviceType === 'coins'))
     ? user.balance + purchase.amount 
     : user.balance;
   
@@ -111,7 +111,7 @@ export const getTotalCoins = (): number => {
   // Si aucune valeur n'est stockée, calculer à partir de l'historique
   const user = getUserData();
   const successfulCoins = user.purchaseHistory
-    .filter(purchase => purchase.status === 'success')
+    .filter(purchase => purchase.status === 'success' && (!purchase.serviceType || purchase.serviceType === 'coins'))
     .reduce((total, purchase) => total + purchase.amount, 0);
   
   return successfulCoins;

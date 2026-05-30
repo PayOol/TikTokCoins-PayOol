@@ -1,4 +1,4 @@
-import { Coins, CalendarDays, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Coins, Users, CalendarDays, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { Purchase, TransactionStatus } from '../types';
 
 interface PurchaseHistoryProps {
@@ -77,7 +77,7 @@ export const PurchaseHistory = ({ purchases }: PurchaseHistoryProps) => {
         </div>
         <h3 className="text-base sm:text-lg font-medium mb-1">Aucun historique</h3>
         <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-xs mx-auto">
-          Vous n'avez pas encore effectué d'achat de pièces TikTok.
+          Vous n'avez pas encore effectué d'achat.
         </p>
       </div>
     );
@@ -89,11 +89,19 @@ export const PurchaseHistory = ({ purchases }: PurchaseHistoryProps) => {
         <div key={purchase.id} className={`bg-[var(--card-bg)] rounded-[var(--radius-md)] shadow-[var(--shadow-sm)] p-3 sm:p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-3 border ${getStatusBorderColor(purchase.status)}`}>
           <div className="flex items-center gap-2 sm:gap-3">
             <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${getStatusBackgroundColor(purchase.status)}`}>
-              <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+              {purchase.serviceType === 'accounts'
+                ? <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                : <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+              }
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm sm:text-base font-medium">{purchase.amount} pièces</span>
+                <span className="text-sm sm:text-base font-medium">
+                  {purchase.serviceType === 'accounts'
+                    ? 'Compte TikTok'
+                    : `${purchase.amount} pièces`
+                  }
+                </span>
                 {getStatusBadge(purchase.status)}
               </div>
               <div className="text-xs sm:text-sm text-[var(--text-secondary)]">{formatDate(purchase.date)}</div>
