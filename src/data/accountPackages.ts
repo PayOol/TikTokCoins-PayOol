@@ -5,7 +5,7 @@ export const accountPackages: AccountPackage[] = [
     id: 1,
     name: '',
     description: '',
-    price: 1,
+    price: 2000,
     features: [],
     translationKey: 'virgin'
   },
