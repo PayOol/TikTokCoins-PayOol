@@ -32,12 +32,13 @@ export function PWAInstallPrompt() {
       return;
     }
 
-    // Vérifier si on a déjà affiché la modale aujourd'hui
-    const lastPromptDate = localStorage.getItem('pwa-install-prompt-date');
-    const today = new Date().toDateString();
-    
-    if (lastPromptDate === today) {
-      console.log('PWA: Déjà affiché aujourd\'hui');
+    // Vérifier si on a déjà affiché la modale dans la dernière heure
+    const lastPromptTime = localStorage.getItem('pwa-install-prompt-time');
+    const now = Date.now();
+    const oneHour = 60 * 60 * 1000; // 1 heure en millisecondes
+
+    if (lastPromptTime && (now - parseInt(lastPromptTime, 10)) < oneHour) {
+      console.log('PWA: Déjà affiché il y a moins d\'une heure');
       return;
     }
 
@@ -64,7 +65,6 @@ export function PWAInstallPrompt() {
     const timer = setTimeout(() => {
       console.log('PWA: Affichage de la modale');
       setShowPrompt(true);
-      // Ne pas enregistrer la date ici - seulement quand l'utilisateur clique sur "Installer" ou "Ne plus afficher"
     }, 2000);
 
     return () => {
@@ -74,39 +74,39 @@ export function PWAInstallPrompt() {
   }, []);
 
   const handleInstall = async () => {
-    const today = new Date().toDateString();
-    
+    const now = Date.now().toString();
+
     if (deferredPrompt) {
       // Utiliser l'API native d'installation (Chrome, Edge, etc.)
       console.log('PWA: Lancement de l\'installation native');
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      
+
       console.log('PWA: Résultat installation:', outcome);
       if (outcome === 'accepted') {
         localStorage.setItem('pwa-installed', 'true');
       }
-      
-      // Marquer comme vu pour aujourd'hui
-      localStorage.setItem('pwa-install-prompt-date', today);
+
+      // Marquer comme vu (timestamp)
+      localStorage.setItem('pwa-install-prompt-time', now);
       setDeferredPrompt(null);
       setShowPrompt(false);
     } else {
       // L'API native n'est pas disponible, marquer comme vu et fermer
       console.log('PWA: API native non disponible, fermeture de la modale');
-      localStorage.setItem('pwa-install-prompt-date', today);
+      localStorage.setItem('pwa-install-prompt-time', now);
       setShowPrompt(false);
     }
   };
 
   const handleClose = () => {
+    localStorage.setItem('pwa-install-prompt-time', Date.now().toString());
     setShowPrompt(false);
   };
 
   const handleNeverShow = () => {
-    const today = new Date().toDateString();
     localStorage.setItem('pwa-installed', 'true');
-    localStorage.setItem('pwa-install-prompt-date', today);
+    localStorage.setItem('pwa-install-prompt-time', Date.now().toString());
     setShowPrompt(false);
   };
 
