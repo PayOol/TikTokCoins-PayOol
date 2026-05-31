@@ -242,13 +242,21 @@ function App() {
       {/* Sélecteur de service */}
       <div className="mb-6 sm:mb-8">
         <div className="bg-[var(--background-elevated)] rounded-[var(--radius-lg)] p-1.5 shadow-[var(--shadow-md)] border border-[var(--border-dark)]">
-          <div className="flex gap-1">
+          <div className="relative flex gap-1">
+            {/* Indicateur coulissant */}
+            <div
+              className="absolute top-0 bottom-0 rounded-[var(--radius-md)] bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] shadow-md transition-all duration-300 ease-out z-0"
+              style={{
+                left: activeService === 'coins' ? '0' : 'calc(50% + 2px)',
+                width: 'calc(50% - 2px)',
+              }}
+            />
             <button
               onClick={() => setActiveService('coins')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-[var(--radius-md)] font-medium text-sm sm:text-base transition-all ${
+              className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-[var(--radius-md)] font-medium text-sm sm:text-base transition-colors ${
                 activeService === 'coins'
-                  ? 'bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] text-white shadow-md'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--background-elevated-2)]'
+                  ? 'text-white'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <Coins className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -256,10 +264,10 @@ function App() {
             </button>
             <button
               onClick={() => setActiveService('accounts')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-[var(--radius-md)] font-medium text-sm sm:text-base transition-all ${
+              className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-[var(--radius-md)] font-medium text-sm sm:text-base transition-colors ${
                 activeService === 'accounts'
-                  ? 'bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] text-white shadow-md'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--background-elevated-2)]'
+                  ? 'text-white'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <Users className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -270,7 +278,7 @@ function App() {
       </div>
 
       {activeService === 'coins' && (
-        <>
+        <div className="page-fade-in">
           {/* Section vidéo d'aide */}
           <div className="mb-6 sm:mb-8">
             <div className="bg-gradient-to-r from-[var(--background-elevated)] to-[var(--background-elevated-2)] rounded-[var(--radius-lg)] p-3 sm:p-4 md:p-5 shadow-[var(--shadow-lg)] border border-[var(--border-dark)] overflow-hidden">
@@ -332,11 +340,11 @@ function App() {
               <CustomPackage onSelect={handlePackageSelect} />
             </div>
           </div>
-        </>
+        </div>
       )}
 
       {activeService === 'accounts' && (
-        <>
+        <div className="page-fade-in">
           {/* Section forfaits de création de compte */}
           <div className="mb-8 sm:mb-12">
             <div className="flex items-center justify-between gap-2 sm:gap-3 mb-6 sm:mb-8">
@@ -357,7 +365,7 @@ function App() {
               ))}
             </div>
           </div>
-        </>
+        </div>
       )}
 
       {/* Section historique des achats */}
