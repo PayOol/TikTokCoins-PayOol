@@ -19,7 +19,7 @@ export function CustomPackage({ onSelect }: Props) {
   // Mettre à jour le prix lorsque le montant change
   useEffect(() => {
     const coinAmount = parseInt(amount, 10);
-    if (!isNaN(coinAmount) && coinAmount >= 70) {
+    if (!isNaN(coinAmount) && coinAmount >= 100) {
       setPrice(Math.round(coinAmount * PRICE_PER_COIN));
     } else {
       setPrice(0);
@@ -29,7 +29,7 @@ export function CustomPackage({ onSelect }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const coinAmount = parseInt(amount, 10);
-    if (coinAmount >= 70) { // Minimum 70 pièces
+    if (coinAmount >= 100) { // Minimum 100 pièces
       setIsAnimating(true);
       
       // Animation avant de sélectionner
@@ -70,7 +70,7 @@ export function CustomPackage({ onSelect }: Props) {
             <input
               type="number"
               id="customAmount"
-              min="70"
+              min="100"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               className="tiktok-input pr-12 text-sm sm:text-base"
@@ -100,7 +100,7 @@ export function CustomPackage({ onSelect }: Props) {
         <button
           type="submit"
           className="tiktok-button w-full flex items-center justify-center gap-2 text-sm sm:text-base py-2.5 sm:py-3"
-          disabled={!amount || parseInt(amount, 10) < 70}
+          disabled={!amount || parseInt(amount, 10) < 100}
         >
           <span>{t('buyNow')}</span>
           <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
