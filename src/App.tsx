@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
 import i18n from './i18n';
 import { Sparkles, CreditCard, RefreshCw, Coins, Users } from 'lucide-react';
 import { CoinPackage as CoinPackageComponent } from './components/CoinPackage';
@@ -26,6 +27,15 @@ import './styles/theme.css';
 import './styles/confetti.css';
 
 type ServiceType = 'coins' | 'accounts' | 'cards';
+type SeoLanguage = 'fr' | 'en';
+
+interface ServiceSeoContent {
+  title: string;
+  description: string;
+  keywords: string;
+  imageAlt: string;
+  schemaName: string;
+}
 
 const serviceTabOffsets: Record<ServiceType, string> = {
   coins: '0',
@@ -33,13 +43,13 @@ const serviceTabOffsets: Record<ServiceType, string> = {
   cards: 'calc((200% + 0.5rem) / 3)',
 };
 
-const serviceHashes: Record<ServiceType, string> = {
+const servicePaths: Record<ServiceType, string> = {
   coins: 'pieces-tiktok',
   accounts: 'comptes-tiktok',
   cards: 'cartes-virtuelles',
 };
 
-const serviceByHash: Record<string, ServiceType> = {
+const serviceByPath: Record<string, ServiceType> = {
   'pieces-tiktok': 'coins',
   coins: 'coins',
   'comptes-tiktok': 'accounts',
@@ -48,14 +58,140 @@ const serviceByHash: Record<string, ServiceType> = {
   cards: 'cards',
 };
 
+const serviceSeoContent: Record<ServiceType, Record<SeoLanguage, ServiceSeoContent>> = {
+  coins: {
+    fr: {
+      title: 'TikTok Coins PayOol - Achat de pieces TikTok en Afrique',
+      description: 'Achetez des TikTok Coins avec PayOol. Paiement Mobile Money en Afrique, forfaits flexibles et traitement rapide.',
+      keywords: 'TikTok Coins, acheter TikTok Coins, pieces TikTok, recharge TikTok, PayOol, Mobile Money, Orange Money, MTN Mobile Money, Wave',
+      imageAlt: 'PayOol - Achat de TikTok Coins',
+      schemaName: 'TikTok Coins PayOol',
+    },
+    en: {
+      title: 'TikTok Coins PayOol - Buy TikTok Coins in Africa',
+      description: 'Buy TikTok Coins with PayOol. Mobile Money payment in Africa, flexible packages and fast processing.',
+      keywords: 'TikTok Coins, buy TikTok Coins, TikTok recharge, PayOol, Mobile Money, Orange Money, MTN Mobile Money, Wave',
+      imageAlt: 'PayOol - Buy TikTok Coins',
+      schemaName: 'PayOol TikTok Coins',
+    },
+  },
+  accounts: {
+    fr: {
+      title: 'Comptes TikTok monetisables - PayOol',
+      description: 'Commandez des comptes TikTok europeens avec options live, monetisation et livraison rapide via PayOol.',
+      keywords: 'compte TikTok, compte TikTok europeen, compte TikTok monetisable, TikTok live, PayOol, compte TikTok avec followers',
+      imageAlt: 'PayOol - Comptes TikTok monetisables',
+      schemaName: 'Comptes TikTok monetisables PayOol',
+    },
+    en: {
+      title: 'Monetizable TikTok Accounts - PayOol',
+      description: 'Order European TikTok accounts with live access, monetization options and fast delivery through PayOol.',
+      keywords: 'TikTok account, European TikTok account, monetizable TikTok account, TikTok live, PayOol, TikTok account with followers',
+      imageAlt: 'PayOol - Monetizable TikTok Accounts',
+      schemaName: 'PayOol Monetizable TikTok Accounts',
+    },
+  },
+  cards: {
+    fr: {
+      title: 'Cartes Virtuelles PayOol - Visa et Mastercard virtuelles',
+      description: 'Decouvrez les cartes virtuelles PayOol: Visa, Mastercard, cartes prepayees, 3D Secure et options pour paiements en ligne.',
+      keywords: 'cartes virtuelles, carte virtuelle Visa, carte virtuelle Mastercard, carte prepayee, carte bancaire virtuelle, PayOol, paiement en ligne',
+      imageAlt: 'PayOol - Cartes Virtuelles',
+      schemaName: 'Cartes Virtuelles PayOol',
+    },
+    en: {
+      title: 'PayOol Virtual Cards - Virtual Visa and Mastercard',
+      description: 'Discover PayOol virtual cards: Visa, Mastercard, prepaid cards, 3D Secure and online payment options.',
+      keywords: 'virtual cards, virtual Visa card, virtual Mastercard, prepaid card, virtual bank card, PayOol, online payment',
+      imageAlt: 'PayOol - Virtual Cards',
+      schemaName: 'PayOol Virtual Cards',
+    },
+  },
+};
+
+const getServiceFromPath = (pathname: string): ServiceType => {
+  const pathSegments = pathname.toLowerCase().split('/').filter(Boolean);
+  const currentSegment = pathSegments[pathSegments.length - 1] || '';
+  return serviceByPath[currentSegment] || 'coins';
+};
+
 const getInitialService = (): ServiceType => {
-  const hash = window.location.hash.replace('#', '').toLowerCase();
-  return serviceByHash[hash] || 'coins';
+  const serviceFromPath = getServiceFromPath(window.location.pathname);
+  if (serviceFromPath !== 'coins') {
+    return serviceFromPath;
+  }
+
+  const legacyHash = window.location.hash.replace('#', '').toLowerCase();
+  return serviceByPath[legacyHash] || serviceFromPath;
+};
+
+const setMetaContent = (selector: string, content: string) => {
+  const element = document.head.querySelector<HTMLMetaElement>(selector);
+  if (element) {
+    element.content = content;
+  }
+};
+
+const updateServiceSeo = (service: ServiceType, language: SeoLanguage) => {
+  const seo = serviceSeoContent[service][language];
+  const routePath = servicePaths[service];
+  const baseUrl = `${window.location.origin}${import.meta.env.BASE_URL}`;
+  const pageUrl = `${baseUrl}${routePath}`;
+  const imageUrl = `${window.location.origin}${import.meta.env.BASE_URL}pwa-512x512.png`;
+
+  document.title = seo.title;
+  document.documentElement.lang = language;
+
+  setMetaContent('meta[name="description"]', seo.description);
+  setMetaContent('meta[name="keywords"]', seo.keywords);
+  setMetaContent('meta[name="language"]', language === 'fr' ? 'French' : 'English');
+  setMetaContent('meta[property="og:url"]', pageUrl);
+  setMetaContent('meta[property="og:title"]', seo.title);
+  setMetaContent('meta[property="og:description"]', seo.description);
+  setMetaContent('meta[property="og:image"]', imageUrl);
+  setMetaContent('meta[property="og:image:alt"]', seo.imageAlt);
+  setMetaContent('meta[property="og:locale"]', language === 'fr' ? 'fr_FR' : 'en_US');
+  setMetaContent('meta[property="twitter:url"]', pageUrl);
+  setMetaContent('meta[property="twitter:title"]', seo.title);
+  setMetaContent('meta[property="twitter:description"]', seo.description);
+  setMetaContent('meta[property="twitter:image"]', imageUrl);
+  setMetaContent('meta[property="twitter:image:alt"]', seo.imageAlt);
+
+  const canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+  if (canonical) {
+    canonical.href = pageUrl;
+  }
+
+  let schema = document.head.querySelector<HTMLScriptElement>('script[data-service-seo="true"]');
+  if (!schema) {
+    schema = document.createElement('script');
+    schema.type = 'application/ld+json';
+    schema.dataset.serviceSeo = 'true';
+    document.head.appendChild(schema);
+  }
+
+  schema.textContent = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: seo.schemaName,
+    url: pageUrl,
+    description: seo.description,
+    image: imageUrl,
+    provider: {
+      '@type': 'Organization',
+      name: 'PayOol',
+      url: `${window.location.origin}${import.meta.env.BASE_URL}`,
+    },
+    areaServed: 'Africa',
+    inLanguage: language === 'fr' ? 'fr-FR' : 'en-US',
+  });
 };
 
 function App() {
   // Initialiser la traduction
   const { t } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
   
   // Charger les données utilisateur depuis le localStorage au démarrage
   const [user, setUser] = useState<User>(getUserData());
@@ -128,9 +264,9 @@ function App() {
   const handleServiceChange = (service: ServiceType) => {
     setActiveService(service);
 
-    const nextHash = serviceHashes[service];
-    if (window.location.hash !== `#${nextHash}`) {
-      window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#${nextHash}`);
+    const nextPath = `/${servicePaths[service]}`;
+    if (location.pathname !== nextPath) {
+      navigate(nextPath);
     }
   };
 
@@ -274,13 +410,22 @@ function App() {
   }, [showConfetti]);
 
   useEffect(() => {
-    const handleHashChange = () => {
-      setActiveService(getInitialService());
-    };
+    setActiveService(getServiceFromPath(location.pathname));
+  }, [location.pathname]);
 
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
+  useEffect(() => {
+    const legacyHash = window.location.hash.replace('#', '').toLowerCase();
+    const legacyService = serviceByPath[legacyHash];
+
+    if (legacyService) {
+      navigate(`/${servicePaths[legacyService]}`, { replace: true });
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    const language: SeoLanguage = i18n.language.startsWith('fr') ? 'fr' : 'en';
+    updateServiceSeo(activeService, language);
+  }, [activeService, i18n.language]);
 
   return (
     <Layout balance={user.balance}>
