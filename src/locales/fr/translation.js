@@ -127,7 +127,17 @@ const translation = {
   // Service tabs
   "services": {
     "coins": "Pièces TikTok",
-    "accounts": "Compte TikTok Monétisables"
+    "accounts": "Compte TikTok Monétisables",
+    "cards": "Cartes Virtuelles"
+  },
+
+  // Virtual cards
+  "virtualCards": {
+    "title": "Cartes Virtuelles",
+    "badge": "Service carte",
+    "heading": "Cartes Virtuelles PayOol",
+    "description": "La section cartes virtuelles est en preparation.",
+    "status": "Bientot disponible"
   },
 
   // Account packages

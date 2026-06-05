@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import i18n from './i18n';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, CreditCard, RefreshCw, Coins, Users } from 'lucide-react';
 import { CoinPackage as CoinPackageComponent } from './components/CoinPackage';
 import { CustomPackage } from './components/CustomPackage';
 import { PurchaseHistory } from './components/PurchaseHistory';
@@ -20,11 +20,38 @@ import { accountPackages } from './data/accountPackages';
 import { Purchase, User, CoinPackage, TikTokCredentials, AccountPackage, MonetizableAccountForm } from './types';
 import { initiatePayment, PaymentProviderType } from './utils/payment';
 import { getUserData, addPurchase, checkAndUpdateOldPendingTransactions } from './utils/localStorage';
-import { RefreshCw, Coins, Users } from 'lucide-react';
 
 // Importer les fichiers de style
 import './styles/theme.css';
 import './styles/confetti.css';
+
+type ServiceType = 'coins' | 'accounts' | 'cards';
+
+const serviceTabOffsets: Record<ServiceType, string> = {
+  coins: '0',
+  accounts: 'calc((100% + 0.25rem) / 3)',
+  cards: 'calc((200% + 0.5rem) / 3)',
+};
+
+const serviceHashes: Record<ServiceType, string> = {
+  coins: 'pieces-tiktok',
+  accounts: 'comptes-tiktok',
+  cards: 'cartes-virtuelles',
+};
+
+const serviceByHash: Record<string, ServiceType> = {
+  'pieces-tiktok': 'coins',
+  coins: 'coins',
+  'comptes-tiktok': 'accounts',
+  accounts: 'accounts',
+  'cartes-virtuelles': 'cards',
+  cards: 'cards',
+};
+
+const getInitialService = (): ServiceType => {
+  const hash = window.location.hash.replace('#', '').toLowerCase();
+  return serviceByHash[hash] || 'coins';
+};
 
 function App() {
   // Initialiser la traduction
@@ -33,7 +60,7 @@ function App() {
   // Charger les données utilisateur depuis le localStorage au démarrage
   const [user, setUser] = useState<User>(getUserData());
 
-  const [activeService, setActiveService] = useState<'coins' | 'accounts'>('coins');
+  const [activeService, setActiveService] = useState<ServiceType>(getInitialService);
   const [selectedPackage, setSelectedPackage] = useState<CoinPackage | null>(null);
   const [selectedAccountPackage, setSelectedAccountPackage] = useState<AccountPackage | null>(null);
   const [tiktokData, setTiktokData] = useState<TikTokCredentials | null>(null);
@@ -96,6 +123,15 @@ function App() {
   const handleRefreshHistory = () => {
     const updatedUser = checkAndUpdateOldPendingTransactions();
     setUser(updatedUser);
+  };
+
+  const handleServiceChange = (service: ServiceType) => {
+    setActiveService(service);
+
+    const nextHash = serviceHashes[service];
+    if (window.location.hash !== `#${nextHash}`) {
+      window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#${nextHash}`);
+    }
   };
 
   const [paymentError, setPaymentError] = useState<string | null>(null);
@@ -237,41 +273,61 @@ function App() {
     }
   }, [showConfetti]);
 
+  useEffect(() => {
+    const handleHashChange = () => {
+      setActiveService(getInitialService());
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
   return (
     <Layout balance={user.balance}>
       {/* Sélecteur de service */}
       <div className="mb-6 sm:mb-8">
         <div className="bg-[var(--background-elevated)] rounded-[var(--radius-lg)] p-1.5 shadow-[var(--shadow-md)] border border-[var(--border-dark)]">
-          <div className="relative flex gap-1">
+          <div className="relative grid grid-cols-3 gap-1">
             {/* Indicateur coulissant */}
             <div
               className="absolute top-0 bottom-0 rounded-[var(--radius-md)] bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] shadow-md transition-all duration-300 ease-out z-0"
               style={{
-                left: activeService === 'coins' ? '0' : 'calc(50% + 2px)',
-                width: 'calc(50% - 2px)',
+                left: serviceTabOffsets[activeService],
+                width: 'calc((100% - 0.5rem) / 3)',
               }}
             />
             <button
-              onClick={() => setActiveService('coins')}
-              className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-[var(--radius-md)] font-medium text-sm sm:text-base transition-colors ${
+              onClick={() => handleServiceChange('coins')}
+              className={`relative z-10 min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 py-3 px-2 sm:px-4 rounded-[var(--radius-md)] font-medium text-xs sm:text-base transition-colors ${
                 activeService === 'coins'
                   ? 'text-white'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <Coins className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span>{t('services.coins')}</span>
+              <span className="truncate">{t('services.coins')}</span>
             </button>
             <button
-              onClick={() => setActiveService('accounts')}
-              className={`relative z-10 flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-[var(--radius-md)] font-medium text-sm sm:text-base transition-colors ${
+              onClick={() => handleServiceChange('accounts')}
+              className={`relative z-10 min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 py-3 px-2 sm:px-4 rounded-[var(--radius-md)] font-medium text-xs sm:text-base transition-colors ${
                 activeService === 'accounts'
                   ? 'text-white'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <Users className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span>{t('services.accounts')}</span>
+              <span className="truncate">{t('services.accounts')}</span>
+            </button>
+            <button
+              onClick={() => handleServiceChange('cards')}
+              className={`relative z-10 min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 py-3 px-2 sm:px-4 rounded-[var(--radius-md)] font-medium text-xs sm:text-base transition-colors ${
+                activeService === 'cards'
+                  ? 'text-white'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              <CreditCard className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="truncate">{t('services.cards')}</span>
             </button>
           </div>
         </div>
@@ -363,6 +419,35 @@ function App() {
                   onSelect={handleAccountPackageSelect}
                 />
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeService === 'cards' && (
+        <div className="page-fade-in">
+          <div className="mb-8 sm:mb-12">
+            <div className="flex items-center justify-between gap-2 sm:gap-3 mb-6 sm:mb-8">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold">{t('virtualCards.title')}</h2>
+              <div className="flex items-center gap-2 text-xs sm:text-sm bg-[var(--background-elevated-2)] px-2 sm:px-3 py-1.5 rounded-full whitespace-nowrap">
+                <CreditCard className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--tiktok-red)]" />
+                <span>{t('virtualCards.badge')}</span>
+              </div>
+            </div>
+
+            <div className="tiktok-card p-5 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[var(--radius-md)] bg-gradient-to-br from-[var(--tiktok-blue)] to-[var(--tiktok-red)] flex items-center justify-center flex-shrink-0">
+                  <CreditCard className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-base sm:text-xl font-bold text-[var(--text-primary)]">{t('virtualCards.heading')}</h3>
+                  <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">{t('virtualCards.description')}</p>
+                </div>
+                <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-full bg-[var(--background-elevated-2)] text-xs sm:text-sm text-[var(--text-secondary)] whitespace-nowrap">
+                  {t('virtualCards.status')}
+                </span>
+              </div>
             </div>
           </div>
         </div>
