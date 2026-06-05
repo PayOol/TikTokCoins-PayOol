@@ -1,4 +1,4 @@
-import { Coins, Users, CalendarDays, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Coins, Users, CreditCard, CalendarDays, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { Purchase, TransactionStatus } from '../types';
 
 interface PurchaseHistoryProps {
@@ -69,6 +69,30 @@ export const PurchaseHistory = ({ purchases }: PurchaseHistoryProps) => {
     }).format(new Date(date));
   };
 
+  const getPurchaseIcon = (purchase: Purchase) => {
+    if (purchase.serviceType === 'accounts') {
+      return <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />;
+    }
+
+    if (purchase.serviceType === 'cards') {
+      return <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-white" />;
+    }
+
+    return <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-white" />;
+  };
+
+  const getPurchaseLabel = (purchase: Purchase) => {
+    if (purchase.serviceType === 'accounts') {
+      return 'Compte TikTok';
+    }
+
+    if (purchase.serviceType === 'cards') {
+      return purchase.label || 'Carte virtuelle';
+    }
+
+    return `${purchase.amount} pièces`;
+  };
+
   if (purchases.length === 0) {
     return (
       <div className="bg-[var(--card-bg)] rounded-[var(--radius-md)] p-6 sm:p-8 text-center shadow-[var(--shadow-sm)] border border-[var(--border-dark)]">
@@ -89,18 +113,12 @@ export const PurchaseHistory = ({ purchases }: PurchaseHistoryProps) => {
         <div key={purchase.id} className={`bg-[var(--card-bg)] rounded-[var(--radius-md)] shadow-[var(--shadow-sm)] p-3 sm:p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-3 border ${getStatusBorderColor(purchase.status)}`}>
           <div className="flex items-center gap-2 sm:gap-3">
             <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${getStatusBackgroundColor(purchase.status)}`}>
-              {purchase.serviceType === 'accounts'
-                ? <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                : <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-              }
+              {getPurchaseIcon(purchase)}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-sm sm:text-base font-medium">
-                  {purchase.serviceType === 'accounts'
-                    ? 'Compte TikTok'
-                    : `${purchase.amount} pièces`
-                  }
+                  {getPurchaseLabel(purchase)}
                 </span>
                 {getStatusBadge(purchase.status)}
               </div>

@@ -14,11 +14,13 @@ import { Confetti } from './components/Confetti';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { ServiceWorkerUpdate } from './components/ServiceWorkerUpdate';
 import { AccountPackageCard } from './components/AccountPackageCard';
+import { VirtualCardPackageCard } from './components/VirtualCardPackageCard';
 import { MonetizableAccountFormModal } from './components/MonetizableAccountForm';
 import { AccountInstructionsModal } from './components/AccountInstructionsModal';
 import { coinPackages } from './data/coinPackages';
 import { accountPackages } from './data/accountPackages';
-import { Purchase, User, CoinPackage, TikTokCredentials, AccountPackage, MonetizableAccountForm } from './types';
+import { virtualCardPackages } from './data/virtualCardPackages';
+import { Purchase, User, CoinPackage, TikTokCredentials, AccountPackage, MonetizableAccountForm, VirtualCardPackage, LocalizedText } from './types';
 import { initiatePayment, PaymentProviderType } from './utils/payment';
 import { getUserData, addPurchase, checkAndUpdateOldPendingTransactions } from './utils/localStorage';
 
@@ -125,6 +127,10 @@ const getInitialService = (): ServiceType => {
   return serviceByPath[legacyHash] || serviceFromPath;
 };
 
+const getLocalizedText = (value: LocalizedText, language: string) => (
+  language.startsWith('fr') ? value.fr : value.en
+);
+
 const setMetaContent = (selector: string, content: string) => {
   const element = document.head.querySelector<HTMLMetaElement>(selector);
   if (element) {
@@ -199,6 +205,7 @@ function App() {
   const [activeService, setActiveService] = useState<ServiceType>(getInitialService);
   const [selectedPackage, setSelectedPackage] = useState<CoinPackage | null>(null);
   const [selectedAccountPackage, setSelectedAccountPackage] = useState<AccountPackage | null>(null);
+  const [selectedCardPackage, setSelectedCardPackage] = useState<VirtualCardPackage | null>(null);
   const [tiktokData, setTiktokData] = useState<TikTokCredentials | null>(null);
   const [accountFormData, setAccountFormData] = useState<MonetizableAccountForm | null>(null);
   const [showEmailForm, setShowEmailForm] = useState(false);
@@ -216,6 +223,11 @@ function App() {
   const handleAccountPackageSelect = (pkg: AccountPackage) => {
     setSelectedAccountPackage(pkg);
     setShowAccountInstructions(true);
+  };
+
+  const handleCardPackageSelect = (pkg: VirtualCardPackage) => {
+    setSelectedCardPackage(pkg);
+    setShowEmailForm(true);
   };
 
   const handleAccountInstructionsClose = () => {
@@ -248,12 +260,16 @@ function App() {
     setTiktokData(null);
     setShowEmailForm(false);
     setSelectedAccountPackage(null);
+    setSelectedCardPackage(null);
     setAccountFormData(null);
     setAccountEmail('');
   };
 
   const handleEmailFormCancel = () => {
     setShowEmailForm(false);
+    if (activeService === 'cards') {
+      setSelectedCardPackage(null);
+    }
   };
 
   const handleRefreshHistory = () => {
@@ -280,20 +296,20 @@ function App() {
   };
 
   // Helper to generate order ID
-  const generateOrderId = () => {
+  const generateOrderId = (prefix = 'TKT') => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let result = '';
     for (let i = 0; i < 5; i++) {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    return `TKT-${result}`;
+    return `${prefix}-${result}`;
   };
 
   // Second step: collect email and process payment
   const handleEmailSubmit = (email: string, provider: PaymentProviderType) => {
     setPaymentError(null);
     setIsPaymentLoading(true);
-    const orderId = generateOrderId();
+    const orderId = generateOrderId(activeService === 'cards' ? 'CARD' : 'TKT');
 
     if (activeService === 'coins') {
       if (!selectedPackage || !tiktokData) {
@@ -384,6 +400,53 @@ function App() {
           setIsPaymentLoading(false);
           setSelectedAccountPackage(null);
           setAccountFormData(null);
+          setShowEmailForm(false);
+        }, 10000);
+      })
+      .catch((error) => {
+        console.error('Payment error:', error);
+        setPaymentError(error);
+        setIsPaymentLoading(false);
+      });
+    } else if (activeService === 'cards') {
+      if (!selectedCardPackage) {
+        setIsPaymentLoading(false);
+        return;
+      }
+
+      const cardName = getLocalizedText(selectedCardPackage.name, i18n.language);
+      const description = `Carte virtuelle ${cardName}`.substring(0, 50);
+      const customerName = `Carte: ${cardName}`;
+      const message = `Commande carte virtuelle | Carte: ${cardName} | Devise: ${selectedCardPackage.currency} | Email: ${email}`;
+
+      initiatePayment({
+        amount: selectedCardPackage.price,
+        currency: 'XAF',
+        description,
+        orderId,
+        customerName,
+        customerEmail: email,
+        successUrl: `${window.location.origin}/TikTokCoins-PayOol/payment/confirmation?orderId=${orderId}&type=card&package=${selectedCardPackage.id}&card=${encodeURIComponent(cardName)}&email=${encodeURIComponent(email)}&price=${selectedCardPackage.price}`,
+        failureUrl: `${window.location.origin}/TikTokCoins-PayOol/payment/failure?orderId=${orderId}`,
+        shopName: 'PayOol',
+        message
+      }, provider)
+      .then(() => {
+        const purchase: Purchase = {
+          id: orderId,
+          packageId: selectedCardPackage.id,
+          amount: 0,
+          price: selectedCardPackage.price,
+          date: new Date(),
+          status: 'pending',
+          serviceType: 'cards',
+          label: cardName,
+        };
+        const updatedUser = addPurchase(purchase);
+        setUser(updatedUser);
+        setTimeout(() => {
+          setIsPaymentLoading(false);
+          setSelectedCardPackage(null);
           setShowEmailForm(false);
         }, 10000);
       })
@@ -575,24 +638,19 @@ function App() {
             <div className="flex items-center justify-between gap-2 sm:gap-3 mb-6 sm:mb-8">
               <h2 className="text-lg sm:text-xl md:text-2xl font-bold">{t('virtualCards.title')}</h2>
               <div className="flex items-center gap-2 text-xs sm:text-sm bg-[var(--background-elevated-2)] px-2 sm:px-3 py-1.5 rounded-full whitespace-nowrap">
-                <CreditCard className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--tiktok-red)]" />
-                <span>{t('virtualCards.badge')}</span>
+                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--tiktok-red)]" />
+                <span>{t('securePayment')}</span>
               </div>
             </div>
 
-            <div className="tiktok-card p-5 sm:p-6">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[var(--radius-md)] bg-gradient-to-br from-[var(--tiktok-blue)] to-[var(--tiktok-red)] flex items-center justify-center flex-shrink-0">
-                  <CreditCard className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="text-base sm:text-xl font-bold text-[var(--text-primary)]">{t('virtualCards.heading')}</h3>
-                  <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">{t('virtualCards.description')}</p>
-                </div>
-                <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-full bg-[var(--background-elevated-2)] text-xs sm:text-sm text-[var(--text-secondary)] whitespace-nowrap">
-                  {t('virtualCards.status')}
-                </span>
-              </div>
+            <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 xl:gap-5">
+              {virtualCardPackages.map((pkg) => (
+                <VirtualCardPackageCard
+                  key={pkg.id}
+                  package={pkg}
+                  onSelect={handleCardPackageSelect}
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -677,6 +735,19 @@ function App() {
           serviceType="accounts"
           packageTranslationKey={selectedAccountPackage.translationKey}
           defaultEmail={accountEmail}
+        />
+      )}
+
+      {activeService === 'cards' && showEmailForm && selectedCardPackage && (
+        <EmailFormModal
+          packageAmount={0}
+          packagePrice={selectedCardPackage.price}
+          onSubmit={handleEmailSubmit}
+          onCancel={handleEmailFormCancel}
+          isLoading={isPaymentLoading}
+          serviceType="cards"
+          packageLabel={`${getLocalizedText(selectedCardPackage.name, i18n.language)} - ${selectedCardPackage.price.toLocaleString()} ${selectedCardPackage.currency}`}
+          packageCurrency={selectedCardPackage.currency}
         />
       )}
       

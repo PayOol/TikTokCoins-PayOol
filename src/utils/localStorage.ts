@@ -146,7 +146,7 @@ export const updateTransactionStatus = (orderId: string, status: TransactionStat
   
   // Recalculer le solde en fonction des transactions réussies
   const successfulCoins = updatedPurchaseHistory
-    .filter(purchase => purchase.status === 'success')
+    .filter(purchase => purchase.status === 'success' && (!purchase.serviceType || purchase.serviceType === 'coins'))
     .reduce((total, purchase) => total + purchase.amount, 0);
   
   const updatedUser = {
@@ -186,7 +186,7 @@ export const checkAndUpdateOldPendingTransactions = (): User => {
   if (hasUpdates) {
     // Recalculer le solde en fonction des transactions réussies
     const successfulCoins = updatedPurchaseHistory
-      .filter(purchase => purchase.status === 'success')
+      .filter(purchase => purchase.status === 'success' && (!purchase.serviceType || purchase.serviceType === 'coins'))
       .reduce((total, purchase) => total + purchase.amount, 0);
     
     const updatedUser = {

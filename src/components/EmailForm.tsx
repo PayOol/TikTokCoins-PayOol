@@ -10,13 +10,14 @@ interface Props {
   isLoading?: boolean;
   packageAmount: number;
   packagePrice: number;
-  serviceType?: 'coins' | 'accounts';
+  serviceType?: 'coins' | 'accounts' | 'cards';
   packageLabel?: string;
   packageTranslationKey?: string;
   defaultEmail?: string;
+  packageCurrency?: string;
 }
 
-export function EmailFormModal({ onSubmit, onCancel, isLoading = false, packageAmount, packagePrice, serviceType = 'coins', packageLabel, packageTranslationKey, defaultEmail = '' }: Props) {
+export function EmailFormModal({ onSubmit, onCancel, isLoading = false, packageAmount, packagePrice, serviceType = 'coins', packageLabel, packageTranslationKey, defaultEmail = '', packageCurrency = 'FCFA' }: Props) {
   const { t } = useTranslation();
   const [email, setEmail] = useState(defaultEmail);
   const [isValid, setIsValid] = useState(false);
@@ -130,7 +131,7 @@ export function EmailFormModal({ onSubmit, onCancel, isLoading = false, packageA
                 </>
               ) : (
                 <>
-                  <span>{t('proceedToPayment')} {packagePrice.toLocaleString()} FCFA</span>
+                  <span>{t('proceedToPayment')} {packagePrice.toLocaleString()} {packageCurrency}</span>
                   <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
                 </>
               )}

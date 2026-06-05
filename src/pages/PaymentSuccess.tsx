@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Layout } from '../components/Layout';
-import { CheckCircle, ArrowLeft, Coins } from 'lucide-react';
+import { CheckCircle, ArrowLeft, Coins, CreditCard } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Confetti } from '../components/Confetti';
@@ -15,7 +15,12 @@ export const PaymentSuccess = () => {
   const searchParams = new URLSearchParams(location.search);
   const orderId = searchParams.get('orderId');
   const urlType = searchParams.get('type');
-  const [isAccount, setIsAccount] = useState(false);
+  const [serviceType, setServiceType] = useState<'coins' | 'accounts' | 'cards'>(
+    urlType === 'account' ? 'accounts' : urlType === 'card' ? 'cards' : 'coins'
+  );
+  const isAccount = serviceType === 'accounts';
+  const isCard = serviceType === 'cards';
+  const isNonCoinPurchase = isAccount || isCard;
 
   useEffect(() => {
     if (orderId) {
@@ -27,9 +32,9 @@ export const PaymentSuccess = () => {
       const purchase = purchaseHistory.find(p => p.id === orderId);
       if (purchase) {
         setPurchaseDetails(purchase);
-        setIsAccount(purchase.serviceType === 'accounts');
+        setServiceType(purchase.serviceType || 'coins');
       } else if (urlType) {
-        setIsAccount(urlType === 'account');
+        setServiceType(urlType === 'account' ? 'accounts' : urlType === 'card' ? 'cards' : 'coins');
       }
     }
 
@@ -42,7 +47,7 @@ export const PaymentSuccess = () => {
   }, [location.search]);
   
   return (
-    <Layout balance={purchaseDetails?.amount || 0} hideBalance={!purchaseDetails || isAccount}>
+    <Layout balance={purchaseDetails?.amount || 0} hideBalance={!purchaseDetails || isNonCoinPurchase}>
       {showConfetti && <Confetti duration={5000} />}
       
       <div className="max-w-2xl mx-auto mt-12 p-8 bg-[var(--card-bg)] rounded-[var(--radius-lg)] shadow-[var(--shadow-md)] border border-[var(--border-dark)]">
@@ -58,7 +63,9 @@ export const PaymentSuccess = () => {
           <p className="text-[var(--text-secondary)] max-w-md mb-4">
             {isAccount
               ? t('successMessageAccount', 'Votre paiement a été traité avec succès. Vous recevrez les identifiants de votre compte TikTok par email dans un délai de 2-4h. Si vous ne recevez pas vos identifiants dans ce délai, veuillez contacter notre service client sur WhatsApp.')
-              : t('successMessage', 'Votre paiement a été traité avec succès. Vous recevrez vos pièces dans un délai de 10 minutes. Si vous ne recevez pas vos pièces dans ce délai, veuillez contacter notre service client sur WhatsApp.')
+              : isCard
+                ? t('successMessageCard', 'Votre paiement a ete traite avec succes. Votre carte virtuelle sera preparee et les informations de livraison seront envoyees par email.')
+                : t('successMessage', 'Votre paiement a été traité avec succès. Vous recevrez vos pièces dans un délai de 10 minutes. Si vous ne recevez pas vos pièces dans ce délai, veuillez contacter notre service client sur WhatsApp.')
             }
           </p>
           <div className="mb-6 p-4 bg-green-100 border border-green-200 rounded-[var(--radius-md)] text-green-800">
@@ -69,7 +76,9 @@ export const PaymentSuccess = () => {
             <p className="text-sm">
               {isAccount
                 ? t('paymentConfirmationAccount', 'Votre paiement a été traité avec succès. Votre compte TikTok sera créé et les identifiants vous seront envoyés par email.')
-                : t('paymentConfirmation', 'Votre paiement a été traité avec succès. Vos pièces seront créditées sur votre compte TikTok dans les prochaines minutes.')
+                : isCard
+                  ? t('paymentConfirmationCard', 'Votre commande de carte virtuelle est confirmee. PayOol va traiter la livraison apres validation.')
+                  : t('paymentConfirmation', 'Votre paiement a été traité avec succès. Vos pièces seront créditées sur votre compte TikTok dans les prochaines minutes.')
               }
             </p>
           </div>
@@ -100,7 +109,7 @@ export const PaymentSuccess = () => {
                 <span className="font-medium">{purchaseDetails.id}</span>
               </div>
               
-              {!isAccount && (
+              {!isNonCoinPurchase && (
                 <div className="flex justify-between items-center">
                   <span className="text-[var(--text-secondary)]">{t('purchasedCoins', 'Pièces achetées')}</span>
                   <div className="flex items-center gap-2">
@@ -108,6 +117,18 @@ export const PaymentSuccess = () => {
                       <Coins className="w-3 h-3 text-white" />
                     </div>
                     <span className="font-bold">{purchaseDetails.amount.toLocaleString()}</span>
+                  </div>
+                </div>
+              )}
+
+              {isCard && (
+                <div className="flex justify-between items-center">
+                  <span className="text-[var(--text-secondary)]">{t('virtualCards.card', 'Carte')}</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center">
+                      <CreditCard className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="font-bold">{purchaseDetails.label || t('virtualCards.title')}</span>
                   </div>
                 </div>
               )}
@@ -125,16 +146,16 @@ export const PaymentSuccess = () => {
           </div>
         )}
         
-        <div className={`flex gap-4 ${isAccount ? 'justify-center' : 'flex-col sm:flex-row'}`}>
+        <div className={`flex gap-4 ${isNonCoinPurchase ? 'justify-center' : 'flex-col sm:flex-row'}`}>
           <Link
-            to="/"
+            to={isCard ? '/cartes-virtuelles' : isAccount ? '/comptes-tiktok' : '/'}
             className="flex items-center justify-center gap-2 py-3 px-6 rounded-[var(--radius-md)] bg-[var(--background-elevated)] hover:bg-[var(--background-elevated-2)] transition-colors border border-[var(--border-dark)]"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>{t('backToHome')}</span>
           </Link>
 
-          {!isAccount && (
+          {!isNonCoinPurchase && (
             <a
               href="https://www.tiktok.com"
               target="_blank"

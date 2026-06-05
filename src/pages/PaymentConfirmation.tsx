@@ -41,6 +41,7 @@ export const PaymentConfirmation = () => {
   const amountFromUrl = searchParams.get('amount');
   const priceFromUrl = searchParams.get('price');
   const desiredUsername = searchParams.get('desiredUsername');
+  const cardName = searchParams.get('card');
   
   // Paramètres BkaPay - vérifier le statut du paiement
   const paymentStatus = searchParams.get('status');
@@ -95,9 +96,12 @@ export const PaymentConfirmation = () => {
     if (isPaymentFailed) return;
 
     const isAccountPurchase = type === 'account';
+    const isCardPurchase = type === 'card';
     const hasRequiredParams = isAccountPurchase
       ? (email && whatsapp && orderId)
-      : (username && password && email && whatsapp && orderId);
+      : isCardPurchase
+        ? (email && orderId)
+        : (username && password && email && whatsapp && orderId);
 
     // Vérifier que tous les paramètres sont présents et que l'email n'a pas déjà été envoyé
     if (hasRequiredParams && !hasSentEmail.current) {
@@ -130,13 +134,17 @@ export const PaymentConfirmation = () => {
 
       const templateParams = {
         order_id: orderId,
-        service_type: type === 'account' ? 'Compte TikTok Monétisable' : 'TikTok Coins',
+        service_type: type === 'account'
+          ? 'Compte TikTok Monétisable'
+          : type === 'card'
+            ? 'Carte Virtuelle PayOol'
+            : 'TikTok Coins',
         tiktok_username: username || '—',
         tiktok_password: password || '—',
-        desired_username: desiredUsername || '—',
+        desired_username: type === 'card' ? (cardName || '—') : (desiredUsername || '—'),
         client_email: email,
-        client_whatsapp: whatsapp,
-        coins_amount: type !== 'account' ? (coinsAmount?.toLocaleString() || '—') : '—',
+        client_whatsapp: whatsapp || '—',
+        coins_amount: type === 'coins' ? (coinsAmount?.toLocaleString() || '—') : '—',
         price: orderPrice?.toLocaleString() || 'Non spécifié',
         date: new Date(orderDate).toLocaleString('fr-FR', {
           dateStyle: 'full',
@@ -167,7 +175,7 @@ export const PaymentConfirmation = () => {
       
       // Rediriger vers la page de succès après 2 secondes
       setTimeout(() => {
-        navigate(`/payment/success?orderId=${orderId}`);
+        navigate(`/payment/success?orderId=${orderId}&type=${type}`);
       }, 2000);
 
     } catch (error) {
@@ -195,7 +203,7 @@ export const PaymentConfirmation = () => {
   }
   
   return (
-    <Layout balance={purchaseDetails?.amount || 0} hideBalance={!purchaseDetails}>
+    <Layout balance={purchaseDetails?.amount || 0} hideBalance={!purchaseDetails || type === 'account' || type === 'card'}>
       {showConfetti && <Confetti duration={5000} />}
       
       <div className="max-w-2xl mx-auto mt-12 p-8 bg-[var(--card-bg)] rounded-[var(--radius-lg)] shadow-[var(--shadow-md)] border border-[var(--border-dark)]">
@@ -258,7 +266,7 @@ export const PaymentConfirmation = () => {
                 <span className="font-bold">{purchaseDetails.price.toLocaleString()} FCFA</span>
               </div>
               
-              {type !== 'account' && (
+              {type === 'coins' && (
                 <div className="flex justify-between">
                   <span className="text-[var(--text-secondary)]">{t('purchasedCoins', 'Pièces achetées')}</span>
                   <span className="font-bold">{purchaseDetails.amount.toLocaleString()}</span>

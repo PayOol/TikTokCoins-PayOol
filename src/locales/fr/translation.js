@@ -136,8 +136,15 @@ const translation = {
     "title": "Cartes Virtuelles",
     "badge": "Service carte",
     "heading": "Cartes Virtuelles PayOol",
-    "description": "La section cartes virtuelles est en preparation.",
-    "status": "Bientot disponible"
+    "description": "Choisissez votre carte virtuelle PayOol et payez directement en ligne.",
+    "status": "Disponible",
+    "mostPopular": "Plus populaire",
+    "currency": "Devise",
+    "seeMore": "Voir plus",
+    "seeLess": "Voir moins",
+    "buyNow": "Acheter maintenant",
+    "card": "Carte",
+    "featuresTitle": "Caractéristiques"
   },
 
   // Account packages
