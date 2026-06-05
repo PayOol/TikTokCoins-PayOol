@@ -6,6 +6,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>TikTokCoins - Achat de TikTok Coins en Afrique | Mobile Money</title>
 
+    <script>
+      (function() {
+        var base = '/TikTokCoins-PayOol/';
+        var redirectPath = null;
+
+        try {
+          redirectPath = sessionStorage.getItem('payool:redirect-path');
+          if (redirectPath) {
+            sessionStorage.removeItem('payool:redirect-path');
+          }
+        } catch (error) {
+          redirectPath = null;
+        }
+
+        if (!redirectPath) {
+          var params = new URLSearchParams(window.location.search);
+          redirectPath = params.get('redirect');
+        }
+
+        if (redirectPath) {
+          if (redirectPath.charAt(0) !== '/') {
+            redirectPath = '/' + redirectPath;
+          }
+
+          window.history.replaceState(null, '', base + redirectPath.replace(/^\/+/, ''));
+        }
+      })();
+    </script>
+
     <!-- SEO Meta Tags -->
     <meta name="description" content="Achetez des TikTok Coins facilement et en toute sécurité avec PayOol. Paiement par Mobile Money (Orange Money, MTN Mobile Money, Wave) en Afrique. Livraison rapide et sécurisée." />
     <meta name="keywords" content="TikTok Coins, acheter TikTok Coins, TikTok Coins pas cher, TikTok Coins Afrique, Mobile Money, Orange Money, MTN Mobile Money, Wave, PayOol, TikTok, pièces TikTok, recharger TikTok, TikTok live, cadeaux TikTok" />

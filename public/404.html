@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex" />
+    <title>Redirection PayOol</title>
+    <script>
+      (function() {
+        var base = '/TikTokCoins-PayOol/';
+        var pathname = window.location.pathname;
+        var route = pathname.indexOf(base) === 0
+          ? pathname.slice(base.length)
+          : pathname.replace(/^\/+/, '');
+        var target = '/' + route.replace(/^\/+/, '') + window.location.search + window.location.hash;
+
+        if (!route) {
+          window.location.replace(base);
+          return;
+        }
+
+        try {
+          sessionStorage.setItem('payool:redirect-path', target);
+          window.location.replace(base);
+        } catch (error) {
+          window.location.replace(base + '?redirect=' + encodeURIComponent(target));
+        }
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>
