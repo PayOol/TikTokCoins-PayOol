@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Layout } from '../components/Layout';
-import { CheckCircle, ArrowLeft, Coins, CreditCard } from 'lucide-react';
+import { CheckCircle, ArrowLeft, ArrowRight, Coins, CreditCard, Home, Link as LinkIcon, Mail, Printer } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Confetti } from '../components/Confetti';
 import { Purchase } from '../types';
 import { getPurchaseHistory, updateTransactionStatus } from '../utils/localStorage';
+
+const CARD_ACCOUNT_URL = 'https://prismcard.net/r/RGBY2OC6';
+const SUPPORT_WHATSAPP_URL = 'https://wa.me/237658314543';
 
 export const PaymentSuccess = () => {
   const { t, i18n } = useTranslation();
@@ -45,6 +48,131 @@ export const PaymentSuccess = () => {
 
     return () => clearTimeout(timer);
   }, [location.search]);
+
+  const orderDate = purchaseDetails?.date ? new Date(purchaseDetails.date) : new Date();
+  const formattedCardOrderDate = orderDate.toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
+  const cardPrice = purchaseDetails?.price || 0;
+  const cardWhatsappMessage = encodeURIComponent(
+    `Bonjour PayOol, ma commande de carte virtuelle${orderId ? ` ${orderId}` : ''} est confirmee. Voici l'adresse e-mail associee a mon compte PrismCard : `
+  );
+  const cardWhatsappUrl = `${SUPPORT_WHATSAPP_URL}?text=${cardWhatsappMessage}`;
+
+  if (isCard) {
+    return (
+      <Layout balance={0} hideBalance={true}>
+        {showConfetti && <Confetti duration={5000} />}
+
+        <section className="mx-auto max-w-5xl overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-dark)] bg-[var(--card-bg)] p-5 text-[var(--text-primary)] shadow-[var(--shadow-lg)] sm:p-8">
+          <div className="mb-6 flex justify-center">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-400/30 sm:h-24 sm:w-24">
+              <CheckCircle className="h-14 w-14 sm:h-16 sm:w-16" />
+            </div>
+          </div>
+
+          <div className="mb-6 rounded-[var(--radius-md)] bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-6 text-center text-white shadow-md sm:px-8">
+            <h1 className="text-2xl font-black leading-tight sm:text-3xl">Paiement Réussi !</h1>
+            <p className="mt-2 text-sm font-medium text-white/90">
+              Votre commande a été confirmée avec succès
+            </p>
+          </div>
+
+          <div className="grid gap-5 lg:grid-cols-2">
+            <div className="rounded-[var(--radius-md)] border border-[var(--border-dark)] bg-[var(--background-elevated)] p-5">
+              <div className="mb-6 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400">
+                  <CreditCard className="h-5 w-5" />
+                </div>
+                <h2 className="text-lg font-bold text-[var(--text-primary)]">Détails de la commande</h2>
+              </div>
+
+              <div className="space-y-4 text-sm sm:text-base">
+                <div className="flex items-center justify-between gap-4 border-b border-[var(--border-dark)] pb-3">
+                  <span className="text-[var(--text-secondary)]">Article commandé</span>
+                  <span className="text-right font-bold text-[var(--text-primary)]">Carte Virtuelle</span>
+                </div>
+                <div className="flex items-center justify-between gap-4 border-b border-[var(--border-dark)] pb-3">
+                  <span className="text-[var(--text-secondary)]">Prix</span>
+                  <span className="text-right font-black text-emerald-400">{cardPrice.toLocaleString()} FCFA</span>
+                </div>
+                <div className="flex items-center justify-between gap-4 border-b border-[var(--border-dark)] pb-3">
+                  <span className="text-[var(--text-secondary)]">Date de commande</span>
+                  <span className="text-right font-bold text-[var(--text-primary)]">{formattedCardOrderDate}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-[var(--radius-md)] border border-[var(--border-dark)] bg-[var(--background-elevated)] p-5">
+              <div className="mb-5 flex items-center gap-2 text-[var(--text-primary)]">
+                <ArrowRight className="h-5 w-5 text-[var(--tiktok-blue)]" />
+                <h2 className="text-lg font-bold">Prochaines étapes</h2>
+              </div>
+
+              <div className="space-y-5 text-sm leading-relaxed text-[var(--text-secondary)]">
+                <div className="flex gap-4">
+                  <LinkIcon className="mt-1 h-5 w-5 shrink-0 text-[var(--tiktok-blue)]" />
+                  <div>
+                    <p>Veuillez cliquer sur le lien suivant afin d'ouvrir votre compte :</p>
+                    <a
+                      href={CARD_ACCOUNT_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 inline-flex rounded-[var(--radius-sm)] border border-[var(--border-dark)] bg-[var(--background-elevated-2)] px-4 py-2 font-bold text-[var(--text-primary)] transition-colors hover:border-[var(--tiktok-blue)]"
+                    >
+                      prismcard.net/r/RGBY2OC6
+                    </a>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <Mail className="mt-1 h-5 w-5 shrink-0 text-[var(--tiktok-blue)]" />
+                  <p>
+                    Une fois votre compte créé et vérifié, nous vous prions de bien vouloir nous envoyer
+                    l'adresse e-mail associée par WhatsApp. Nous procéderons alors à l'ajout de la carte
+                    dans votre compte.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-3 print:hidden sm:grid-cols-3">
+            <a
+              href={cardWhatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-emerald-600 px-4 py-3 text-center font-bold text-white shadow-md transition-colors hover:bg-emerald-700"
+            >
+              <Mail className="h-5 w-5" />
+              <span>Envoyer l'email sur WhatsApp</span>
+            </a>
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--border-dark)] bg-[var(--background-elevated)] px-4 py-3 font-bold text-[var(--text-primary)] transition-colors hover:bg-[var(--background-elevated-2)]"
+            >
+              <Printer className="h-5 w-5" />
+              <span>Imprimer le reçu</span>
+            </button>
+            <Link
+              to="/"
+              className="flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--border-dark)] bg-[var(--background-elevated)] px-4 py-3 font-bold text-[var(--text-primary)] transition-colors hover:bg-[var(--background-elevated-2)]"
+            >
+              <Home className="h-5 w-5" />
+              <span>Retour à l'accueil</span>
+            </Link>
+          </div>
+
+          <p className="mt-5 text-center text-sm text-[var(--text-secondary)]">
+            Merci de votre confiance !
+          </p>
+        </section>
+      </Layout>
+    );
+  }
   
   return (
     <Layout balance={purchaseDetails?.amount || 0} hideBalance={!purchaseDetails || isNonCoinPurchase}>
