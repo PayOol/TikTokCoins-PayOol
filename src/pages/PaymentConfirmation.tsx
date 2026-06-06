@@ -57,6 +57,30 @@ export const PaymentConfirmation = () => {
   // Convertir les valeurs en nombres si elles existent
   const amount = amountFromUrl ? parseInt(amountFromUrl, 10) : null;
   const price = priceFromUrl ? parseInt(priceFromUrl, 10) : null;
+  const buildSuccessUrl = () => {
+    const successParams = new URLSearchParams();
+    const packageId = searchParams.get('package');
+
+    if (orderId) {
+      successParams.set('orderId', orderId);
+    }
+
+    successParams.set('type', type);
+
+    if (type === 'card') {
+      if (packageId) {
+        successParams.set('package', packageId);
+      }
+      if (cardName) {
+        successParams.set('card', cardName);
+      }
+      if (priceFromUrl) {
+        successParams.set('price', priceFromUrl);
+      }
+    }
+
+    return `/payment/success?${successParams.toString()}`;
+  };
   
   // Vérifier si le paiement a échoué (BkaPay renvoie status=failed)
   // Cette vérification doit être faite AVANT tout autre traitement
@@ -117,7 +141,7 @@ export const PaymentConfirmation = () => {
         hasSentEmail.current = true;
         setEmailSent(true);
         setTimeout(() => {
-          navigate(`/payment/success?orderId=${orderId}&type=${type}`);
+          navigate(buildSuccessUrl());
         }, 2000);
       }
     }
@@ -175,7 +199,7 @@ export const PaymentConfirmation = () => {
       
       // Rediriger vers la page de succès après 2 secondes
       setTimeout(() => {
-        navigate(`/payment/success?orderId=${orderId}&type=${type}`);
+        navigate(buildSuccessUrl());
       }, 2000);
 
     } catch (error) {

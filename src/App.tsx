@@ -15,6 +15,7 @@ import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { ServiceWorkerUpdate } from './components/ServiceWorkerUpdate';
 import { AccountPackageCard } from './components/AccountPackageCard';
 import { VirtualCardPackageCard } from './components/VirtualCardPackageCard';
+import { VirtualCardInstructionsModal } from './components/VirtualCardInstructionsModal';
 import { MonetizableAccountFormModal } from './components/MonetizableAccountForm';
 import { AccountInstructionsModal } from './components/AccountInstructionsModal';
 import { coinPackages } from './data/coinPackages';
@@ -212,6 +213,7 @@ function App() {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showAccountForm, setShowAccountForm] = useState(false);
   const [showAccountInstructions, setShowAccountInstructions] = useState(false);
+  const [showCardInstructions, setShowCardInstructions] = useState(false);
   const [accountEmail, setAccountEmail] = useState('');
 
   const handlePackageSelect = (pkg: CoinPackage) => {
@@ -227,7 +229,8 @@ function App() {
 
   const handleCardPackageSelect = (pkg: VirtualCardPackage) => {
     setSelectedCardPackage(pkg);
-    setShowEmailForm(true);
+    setShowCardInstructions(true);
+    setShowEmailForm(false);
   };
 
   const handleAccountInstructionsClose = () => {
@@ -238,6 +241,17 @@ function App() {
   const handleAccountInstructionsContinue = () => {
     setShowAccountInstructions(false);
     setShowAccountForm(true);
+  };
+
+  const handleCardInstructionsAccept = () => {
+    setShowCardInstructions(false);
+    setShowEmailForm(true);
+  };
+
+  const handleCardInstructionsDecline = () => {
+    setShowCardInstructions(false);
+    setShowEmailForm(false);
+    setSelectedCardPackage(null);
   };
 
   const handleAccountFormSubmit = (data: MonetizableAccountForm) => {
@@ -261,6 +275,7 @@ function App() {
     setShowEmailForm(false);
     setSelectedAccountPackage(null);
     setSelectedCardPackage(null);
+    setShowCardInstructions(false);
     setAccountFormData(null);
     setAccountEmail('');
   };
@@ -269,6 +284,7 @@ function App() {
     setShowEmailForm(false);
     if (activeService === 'cards') {
       setSelectedCardPackage(null);
+      setShowCardInstructions(false);
     }
   };
 
@@ -748,6 +764,14 @@ function App() {
           serviceType="cards"
           packageLabel={`${getLocalizedText(selectedCardPackage.name, i18n.language)} - ${selectedCardPackage.price.toLocaleString()} ${selectedCardPackage.currency}`}
           packageCurrency={selectedCardPackage.currency}
+        />
+      )}
+
+      {activeService === 'cards' && showCardInstructions && selectedCardPackage && (
+        <VirtualCardInstructionsModal
+          isOpen={showCardInstructions}
+          onAccept={handleCardInstructionsAccept}
+          onDecline={handleCardInstructionsDecline}
         />
       )}
       

@@ -5,10 +5,44 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Confetti } from '../components/Confetti';
 import { Purchase } from '../types';
+import { virtualCardPackages } from '../data/virtualCardPackages';
 import { getPurchaseHistory, updateTransactionStatus } from '../utils/localStorage';
 
 const CARD_ACCOUNT_URL = 'https://prismcard.net/r/RGBY2OC6';
 const SUPPORT_WHATSAPP_URL = 'https://wa.me/237658314543';
+
+const getLocalizedText = (value: { fr: string; en: string }, language: string) => (
+  language.startsWith('fr') ? value.fr : value.en
+);
+
+const normalizeCardName = (value?: string | null) => {
+  const trimmedValue = value?.trim();
+
+  if (!trimmedValue || trimmedValue === '-' || trimmedValue === '—') {
+    return null;
+  }
+
+  return trimmedValue;
+};
+
+const getCardNameFromPendingOrders = (orderId: string | null) => {
+  if (!orderId) {
+    return null;
+  }
+
+  try {
+    const pendingOrders = JSON.parse(localStorage.getItem('pendingOrders') || '[]') as Array<{
+      order_id?: string;
+      desired_username?: string;
+    }>;
+    const matchingOrder = pendingOrders.find(order => order.order_id === orderId);
+
+    return normalizeCardName(matchingOrder?.desired_username);
+  } catch (error) {
+    console.error('Erreur lors de la récupération du nom de la carte:', error);
+    return null;
+  }
+};
 
 export const PaymentSuccess = () => {
   const { t, i18n } = useTranslation();
@@ -55,9 +89,20 @@ export const PaymentSuccess = () => {
     month: 'long',
     year: 'numeric',
   });
-  const cardPrice = purchaseDetails?.price || 0;
+  const cardPackageFromUrl = searchParams.get('package');
+  const cardPriceFromUrl = searchParams.get('price');
+  const cardPrice = purchaseDetails?.price || Number(cardPriceFromUrl) || 0;
+  const fallbackCardPackage = virtualCardPackages.find(pkg => (
+    pkg.id === Number(cardPackageFromUrl || purchaseDetails?.packageId)
+  )) || virtualCardPackages.find(pkg => (
+    pkg.price === Number(cardPriceFromUrl || purchaseDetails?.price)
+  ));
+  const cardArticleLabel = normalizeCardName(purchaseDetails?.label)
+    || normalizeCardName(searchParams.get('card'))
+    || getCardNameFromPendingOrders(orderId)
+    || (fallbackCardPackage ? getLocalizedText(fallbackCardPackage.name, i18n.language) : 'Carte Virtuelle');
   const cardWhatsappMessage = encodeURIComponent(
-    `Bonjour PayOol, ma commande de carte virtuelle${orderId ? ` ${orderId}` : ''} est confirmee. Voici l'adresse e-mail associee a mon compte PrismCard : `
+    `Bonjour PayOol, ma commande ${cardArticleLabel}${orderId ? ` ${orderId}` : ''} est confirmee. Voici l'adresse e-mail associee a mon compte PrismCard : `
   );
   const cardWhatsappUrl = `${SUPPORT_WHATSAPP_URL}?text=${cardWhatsappMessage}`;
 
@@ -92,7 +137,7 @@ export const PaymentSuccess = () => {
               <div className="space-y-4 text-sm sm:text-base">
                 <div className="flex items-center justify-between gap-4 border-b border-[var(--border-dark)] pb-3">
                   <span className="text-[var(--text-secondary)]">Article commandé</span>
-                  <span className="text-right font-bold text-[var(--text-primary)]">Carte Virtuelle</span>
+                  <span className="text-right font-bold text-[var(--text-primary)]">{cardArticleLabel}</span>
                 </div>
                 <div className="flex items-center justify-between gap-4 border-b border-[var(--border-dark)] pb-3">
                   <span className="text-[var(--text-secondary)]">Prix</span>
