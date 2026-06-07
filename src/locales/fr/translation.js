@@ -76,7 +76,7 @@ const translation = {
   
   // Custom Package
   "customAmount": "Montant personnalisé",
-  "minimumCoins": "Minimum 100 pièces",
+  "minimumCoins": "Minimum 70 pièces",
   "pricePerCoin": "Prix par pièce",
   "unitPrice": "Prix unitaire",
   "totalToPay": "Total à payer",

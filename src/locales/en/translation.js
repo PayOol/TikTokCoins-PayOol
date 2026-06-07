@@ -76,7 +76,7 @@ const translation = {
   
   // Custom Package
   "customAmount": "Custom Amount",
-  "minimumCoins": "Minimum 100 coins",
+  "minimumCoins": "Minimum 70 coins",
   "pricePerCoin": "Price per coin",
   "unitPrice": "Unit price",
   "totalToPay": "Total to pay",
