@@ -1,4 +1,5 @@
 import { PaymentProvider, PaymentParams, PaymentResponse, PaymentStatusResponse } from './types';
+import { getProviderConfig } from './config';
 
 interface SebPayApiEnvelope<T> {
   success?: boolean;
@@ -18,11 +19,6 @@ interface SebPayCollection {
   message?: string;
 }
 
-const SEBPAY_PUBLIC_KEY = 'pk_test_LRx0bXdMWcnW07G7TldS6oEI6fc7FYoZrWzT8Kx5';
-const SEBPAY_SECRET_KEY = 'sk_test_l9Uhiu0zaKMX0UZvZ2c02LBgIZZ1FxiLMuTffHPpP943jRudhFTwCb6hnpsI';
-const SEBPAY_BASE_URL = import.meta.env.DEV
-  ? '/sebpay-api/api/v1'
-  : 'https://newapi.sebpay.bj/api/v1';
 const SEBPAY_STATUS_POLL_INTERVAL_MS = 5000;
 const SEBPAY_STATUS_MAX_ATTEMPTS = 60;
 
@@ -58,23 +54,19 @@ const formatSebPayApiError = (
  */
 export class SebPayProvider implements PaymentProvider {
   name = 'SebPay';
-  private publicKey: string;
-  private secretKey: string;
-  private baseUrl = SEBPAY_BASE_URL;
+  private proxyUrl: string;
 
-  constructor(publicKey: string, secretKey = '') {
-    this.publicKey = publicKey || SEBPAY_PUBLIC_KEY;
-    this.secretKey = secretKey || SEBPAY_SECRET_KEY;
+  constructor() {
+    const config = getProviderConfig('sebpay' as any);
+    this.proxyUrl = config?.proxyUrl || '';
   }
 
   isConfigured(): boolean {
-    return !!this.publicKey && !!this.secretKey;
+    return !!this.proxyUrl;
   }
 
   private buildHeaders(): HeadersInit {
     return {
-      'X-Public-Key': this.publicKey,
-      'X-Secret-Key': this.secretKey,
       'Content-Type': 'application/json'
     };
   }
@@ -166,7 +158,7 @@ export class SebPayProvider implements PaymentProvider {
         callback_url: params.sebPay.callbackUrl || params.successUrl
       };
 
-      const response = await fetch(`${this.baseUrl}/collections`, {
+      const response = await fetch(`${this.proxyUrl}/collections`, {
         method: 'POST',
         headers: this.buildHeaders(),
         body: JSON.stringify(body)
@@ -199,7 +191,7 @@ export class SebPayProvider implements PaymentProvider {
         throw new Error('Les cles API SebPay ne sont pas configurees');
       }
 
-      const response = await fetch(`${this.baseUrl}/collections/${encodeURIComponent(orderId)}`, {
+      const response = await fetch(`${this.proxyUrl}/collections/${encodeURIComponent(orderId)}`, {
         method: 'GET',
         headers: this.buildHeaders()
       });

@@ -9,6 +9,7 @@ export interface ProviderConfig {
   secretKey?: string;
   enabled: boolean;
   recommended?: boolean; // Indique si ce provider est recommandé
+  proxyUrl?: string; // URL du proxy pour les providers qui en ont besoin
 }
 
 /**
@@ -23,9 +24,12 @@ export const paymentProvidersConfig: Record<PaymentProviderType, ProviderConfig>
   },
   [PaymentProviderType.SEBPAY]: {
     type: PaymentProviderType.SEBPAY,
-    apiKey: 'pk_live_7LcSTgDFQRvr95OouWhlYLtWp5TgxTvCJidTljfy',
-    secretKey: 'sk_live_8BmS6oqoWUYUwZ1mmuanrbaSEXz6X1kqBXRBzdxYCNTsqw8PWuNGRvUqlMlN',
-    enabled: true
+    apiKey: '', // Credentials now in Cloudflare Worker proxy
+    secretKey: '', // Credentials now in Cloudflare Worker proxy
+    enabled: true,
+    proxyUrl: import.meta.env.DEV
+      ? '/api/sebpay'
+      : 'https://sebpay-proxy.sebpay-proxy.workers.dev/api/sebpay'
   },
   [PaymentProviderType.SOLEASPAY]: {
     type: PaymentProviderType.SOLEASPAY,

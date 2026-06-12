@@ -34,7 +34,7 @@ export class PaymentProviderFactory {
         return new BkaPayProvider(config.apiKey);
 
       case PaymentProviderType.SEBPAY:
-        return new SebPayProvider(config.apiKey, config.secretKey);
+        return new SebPayProvider();
       
       default:
         throw new Error(`Unknown payment provider type: ${type}`);
