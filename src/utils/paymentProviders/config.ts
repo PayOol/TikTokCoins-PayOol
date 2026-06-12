@@ -15,16 +15,16 @@ export interface ProviderConfig {
  * Configuration for all payment providers
  */
 export const paymentProvidersConfig: Record<PaymentProviderType, ProviderConfig> = {
+  [PaymentProviderType.LEEKPAY]: {
+    type: PaymentProviderType.LEEKPAY,
+    apiKey: 'pk_live_OlibyiLyNNrzsQjujN6Txhn7Eieorz9Q', // Remplacer par votre clé publique LeekPay
+    enabled: true,
+    recommended: true // Provider recommandé
+  },
   [PaymentProviderType.SEBPAY]: {
     type: PaymentProviderType.SEBPAY,
     apiKey: 'pk_live_7LcSTgDFQRvr95OouWhlYLtWp5TgxTvCJidTljfy',
     secretKey: 'sk_live_8BmS6oqoWUYUwZ1mmuanrbaSEXz6X1kqBXRBzdxYCNTsqw8PWuNGRvUqlMlN',
-    enabled: true,
-    recommended: true // Provider recommandé
-  },
-  [PaymentProviderType.LEEKPAY]: {
-    type: PaymentProviderType.LEEKPAY,
-    apiKey: 'pk_live_OlibyiLyNNrzsQjujN6Txhn7Eieorz9Q', // Remplacer par votre clé publique LeekPay
     enabled: true
   },
   [PaymentProviderType.SOLEASPAY]: {
