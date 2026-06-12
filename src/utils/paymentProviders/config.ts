@@ -16,18 +16,18 @@ export interface ProviderConfig {
  * Configuration for all payment providers
  */
 export const paymentProvidersConfig: Record<PaymentProviderType, ProviderConfig> = {
-  [PaymentProviderType.LEEKPAY]: {
-    type: PaymentProviderType.LEEKPAY,
-    apiKey: 'pk_live_OlibyiLyNNrzsQjujN6Txhn7Eieorz9Q', // Remplacer par votre clé publique LeekPay
-    enabled: true,
-    recommended: true // Provider recommandé
-  },
   [PaymentProviderType.SEBPAY]: {
     type: PaymentProviderType.SEBPAY,
     apiKey: '', // Credentials now in Cloudflare Worker proxy
     secretKey: '', // Credentials now in Cloudflare Worker proxy
     enabled: true,
+    recommended: true, // Provider recommandé
     proxyUrl: 'https://sebpay-proxy.sebpay-proxy.workers.dev/api/sebpay'
+  },
+  [PaymentProviderType.LEEKPAY]: {
+    type: PaymentProviderType.LEEKPAY,
+    apiKey: 'pk_live_OlibyiLyNNrzsQjujN6Txhn7Eieorz9Q', // Remplacer par votre clé publique LeekPay
+    enabled: true
   },
   [PaymentProviderType.SOLEASPAY]: {
     type: PaymentProviderType.SOLEASPAY,
