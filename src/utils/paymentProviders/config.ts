@@ -17,8 +17,8 @@ export interface ProviderConfig {
 export const paymentProvidersConfig: Record<PaymentProviderType, ProviderConfig> = {
   [PaymentProviderType.SEBPAY]: {
     type: PaymentProviderType.SEBPAY,
-    apiKey: 'pk_live_nZBqZ5TqBR13w87ZDXsmaf3kbingaFGYfPeT20fj',
-    secretKey: 'sk_live_01QhaoeGNgQABzgEtNVj6SIHNdX7JCccHj7MkC1RKsd uHiPdN4z2ZdQcmBQ',
+    apiKey: 'pk_live_7LcSTgDFQRvr95OouWhlYLtWp5TgxTvCJidTljfy',
+    secretKey: 'sk_live_8BmS6oqoWUYUwZ1mmuanrbaSEXz6X1kqBXRBzdxYCNTsqw8PWuNGRvUqlMlN',
     enabled: true,
     recommended: true // Provider recommandé
   },
