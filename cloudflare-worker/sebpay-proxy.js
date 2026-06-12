@@ -44,8 +44,8 @@ export default {
 
       // Clone the request and modify headers
       const modifiedHeaders = new Headers(request.headers);
-      modifiedHeaders.set('Authorization', `Bearer ${sebpaySecretKey}`);
-      modifiedHeaders.set('X-API-Key', sebpayApiKey);
+      modifiedHeaders.set('X-Public-Key', sebpayApiKey);
+      modifiedHeaders.set('X-Secret-Key', sebpaySecretKey);
 
       // Forward the request to SebPay API
       const sebpayRequest = new Request(sebpayApiUrl, {

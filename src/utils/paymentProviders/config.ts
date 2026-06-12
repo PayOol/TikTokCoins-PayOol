@@ -27,9 +27,7 @@ export const paymentProvidersConfig: Record<PaymentProviderType, ProviderConfig>
     apiKey: '', // Credentials now in Cloudflare Worker proxy
     secretKey: '', // Credentials now in Cloudflare Worker proxy
     enabled: true,
-    proxyUrl: import.meta.env.DEV
-      ? '/api/sebpay'
-      : 'https://sebpay-proxy.sebpay-proxy.workers.dev/api/sebpay'
+    proxyUrl: 'https://sebpay-proxy.sebpay-proxy.workers.dev/api/sebpay'
   },
   [PaymentProviderType.SOLEASPAY]: {
     type: PaymentProviderType.SOLEASPAY,
