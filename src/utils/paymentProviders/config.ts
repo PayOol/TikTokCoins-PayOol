@@ -1,5 +1,4 @@
 import { PaymentProviderType } from './types';
-import { decrypt } from '../encryption';
 
 /**
  * Payment provider configuration
@@ -18,24 +17,24 @@ export interface ProviderConfig {
 export const paymentProvidersConfig: Record<PaymentProviderType, ProviderConfig> = {
   [PaymentProviderType.SEBPAY]: {
     type: PaymentProviderType.SEBPAY,
-    apiKey: 'IAomIwYaNjoNLzAUEVAtQ3JgBWMWQXg1KAsWDhQUViAHEFxXU3IXOB8fCjhhVQUf',
-    secretKey: 'IwomIwYaNjpTRCMNKgocdX5VZREjAygqGB0zCUMhLAMrHWoHeHczAjElWCE4JlInORYvRQx6WWJQHlUDfTUIAgYONyM=',
+    apiKey: 'pk_live_nZBqZ5TqBR13w87ZDXsmaf3kbingaFGYfPeT20fj',
+    secretKey: 'sk_live_01QhaoeGNgQABzgEtNVj6SIHNdX7JCccHj7MkC1RKsd uHiPdN4z2ZdQcmBQ',
     enabled: true,
     recommended: true // Provider recommandé
   },
   [PaymentProviderType.LEEKPAY]: {
     type: PaymentProviderType.LEEKPAY,
-    apiKey: 'IAomIwYaNjosGRsHMgw1S358RioSKCUaBh1TNw0aC3wgEFdfQE5pMA==',
+    apiKey: 'pk_live_OlibyiLyNNrzsQjujN6Txhn7Eieorz9Q', // Remplacer par votre clé publique LeekPay
     enabled: true
   },
   [PaymentProviderType.SOLEASPAY]: {
     type: PaymentProviderType.SOLEASPAY,
-    apiKey: 'FFgfIzo+Yw0RRTo/DVNKY3tGe2IGS2IsHQIiBhcdFntRKx9SYmY2V0oEV0ESNQ==',
+    apiKey: 'D9flUR0hr0HZF63QKtO2g2-CqQGebos04R-bPRf63K8-AP',
     enabled: false // Désactivé temporairement
   },
   [PaymentProviderType.BKAPAY]: {
     type: PaymentProviderType.BKAPAY,
-    apiKey: 'IAomIwYaNjpTFhddKgYdAx1XUWZYVHtYVGRIWkxBAGZUQQIGBAxgVk53XV0=',
+    apiKey: 'pk_live_0ce8acd1-ee69-4787-993e-180668077821',
     enabled: false // Désactivé
   }
 };
@@ -71,15 +70,8 @@ export function isProviderEnabled(provider: PaymentProviderType): boolean {
 }
 
 /**
- * Get provider configuration with decrypted keys
+ * Get provider configuration
  */
 export function getProviderConfig(provider: PaymentProviderType): ProviderConfig | null {
-  const config = paymentProvidersConfig[provider];
-  if (!config) return null;
-  
-  return {
-    ...config,
-    apiKey: decrypt(config.apiKey),
-    secretKey: config.secretKey ? decrypt(config.secretKey) : undefined
-  };
+  return paymentProvidersConfig[provider] || null;
 }
