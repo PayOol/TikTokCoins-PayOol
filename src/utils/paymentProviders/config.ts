@@ -27,7 +27,7 @@ export const paymentProvidersConfig: Record<PaymentProviderType, ProviderConfig>
   [PaymentProviderType.LEEKPAY]: {
     type: PaymentProviderType.LEEKPAY,
     apiKey: 'pk_live_OlibyiLyNNrzsQjujN6Txhn7Eieorz9Q', // Remplacer par votre clé publique LeekPay
-    enabled: false
+    enabled: true
   },
   [PaymentProviderType.SOLEASPAY]: {
     type: PaymentProviderType.SOLEASPAY,
