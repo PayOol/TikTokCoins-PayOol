@@ -61,13 +61,13 @@ Une fois déployé, le worker sera accessible à:
 
 Le proxy accepte les requêtes sur le chemin `/api/sebpay`:
 
-- `POST /api/sebpay/create-payment` - Créer un paiement
-- `GET /api/sebpay/payment/:id` - Vérifier un paiement
+- `POST /api/sebpay/collections` - Créer un paiement
+- `GET /api/sebpay/collections/:id` - Vérifier un paiement
 - etc.
 
 Exemple d'utilisation depuis votre application:
 ```javascript
-const response = await fetch('https://sebpay-proxy-prod.YOUR_SUBDOMAIN.workers.dev/api/sebpay/create-payment', {
+const response = await fetch('https://sebpay-proxy.sebpay-proxy.workers.dev/api/sebpay/collections', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
@@ -75,6 +75,9 @@ const response = await fetch('https://sebpay-proxy-prod.YOUR_SUBDOMAIN.workers.d
   body: JSON.stringify({
     amount: 1000,
     currency: 'XOF',
+    phone: '+229XXXXXXXX',
+    operator: 'moov',
+    country: 'BJ',
     // ... autres paramètres
   })
 });

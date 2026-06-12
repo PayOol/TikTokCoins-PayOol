@@ -38,9 +38,9 @@ export default {
       }
 
       // Extract the API endpoint from the path
-      // /api/sebpay/create-payment -> https://api.sebpay.bj/create-payment
+      // /api/sebpay/collections -> https://newapi.sebpay.bj/api/v1/collections
       const apiPath = url.pathname.replace('/api/sebpay', '');
-      const sebpayApiUrl = `https://api.sebpay.bj${apiPath}`;
+      const sebpayApiUrl = `https://newapi.sebpay.bj/api/v1${apiPath}`;
 
       // Clone the request and modify headers
       const modifiedHeaders = new Headers(request.headers);
