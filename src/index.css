@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Empêcher le zoom automatique sur mobile dans les inputs */
+input[type="text"],
+input[type="tel"],
+input[type="email"],
+input[type="number"],
+input[type="password"],
+select,
+textarea {
+  font-size: 16px !important;
+}
