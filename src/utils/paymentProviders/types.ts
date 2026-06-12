@@ -12,6 +12,19 @@ export interface PaymentParams {
   failureUrl: string;
   shopName?: string;
   message?: string;
+  sebPay?: SebPayPaymentDetails;
+}
+
+/**
+ * SebPay collection-specific data.
+ */
+export interface SebPayPaymentDetails {
+  phone: string;
+  operator: string;
+  country: string;
+  currency?: string;
+  amount?: number;
+  callbackUrl?: string;
 }
 
 /**
@@ -62,5 +75,6 @@ export interface PaymentProvider {
 export enum PaymentProviderType {
   LEEKPAY = 'leekpay',
   SOLEASPAY = 'soleaspay',
-  BKAPAY = 'bkapay'
+  BKAPAY = 'bkapay',
+  SEBPAY = 'sebpay'
 }

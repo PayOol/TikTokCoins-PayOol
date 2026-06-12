@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { CreditCard } from 'lucide-react';
-import { PaymentProviderType, getEnabledProviders } from '../utils/paymentProviders';
+import { PaymentProviderType, getEnabledProviders, getProviderConfig } from '../utils/paymentProviders';
 
 interface PaymentProviderSelectorProps {
   selectedProvider: PaymentProviderType;
@@ -20,7 +20,8 @@ export function PaymentProviderSelector({ selectedProvider, onProviderChange }: 
   const providerNames: Record<PaymentProviderType, string> = {
     [PaymentProviderType.LEEKPAY]: 'LeekPay',
     [PaymentProviderType.SOLEASPAY]: 'SoleasPay',
-    [PaymentProviderType.BKAPAY]: 'BkaPay'
+    [PaymentProviderType.BKAPAY]: 'BkaPay',
+    [PaymentProviderType.SEBPAY]: 'SebPay'
   };
 
   return (
@@ -35,6 +36,7 @@ export function PaymentProviderSelector({ selectedProvider, onProviderChange }: 
       <div className="grid grid-cols-2 gap-3">
         {enabledProviders.map((provider) => (
           <button
+            type="button"
             key={provider}
             onClick={() => onProviderChange(provider)}
             className={`
@@ -45,8 +47,8 @@ export function PaymentProviderSelector({ selectedProvider, onProviderChange }: 
               }
             `}
           >
-            {/* Badge Recommandé pour LeekPay */}
-            {provider === PaymentProviderType.LEEKPAY && (
+            {/* Badge Recommandé */}
+            {getProviderConfig(provider)?.recommended && (
               <div className="absolute -top-2 -right-2 bg-gradient-to-r from-[var(--tiktok-red)] to-purple-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
                 {t('paymentProvider.recommended', 'Recommandé')}
               </div>
@@ -73,6 +75,13 @@ export function PaymentProviderSelector({ selectedProvider, onProviderChange }: 
                   <img 
                     src="https://bkapay.com/assets/bkapay-logo-DMJXxtlJ.png" 
                     alt="BkaPay Logo" 
+                    className="h-6 sm:h-8 w-auto object-contain"
+                  />
+                )}
+                {provider === PaymentProviderType.SEBPAY && (
+                  <img
+                    src="https://new.sebpay.bj/sebpay.svg"
+                    alt="SebPay Logo"
                     className="h-6 sm:h-8 w-auto object-contain"
                   />
                 )}

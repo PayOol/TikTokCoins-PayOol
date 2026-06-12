@@ -85,6 +85,7 @@ export function EmailFormModal({ onSubmit, onCancel, isLoading = false, packageA
               type="email"
               id="email"
               required
+              autoFocus
               className={`tiktok-input text-sm sm:text-base ${isValid ? 'border-green-500' : (touched && email && !isValid ? 'border-red-500' : '')}`}
               value={email}
               onChange={handleChange}

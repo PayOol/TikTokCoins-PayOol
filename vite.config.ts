@@ -5,6 +5,16 @@ import { VitePWA } from 'vite-plugin-pwa';
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '/TikTokCoins-PayOol/',
+  server: {
+    proxy: {
+      '/sebpay-api': {
+        target: 'https://newapi.sebpay.bj',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/sebpay-api/, '')
+      }
+    }
+  },
   plugins: [
     react(),
     VitePWA({

@@ -2,6 +2,7 @@ import { PaymentProvider, PaymentProviderType } from './types';
 import { LeekPayProvider } from './leekpay';
 import { SoleasPayProvider } from './soleaspay';
 import { BkaPayProvider } from './bkapay';
+import { SebPayProvider } from './sebpay';
 import { getProviderConfig } from './config';
 
 /**
@@ -31,6 +32,9 @@ export class PaymentProviderFactory {
       
       case PaymentProviderType.BKAPAY:
         return new BkaPayProvider(config.apiKey);
+
+      case PaymentProviderType.SEBPAY:
+        return new SebPayProvider(config.apiKey, config.secretKey);
       
       default:
         throw new Error(`Unknown payment provider type: ${type}`);

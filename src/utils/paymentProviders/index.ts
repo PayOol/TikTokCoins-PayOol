@@ -9,3 +9,4 @@ export * from './factory';
 export * from './leekpay';
 export * from './soleaspay';
 export * from './bkapay';
+export * from './sebpay';

@@ -1,4 +1,5 @@
 import { PaymentProviderType } from './types';
+import { decrypt } from '../encryption';
 
 /**
  * Payment provider configuration
@@ -6,6 +7,7 @@ import { PaymentProviderType } from './types';
 export interface ProviderConfig {
   type: PaymentProviderType;
   apiKey: string;
+  secretKey?: string;
   enabled: boolean;
   recommended?: boolean; // Indique si ce provider est recommandé
 }
@@ -14,20 +16,26 @@ export interface ProviderConfig {
  * Configuration for all payment providers
  */
 export const paymentProvidersConfig: Record<PaymentProviderType, ProviderConfig> = {
-  [PaymentProviderType.LEEKPAY]: {
-    type: PaymentProviderType.LEEKPAY,
-    apiKey: 'pk_live_OlibyiLyNNrzsQjujN6Txhn7Eieorz9Q', // Remplacer par votre clé publique LeekPay
+  [PaymentProviderType.SEBPAY]: {
+    type: PaymentProviderType.SEBPAY,
+    apiKey: 'IAomIwYaNjoNLzAUEVAtQ3JgBWMWQXg1KAsWDhQUViAHEFxXU3IXOB8fCjhhVQUf',
+    secretKey: 'IwomIwYaNjpTRCMNKgocdX5VZREjAygqGB0zCUMhLAMrHWoHeHczAjElWCE4JlInORYvRQx6WWJQHlUDfTUIAgYONyM=',
     enabled: true,
     recommended: true // Provider recommandé
   },
+  [PaymentProviderType.LEEKPAY]: {
+    type: PaymentProviderType.LEEKPAY,
+    apiKey: 'IAomIwYaNjosGRsHMgw1S358RioSKCUaBh1TNw0aC3wgEFdfQE5pMA==',
+    enabled: true
+  },
   [PaymentProviderType.SOLEASPAY]: {
     type: PaymentProviderType.SOLEASPAY,
-    apiKey: 'D9flUR0hr0HZF63QKtO2g2-CqQGebos04R-bPRf63K8-AP',
-    enabled: true
+    apiKey: 'FFgfIzo+Yw0RRTo/DVNKY3tGe2IGS2IsHQIiBhcdFntRKx9SYmY2V0oEV0ESNQ==',
+    enabled: false // Désactivé temporairement
   },
   [PaymentProviderType.BKAPAY]: {
     type: PaymentProviderType.BKAPAY,
-    apiKey: 'pk_live_0ce8acd1-ee69-4787-993e-180668077821',
+    apiKey: 'IAomIwYaNjpTFhddKgYdAx1XUWZYVHtYVGRIWkxBAGZUQQIGBAxgVk53XV0=',
     enabled: false // Désactivé
   }
 };
@@ -63,8 +71,15 @@ export function isProviderEnabled(provider: PaymentProviderType): boolean {
 }
 
 /**
- * Get provider configuration
+ * Get provider configuration with decrypted keys
  */
 export function getProviderConfig(provider: PaymentProviderType): ProviderConfig | null {
-  return paymentProvidersConfig[provider] || null;
+  const config = paymentProvidersConfig[provider];
+  if (!config) return null;
+  
+  return {
+    ...config,
+    apiKey: decrypt(config.apiKey),
+    secretKey: config.secretKey ? decrypt(config.secretKey) : undefined
+  };
 }

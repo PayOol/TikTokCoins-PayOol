@@ -18,11 +18,13 @@ import { VirtualCardPackageCard } from './components/VirtualCardPackageCard';
 import { VirtualCardInstructionsModal } from './components/VirtualCardInstructionsModal';
 import { MonetizableAccountFormModal } from './components/MonetizableAccountForm';
 import { AccountInstructionsModal } from './components/AccountInstructionsModal';
+import { SebPayPaymentModal } from './components/SebPayPaymentModal';
 import { coinPackages } from './data/coinPackages';
 import { accountPackages } from './data/accountPackages';
 import { virtualCardPackages } from './data/virtualCardPackages';
 import { Purchase, User, CoinPackage, TikTokCredentials, AccountPackage, MonetizableAccountForm, VirtualCardPackage, LocalizedText } from './types';
 import { initiatePayment, PaymentProviderType } from './utils/payment';
+import type { SebPayPaymentDetails } from './utils/paymentProviders';
 import { getUserData, addPurchase, checkAndUpdateOldPendingTransactions } from './utils/localStorage';
 
 // Importer les fichiers de style
@@ -215,6 +217,8 @@ function App() {
   const [showAccountInstructions, setShowAccountInstructions] = useState(false);
   const [showCardInstructions, setShowCardInstructions] = useState(false);
   const [accountEmail, setAccountEmail] = useState('');
+  const [showSebPayForm, setShowSebPayForm] = useState(false);
+  const [pendingSebPayEmail, setPendingSebPayEmail] = useState<string | null>(null);
 
   const handlePackageSelect = (pkg: CoinPackage) => {
     setSelectedPackage(pkg);
@@ -278,10 +282,14 @@ function App() {
     setShowCardInstructions(false);
     setAccountFormData(null);
     setAccountEmail('');
+    setShowSebPayForm(false);
+    setPendingSebPayEmail(null);
   };
 
   const handleEmailFormCancel = () => {
     setShowEmailForm(false);
+    setShowSebPayForm(false);
+    setPendingSebPayEmail(null);
     if (activeService === 'cards') {
       setSelectedCardPackage(null);
       setShowCardInstructions(false);
@@ -322,8 +330,21 @@ function App() {
   };
 
   // Second step: collect email and process payment
-  const handleEmailSubmit = (email: string, provider: PaymentProviderType) => {
+  const handleEmailSubmit = (
+    email: string,
+    provider: PaymentProviderType,
+    sebPayDetails?: SebPayPaymentDetails
+  ) => {
     setPaymentError(null);
+
+    if (provider === PaymentProviderType.SEBPAY && !sebPayDetails) {
+      setPendingSebPayEmail(email);
+      setShowEmailForm(false);
+      setShowSebPayForm(true);
+      setIsPaymentLoading(false);
+      return;
+    }
+
     setIsPaymentLoading(true);
     const orderId = generateOrderId(activeService === 'cards' ? 'CARD' : 'TKT');
 
@@ -351,7 +372,8 @@ function App() {
         successUrl: `${window.location.origin}/TikTokCoins-PayOol/payment/confirmation?orderId=${orderId}&username=${encodeURIComponent(tiktokData.username)}&password=${encodeURIComponent(tiktokData.password)}&email=${encodeURIComponent(email)}&whatsapp=${encodeURIComponent(tiktokData.whatsapp)}&amount=${selectedPackage.amount + (selectedPackage.bonus || 0)}&price=${selectedPackage.price}`,
         failureUrl: `${window.location.origin}/TikTokCoins-PayOol/payment/failure?orderId=${orderId}`,
         shopName: 'PayOol™',
-        message: messageWithCredentials
+        message: messageWithCredentials,
+        sebPay: sebPayDetails
       }, provider)
       .then(() => {
         const purchase: Purchase = {
@@ -370,6 +392,8 @@ function App() {
           setSelectedPackage(null);
           setTiktokData(null);
           setShowEmailForm(false);
+          setShowSebPayForm(false);
+          setPendingSebPayEmail(null);
         }, 10000);
       })
       .catch((error) => {
@@ -398,7 +422,8 @@ function App() {
         successUrl: `${window.location.origin}/TikTokCoins-PayOol/payment/confirmation?orderId=${orderId}&type=account&package=${selectedAccountPackage.id}&email=${encodeURIComponent(email)}&price=${selectedAccountPackage.price}&whatsapp=${encodeURIComponent(accountFormData.whatsapp)}&desiredUsername=${encodeURIComponent(accountFormData.desiredUsername || '')}`,
         failureUrl: `${window.location.origin}/TikTokCoins-PayOol/payment/failure?orderId=${orderId}`,
         shopName: 'PayOol™',
-        message
+        message,
+        sebPay: sebPayDetails
       }, provider)
       .then(() => {
         const purchase: Purchase = {
@@ -417,6 +442,8 @@ function App() {
           setSelectedAccountPackage(null);
           setAccountFormData(null);
           setShowEmailForm(false);
+          setShowSebPayForm(false);
+          setPendingSebPayEmail(null);
         }, 10000);
       })
       .catch((error) => {
@@ -445,7 +472,8 @@ function App() {
         successUrl: `${window.location.origin}/TikTokCoins-PayOol/payment/confirmation?orderId=${orderId}&type=card&package=${selectedCardPackage.id}&card=${encodeURIComponent(cardName)}&email=${encodeURIComponent(email)}&price=${selectedCardPackage.price}`,
         failureUrl: `${window.location.origin}/TikTokCoins-PayOol/payment/failure?orderId=${orderId}`,
         shopName: 'PayOol',
-        message
+        message,
+        sebPay: sebPayDetails
       }, provider)
       .then(() => {
         const purchase: Purchase = {
@@ -464,6 +492,8 @@ function App() {
           setIsPaymentLoading(false);
           setSelectedCardPackage(null);
           setShowEmailForm(false);
+          setShowSebPayForm(false);
+          setPendingSebPayEmail(null);
         }, 10000);
       })
       .catch((error) => {
@@ -472,6 +502,45 @@ function App() {
         setIsPaymentLoading(false);
       });
     }
+  };
+
+  const getSebPayDefaultPhone = () => {
+    if (activeService === 'coins') {
+      return tiktokData?.whatsapp || '';
+    }
+
+    if (activeService === 'accounts') {
+      return accountFormData?.whatsapp || '';
+    }
+
+    return '';
+  };
+
+  const getSebPayPaymentAmount = () => {
+    if (activeService === 'coins') {
+      return selectedPackage?.price || 0;
+    }
+
+    if (activeService === 'accounts') {
+      return selectedAccountPackage?.price || 0;
+    }
+
+    return selectedCardPackage?.price || 0;
+  };
+
+  const handleSebPaySubmit = (details: SebPayPaymentDetails) => {
+    if (!pendingSebPayEmail) {
+      return;
+    }
+
+    handleEmailSubmit(pendingSebPayEmail, PaymentProviderType.SEBPAY, details);
+  };
+
+  const handleSebPayCancel = () => {
+    setShowSebPayForm(false);
+    setPendingSebPayEmail(null);
+    setIsPaymentLoading(false);
+    setShowEmailForm(true);
   };
 
 
@@ -772,6 +841,17 @@ function App() {
           isOpen={showCardInstructions}
           onAccept={handleCardInstructionsAccept}
           onDecline={handleCardInstructionsDecline}
+        />
+      )}
+
+      {showSebPayForm && pendingSebPayEmail && (
+        <SebPayPaymentModal
+          amount={getSebPayPaymentAmount()}
+          currency="XAF"
+          defaultPhone={getSebPayDefaultPhone()}
+          isLoading={isPaymentLoading}
+          onSubmit={handleSebPaySubmit}
+          onCancel={handleSebPayCancel}
         />
       )}
       
