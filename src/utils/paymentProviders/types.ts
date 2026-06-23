@@ -25,6 +25,7 @@ export interface SebPayPaymentDetails {
   currency?: string;
   amount?: number;
   callbackUrl?: string;
+  otpCode?: string;
 }
 
 /**
@@ -76,5 +77,7 @@ export enum PaymentProviderType {
   LEEKPAY = 'leekpay',
   SOLEASPAY = 'soleaspay',
   BKAPAY = 'bkapay',
-  SEBPAY = 'sebpay'
+  SEBPAY = 'sebpay',
+  AFRIBAPAY = 'afribapay'
 }
+

@@ -19,6 +19,7 @@ import { VirtualCardInstructionsModal } from './components/VirtualCardInstructio
 import { MonetizableAccountFormModal } from './components/MonetizableAccountForm';
 import { AccountInstructionsModal } from './components/AccountInstructionsModal';
 import { SebPayPaymentModal } from './components/SebPayPaymentModal';
+import { AfribaPayPaymentModal } from './components/AfribaPayPaymentModal';
 import { coinPackages } from './data/coinPackages';
 import { accountPackages } from './data/accountPackages';
 import { virtualCardPackages } from './data/virtualCardPackages';
@@ -218,7 +219,9 @@ function App() {
   const [showCardInstructions, setShowCardInstructions] = useState(false);
   const [accountEmail, setAccountEmail] = useState('');
   const [showSebPayForm, setShowSebPayForm] = useState(false);
+  const [showAfribaPayForm, setShowAfribaPayForm] = useState(false);
   const [pendingSebPayEmail, setPendingSebPayEmail] = useState<string | null>(null);
+  const [pendingPaymentProvider, setPendingPaymentProvider] = useState<PaymentProviderType | null>(null);
 
   const handlePackageSelect = (pkg: CoinPackage) => {
     setSelectedPackage(pkg);
@@ -284,12 +287,14 @@ function App() {
     setAccountEmail('');
     setShowSebPayForm(false);
     setPendingSebPayEmail(null);
+    setPendingPaymentProvider(null);
   };
 
   const handleEmailFormCancel = () => {
     setShowEmailForm(false);
     setShowSebPayForm(false);
     setPendingSebPayEmail(null);
+    setPendingPaymentProvider(null);
     if (activeService === 'cards') {
       setSelectedCardPackage(null);
       setShowCardInstructions(false);
@@ -339,8 +344,18 @@ function App() {
 
     if (provider === PaymentProviderType.SEBPAY && !sebPayDetails) {
       setPendingSebPayEmail(email);
+      setPendingPaymentProvider(provider);
       setShowEmailForm(false);
       setShowSebPayForm(true);
+      setIsPaymentLoading(false);
+      return;
+    }
+
+    if (provider === PaymentProviderType.AFRIBAPAY && !sebPayDetails) {
+      setPendingSebPayEmail(email);
+      setPendingPaymentProvider(provider);
+      setShowEmailForm(false);
+      setShowAfribaPayForm(true);
       setIsPaymentLoading(false);
       return;
     }
@@ -393,6 +408,7 @@ function App() {
           setTiktokData(null);
           setShowEmailForm(false);
           setShowSebPayForm(false);
+          setShowAfribaPayForm(false);
           setPendingSebPayEmail(null);
         }, 10000);
       })
@@ -443,6 +459,7 @@ function App() {
           setAccountFormData(null);
           setShowEmailForm(false);
           setShowSebPayForm(false);
+          setShowAfribaPayForm(false);
           setPendingSebPayEmail(null);
         }, 10000);
       })
@@ -493,6 +510,7 @@ function App() {
           setSelectedCardPackage(null);
           setShowEmailForm(false);
           setShowSebPayForm(false);
+          setShowAfribaPayForm(false);
           setPendingSebPayEmail(null);
         }, 10000);
       })
@@ -529,18 +547,34 @@ function App() {
   };
 
   const handleSebPaySubmit = (details: SebPayPaymentDetails) => {
-    if (!pendingSebPayEmail) {
+    if (!pendingSebPayEmail || !pendingPaymentProvider) {
       return;
     }
 
-    handleEmailSubmit(pendingSebPayEmail, PaymentProviderType.SEBPAY, details);
+    handleEmailSubmit(pendingSebPayEmail, pendingPaymentProvider, details);
   };
 
   const handleSebPayCancel = () => {
     setShowSebPayForm(false);
     setPendingSebPayEmail(null);
+    setPendingPaymentProvider(null);
     setIsPaymentLoading(false);
     setShowEmailForm(true);
+  };
+
+  const handleAfribaPayCancel = () => {
+    setShowAfribaPayForm(false);
+    setPendingSebPayEmail(null);
+    setPendingPaymentProvider(null);
+    setIsPaymentLoading(false);
+    setShowEmailForm(true);
+  };
+
+  const handleAfribaPaySubmit = (details: SebPayPaymentDetails) => {
+    if (!pendingSebPayEmail || !pendingPaymentProvider) {
+      return;
+    }
+    handleEmailSubmit(pendingSebPayEmail, pendingPaymentProvider, details);
   };
 
 
@@ -852,6 +886,18 @@ function App() {
           isLoading={isPaymentLoading}
           onSubmit={handleSebPaySubmit}
           onCancel={handleSebPayCancel}
+          providerName="SebPay"
+        />
+      )}
+
+      {showAfribaPayForm && pendingSebPayEmail && (
+        <AfribaPayPaymentModal
+          amount={getSebPayPaymentAmount()}
+          currency="XAF"
+          defaultPhone={getSebPayDefaultPhone()}
+          isLoading={isPaymentLoading}
+          onSubmit={handleAfribaPaySubmit}
+          onCancel={handleAfribaPayCancel}
         />
       )}
       

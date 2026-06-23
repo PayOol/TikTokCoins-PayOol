@@ -16,18 +16,25 @@ export interface ProviderConfig {
  * Configuration for all payment providers
  */
 export const paymentProvidersConfig: Record<PaymentProviderType, ProviderConfig> = {
+  [PaymentProviderType.AFRIBAPAY]: {
+    type: PaymentProviderType.AFRIBAPAY,
+    apiKey: '', // Les identifiants seront stockés dans le proxy Cloudflare Worker
+    enabled: true, // Activé pour affichage dans la liste
+    recommended: true, // Provider recommandé
+    proxyUrl: 'https://sebpay-proxy.sebpay-proxy.workers.dev/api/afribapay'
+  },
   [PaymentProviderType.SEBPAY]: {
     type: PaymentProviderType.SEBPAY,
     apiKey: '', // Credentials now in Cloudflare Worker proxy
     secretKey: '', // Credentials now in Cloudflare Worker proxy
     enabled: true,
-    recommended: true, // Provider recommandé
+    recommended: false, 
     proxyUrl: 'https://sebpay-proxy.sebpay-proxy.workers.dev/api/sebpay'
   },
   [PaymentProviderType.SOLEASPAY]: {
     type: PaymentProviderType.SOLEASPAY,
     apiKey: 'D9flUR0hr0HZF63QKtO2g2-CqQGebos04R-bPRf63K8-AP',
-    enabled: true // Réactivé
+    enabled: false // Désactivé
   },
   [PaymentProviderType.LEEKPAY]: {
     type: PaymentProviderType.LEEKPAY,

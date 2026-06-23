@@ -21,7 +21,8 @@ export function PaymentProviderSelector({ selectedProvider, onProviderChange }: 
     [PaymentProviderType.LEEKPAY]: 'LeekPay',
     [PaymentProviderType.SOLEASPAY]: 'SoleasPay',
     [PaymentProviderType.BKAPAY]: 'BkaPay',
-    [PaymentProviderType.SEBPAY]: 'SebPay'
+    [PaymentProviderType.SEBPAY]: 'SebPay',
+    [PaymentProviderType.AFRIBAPAY]: 'AfribaPay'
   };
 
   return (
@@ -83,6 +84,17 @@ export function PaymentProviderSelector({ selectedProvider, onProviderChange }: 
                     src="https://new.sebpay.bj/sebpay.svg"
                     alt="SebPay Logo"
                     className="h-6 sm:h-8 w-auto object-contain"
+                  />
+                )}
+                {provider === PaymentProviderType.AFRIBAPAY && (
+                  <img
+                    src="https://www.afribapay.com/wp-content/uploads/2023/12/favicon-300x300-1.png"
+                    alt="AfribaPay Logo"
+                    className="h-6 sm:h-8 w-auto object-contain rounded-sm"
+                    onError={(e) => {
+                      // Fallback au logo générique de carte bancaire
+                      (e.target as HTMLImageElement).src = "https://cdn-icons-png.flaticon.com/512/7479/7479736.png";
+                    }}
                   />
                 )}
                 

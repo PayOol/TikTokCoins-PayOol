@@ -31,6 +31,16 @@ src/utils/paymentProviders/
 - **Base URL**: https://bkapay.com/api-pay/
 - **Documentation**: Voir la documentation API BkaPay
 
+### 3. SebPay
+- **Status**: Actif par défaut (Recommandé)
+- **Méthode**: Proxy via Cloudflare Worker
+- **Base URL**: https://newapi.sebpay.bj
+
+### 4. AfribaPay
+- **Status**: Disponible (nécessite configuration du proxy)
+- **Méthode**: Session initiée via Cloudflare Worker Proxy & Redirection vers la page de paiement hébergée
+- **Base URL**: https://api.afribapay.com (Production) / https://api-sandbox.afribapay.com (Sandbox)
+
 ## Configuration
 
 ### Activer BkaPay
@@ -45,6 +55,29 @@ src/utils/paymentProviders/
   enabled: true // Changez à true pour activer
 }
 ```
+
+### Activer AfribaPay
+
+Pour utiliser AfribaPay de manière sécurisée sans exposer vos clés d'API secrètes dans le navigateur, l'intégration utilise un proxy Cloudflare Worker.
+
+1. **Configurer les secrets sur votre Cloudflare Worker** :
+   Dans l'interface de gestion de votre Cloudflare Worker, configurez les variables d'environnement (secrets) suivantes :
+   - `AFRIBAPAY_API_USER` : Votre identifiant d'API AfribaPay.
+   - `AFRIBAPAY_API_KEY` : Votre clé secrète d'API AfribaPay.
+   - `AFRIBAPAY_MERCHANT_KEY` : (Optionnel) Votre identifiant marchand (merchantKey).
+   - `AFRIBAPAY_AGENT_ID` : (Optionnel) Votre identifiant d'agent (agent_id).
+   - `AFRIBAPAY_ENVIRONMENT` : `sandbox` pour les tests, ou `production` pour les paiements réels (par défaut).
+
+2. **Activer la passerelle sur le Frontend** :
+   Ouvrez le fichier `src/utils/paymentProviders/config.ts` et changez `enabled` à `true` :
+   ```typescript
+   [PaymentProviderType.AFRIBAPAY]: {
+     type: PaymentProviderType.AFRIBAPAY,
+     apiKey: '', // Non utilisé en frontal
+     enabled: true, // Passer à true
+     proxyUrl: 'https://VOTRE-WORKER.workers.dev/api/afribapay' // URL de votre proxy Cloudflare Worker
+   }
+   ```
 
 ### Changer le fournisseur par défaut
 

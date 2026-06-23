@@ -10,3 +10,5 @@ export * from './leekpay';
 export * from './soleaspay';
 export * from './bkapay';
 export * from './sebpay';
+export * from './afribapay';
+

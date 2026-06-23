@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ArrowRight, Globe2, Loader2, Phone, Radio, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Globe2, Loader2, Phone, Radio, X, Smartphone } from 'lucide-react';
 import { SebPayPaymentDetails } from '../utils/paymentProviders';
 
 interface CountryOption {
@@ -25,6 +25,7 @@ interface SebPayPaymentModalProps {
   isLoading?: boolean;
   onSubmit: (details: SebPayPaymentDetails) => void;
   onCancel: () => void;
+  providerName?: string;
 }
 
 const sebPayCountries: CountryOption[] = [
@@ -247,7 +248,8 @@ export function SebPayPaymentModal({
   defaultPhone = '',
   isLoading = false,
   onSubmit,
-  onCancel
+  onCancel,
+  providerName = 'SebPay'
 }: SebPayPaymentModalProps) {
   const { t } = useTranslation();
   const hasManualCountryChange = useRef(false);
@@ -416,24 +418,55 @@ export function SebPayPaymentModal({
           </button>
 
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">
-            {t('sebPayForm.title', 'Paiement SebPay')}
+            {t('sebPayForm.title', `Paiement ${providerName}`)}
           </h2>
           <p className="text-white text-opacity-80 text-xs sm:text-sm">
             {t('sebPayForm.subtitle', 'Informations Mobile Money')}
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
-          <div className="bg-[var(--background-elevated-2)] p-3 sm:p-4 rounded-[var(--radius-md)]">
-            <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
-              {t('sebPayForm.total', 'Total a payer')} :{' '}
-              <span className="font-bold text-[var(--text-primary)]">
-                {isExchangeRateLoading
-                  ? t('sebPayForm.amountLoading', 'Actualisation...')
-                  : `${convertedAmount.toLocaleString()} ${selectedCurrency}`}
-              </span>
-            </p>
-          </div>
+        <div className="p-4 sm:p-6">
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center min-h-[350px] space-y-6 text-center animate-in fade-in zoom-in duration-300">
+              <div className="relative mt-4">
+                <div className="absolute inset-0 bg-green-500/20 rounded-full animate-ping"></div>
+                <div className="relative bg-gradient-to-br from-green-500 to-emerald-600 p-5 rounded-full shadow-lg shadow-green-500/30">
+                  <Smartphone className="w-10 h-10 sm:w-12 sm:h-12 text-white animate-pulse" />
+                </div>
+                <Loader2 className="w-7 h-7 text-white absolute -bottom-2 -right-2 animate-spin bg-[#1a1b26] rounded-full p-1" />
+              </div>
+              
+              <div className="space-y-3">
+                <h3 className="text-xl sm:text-2xl font-bold text-white">
+                  {t('sebPayForm.processingTitle', 'Paiement en cours...')}
+                </h3>
+                <p className="text-sm sm:text-base text-[var(--text-secondary)] px-2">
+                  {t('sebPayForm.processingDesc', 'Veuillez consulter votre téléphone au ')}
+                  <span className="font-semibold text-green-400">{normalizePhone()}</span>
+                  {t('sebPayForm.processingDesc2', ' pour valider la transaction de ')}
+                  <span className="font-semibold text-white">{convertedAmount.toLocaleString()} {selectedCurrency}</span>.
+                </p>
+              </div>
+
+              <div className="pt-4 w-full">
+                <div className="flex items-center justify-center gap-2 text-sm text-[var(--text-secondary)]">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>{t('sebPayForm.waitingConfirmation', 'En attente de la confirmation réseau...')}</span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="bg-[var(--background-elevated-2)] p-3 sm:p-4 rounded-[var(--radius-md)]">
+                <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
+                  {t('sebPayForm.total', 'Total a payer')} :{' '}
+                  <span className="font-bold text-[var(--text-primary)]">
+                    {isExchangeRateLoading
+                      ? t('sebPayForm.amountLoading', 'Actualisation...')
+                      : `${convertedAmount.toLocaleString()} ${selectedCurrency}`}
+                  </span>
+                </p>
+              </div>
 
           <div>
             <label htmlFor="sebpay-phone" className="tiktok-label flex items-center gap-2 text-xs sm:text-sm">
@@ -463,9 +496,10 @@ export function SebPayPaymentModal({
             {errors.phone && <p className="text-xs text-red-400 mt-1">{errors.phone}</p>}
           </div>
 
-          <div>
-            <label htmlFor="sebpay-operator" className="tiktok-label flex items-center gap-2 text-xs sm:text-sm">
-              <Radio className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--tiktok-red)]" />
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            <div>
+              <label htmlFor="sebpay-operator" className="tiktok-label flex items-center gap-2 text-xs sm:text-sm">
+                <Radio className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--tiktok-red)]" />
               <span>{t('sebPayForm.operator', 'Operateur')}</span>
             </label>
             <select
@@ -504,7 +538,8 @@ export function SebPayPaymentModal({
                   {country.name} (+{country.prefix})
                 </option>
               ))}
-            </select>
+              </select>
+            </div>
           </div>
 
           <div className="pt-4 space-y-3">
@@ -525,7 +560,7 @@ export function SebPayPaymentModal({
                 </>
               ) : (
                 <>
-                  <span>{t('sebPayForm.submit', 'Payer avec SebPay')}</span>
+                  <span>{t('sebPayForm.submit', `Payer avec ${providerName}`)}</span>
                   <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
                 </>
               )}
@@ -541,7 +576,9 @@ export function SebPayPaymentModal({
               <span>{t('cancel')}</span>
             </button>
           </div>
-        </form>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );
