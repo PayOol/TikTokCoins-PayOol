@@ -43,10 +43,10 @@ export const PaymentConfirmation = () => {
   const desiredUsername = searchParams.get('desiredUsername');
   const cardName = searchParams.get('card');
   
-  // Paramètres BkaPay - vérifier le statut du paiement
+  // Statut renvoye par le fournisseur de paiement.
   const paymentStatus = searchParams.get('status');
   
-  // Debug: afficher tous les paramètres URL pour comprendre ce que BkaPay renvoie
+  // Debug: afficher tous les paramètres URL pour comprendre le retour fournisseur
   console.log('=== DEBUG PaymentConfirmation ===');
   console.log('URL originale:', fullUrl);
   console.log('URL corrigée:', correctedUrl);
@@ -82,14 +82,16 @@ export const PaymentConfirmation = () => {
     return `/payment/success?${successParams.toString()}`;
   };
   
-  // Vérifier si le paiement a échoué (BkaPay renvoie status=failed)
-  // Cette vérification doit être faite AVANT tout autre traitement
-  const isPaymentFailed = paymentStatus === 'failed';
+  // Cette verification doit etre faite avant tout traitement de commande.
+  const normalizedPaymentStatus = paymentStatus?.toLowerCase();
+  const isPaymentFailed = normalizedPaymentStatus
+    ? ['failed', 'failure', 'cancelled', 'canceled', 'expired', 'error'].includes(normalizedPaymentStatus)
+    : false;
   
   useEffect(() => {
     if (isPaymentFailed) {
       // Rediriger immédiatement vers la page d'échec
-      window.location.href = `/TikTokCoins-PayOol/payment/failure?orderId=${orderId || ''}&error=${encodeURIComponent('Le paiement a été annulé ou a échoué.')}`;
+      window.location.href = `/TikTokCoins-PayOol/payment/failure?orderId=${orderId || ''}&error=${encodeURIComponent('Le paiement a ete annule ou a echoue.')}`;
     }
   }, [isPaymentFailed, orderId]);
   

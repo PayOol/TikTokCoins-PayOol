@@ -26,7 +26,7 @@ export class PaymentProviderFactory {
 
     switch (type) {
       case PaymentProviderType.LEEKPAY:
-        return new LeekPayProvider(config.apiKey);
+        return new LeekPayProvider(config.apiKey, config.proxyUrl);
       
       case PaymentProviderType.SOLEASPAY:
         return new SoleasPayProvider(config.apiKey);

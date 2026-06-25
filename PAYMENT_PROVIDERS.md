@@ -1,270 +1,252 @@
-# Système Multi-API de Paiement
+# Systeme Multi-API de Paiement
 
-Ce document décrit l'architecture du système multi-API de paiement qui permet de supporter plusieurs fournisseurs de paiement (SoleasPay, BkaPay, etc.).
+Ce document decrit la couche paiement de PayOol et l'integration LeekPay mise a jour selon la documentation officielle actuelle:
+
+https://www.leekpay.me/docs
 
 ## Architecture
 
-Le système utilise une architecture basée sur le **Factory Pattern** et des **interfaces** pour permettre l'ajout facile de nouveaux fournisseurs de paiement.
+Le systeme utilise une interface commune et une factory pour permettre a l'application de choisir un fournisseur de paiement sans changer le code des formulaires.
 
-### Structure des fichiers
-
-```
+```text
+src/utils/payment.ts
 src/utils/paymentProviders/
-├── index.ts           # Point d'entrée du module
-├── types.ts           # Interfaces et types communs
-├── config.ts          # Configuration des fournisseurs
-├── factory.ts         # Factory pour créer les instances
-├── soleaspay.ts       # Implémentation SoleasPay
-└── bkapay.ts          # Implémentation BkaPay
+  index.ts
+  types.ts
+  config.ts
+  factory.ts
+  leekpay.ts
+  soleaspay.ts
+  bkapay.ts
+  sebpay.ts
+  afribapay.ts
 ```
 
-## Fournisseurs supportés
+Flux principal:
 
-### 1. SoleasPay
-- **Status**: Actif par défaut
-- **Méthode**: Redirection via formulaire POST
-- **Documentation**: https://checkout.soleaspay.com
+```text
+App.tsx
+  -> initiatePayment(params, provider)
+  -> PaymentProviderFactory.createProvider(provider)
+  -> provider.initiatePayment(params)
+  -> page de confirmation / succes / echec
+```
 
-### 2. BkaPay
-- **Status**: Disponible (nécessite configuration)
-- **Méthode**: Redirection URL
-- **Base URL**: https://bkapay.com/api-pay/
-- **Documentation**: Voir la documentation API BkaPay
+## Etat des fournisseurs
 
-### 3. SebPay
-- **Status**: Actif par défaut (Recommandé)
-- **Méthode**: Proxy via Cloudflare Worker
-- **Base URL**: https://newapi.sebpay.bj
+La source de verite est `src/utils/paymentProviders/config.ts`.
 
-### 4. AfribaPay
-- **Status**: Disponible (nécessite configuration du proxy)
-- **Méthode**: Session initiée via Cloudflare Worker Proxy & Redirection vers la page de paiement hébergée
-- **Base URL**: https://api.afribapay.com (Production) / https://api-sandbox.afribapay.com (Sandbox)
+| Provider | Etat actuel | Methode | Notes |
+| --- | --- | --- | --- |
+| AfribaPay | actif, recommande | Cloudflare Worker proxy | Premier provider actif, donc provider par defaut |
+| SebPay | actif | Cloudflare Worker proxy | Secrets conserves dans le Worker |
+| LeekPay | desactive temporairement | Redirection hebergee via Worker | Implementation prete, masquee du selecteur |
+| SoleasPay | desactive | Formulaire POST | Disponible si `enabled: true` |
+| BkaPay | desactive | Redirection URL | Disponible si `enabled: true` |
 
-## Configuration
+## LeekPay
 
-### Activer BkaPay
+### Methode retenue
 
-1. Ouvrez le fichier `src/utils/paymentProviders/config.ts`
-2. Ajoutez votre clé publique BkaPay :
+PayOol n'utilise plus le SDK JavaScript LeekPay, car ce SDK ouvre une interface de checkout modale. Le flux actuel est une redirection normale vers la page de paiement hebergee par LeekPay:
 
-```typescript
-[PaymentProviderType.BKAPAY]: {
-  type: PaymentProviderType.BKAPAY,
-  apiKey: 'pk_live_VOTRE_CLE_PUBLIQUE', // Remplacez par votre clé
-  enabled: true // Changez à true pour activer
+```text
+Frontend PayOol
+  -> POST Worker /api/leekpay/checkout
+  -> POST LeekPay /api/v1/checkout avec sk_live_xxx
+  -> Worker renvoie paymentUrl
+  -> window.location.href = paymentUrl
+```
+
+La cle secrete `sk_live_xxx` reste cote Cloudflare Worker. Elle ne doit jamais etre placee dans le frontend.
+
+### Configuration
+
+```ts
+[PaymentProviderType.LEEKPAY]: {
+  type: PaymentProviderType.LEEKPAY,
+  apiKey: 'pk_live_xxx',
+  enabled: false,
+  recommended: false,
+  proxyUrl: 'https://sebpay-proxy.sebpay-proxy.workers.dev/api/leekpay'
 }
 ```
 
-### Activer AfribaPay
+`apiKey` reste informatif cote frontend. La creation reelle du checkout REST utilise le secret `LEEKPAY_SECRET_KEY` configure dans le Worker.
 
-Pour utiliser AfribaPay de manière sécurisée sans exposer vos clés d'API secrètes dans le navigateur, l'intégration utilise un proxy Cloudflare Worker.
+### Payload envoye au Worker
 
-1. **Configurer les secrets sur votre Cloudflare Worker** :
-   Dans l'interface de gestion de votre Cloudflare Worker, configurez les variables d'environnement (secrets) suivantes :
-   - `AFRIBAPAY_API_USER` : Votre identifiant d'API AfribaPay.
-   - `AFRIBAPAY_API_KEY` : Votre clé secrète d'API AfribaPay.
-   - `AFRIBAPAY_MERCHANT_KEY` : (Optionnel) Votre identifiant marchand (merchantKey).
-   - `AFRIBAPAY_AGENT_ID` : (Optionnel) Votre identifiant d'agent (agent_id).
-   - `AFRIBAPAY_ENVIRONMENT` : `sandbox` pour les tests, ou `production` pour les paiements réels (par défaut).
+`src/utils/paymentProviders/leekpay.ts` envoie:
 
-2. **Activer la passerelle sur le Frontend** :
-   Ouvrez le fichier `src/utils/paymentProviders/config.ts` et changez `enabled` à `true` :
-   ```typescript
-   [PaymentProviderType.AFRIBAPAY]: {
-     type: PaymentProviderType.AFRIBAPAY,
-     apiKey: '', // Non utilisé en frontal
-     enabled: true, // Passer à true
-     proxyUrl: 'https://VOTRE-WORKER.workers.dev/api/afribapay' // URL de votre proxy Cloudflare Worker
-   }
-   ```
+```json
+{
+  "amount": 5000,
+  "currency": "XOF",
+  "description": "Commande #123",
+  "returnUrl": "https://site/payment/confirmation?...",
+  "cancelUrl": "https://site/payment/failure?...",
+  "customerEmail": "client@example.com",
+  "metadata": {
+    "orderId": "TKT-12345",
+    "provider": "leekpay",
+    "shopName": "PayOol"
+  }
+}
+```
 
-### Changer le fournisseur par défaut
+Notes:
 
-Le fournisseur par défaut est le premier fournisseur activé dans la configuration. Pour changer l'ordre de priorité, modifiez l'ordre dans `paymentProvidersConfig`.
+- `XAF` est converti en `XOF` pour LeekPay.
+- `description` est limitee a 500 caracteres, selon la doc REST.
+- Les identifiants TikTok ne sont pas envoyes dans `customer_name`.
+- Le montant financier est ajoute au retour PayOol dans `paid_amount`, afin de ne pas ecraser le parametre `amount` deja utilise pour le nombre de coins achetes.
+
+### API REST LeekPay appelee par le Worker
+
+```text
+POST https://leekpay.fr/api/v1/checkout
+Authorization: Bearer sk_live_xxx
+```
+
+Champs principaux:
+
+| Champ LeekPay | Source PayOol |
+| --- | --- |
+| `amount` | `PaymentParams.amount` |
+| `currency` | `PaymentParams.currency`, avec `XAF -> XOF` |
+| `description` | `PaymentParams.description` |
+| `return_url` | URL de confirmation PayOol |
+| `cancel_url` | URL d'echec PayOol |
+| `customer_email` | `PaymentParams.customerEmail` |
+| `metadata.orderId` | `PaymentParams.orderId` |
+
+Reponse attendue:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "checkout_42",
+    "payment_url": "https://leekpay.me/pay_AbCdEf1234567890",
+    "status": "pending"
+  }
+}
+```
+
+Le frontend redirige ensuite vers `payment_url`.
+
+### Retour PayOol
+
+Le `return_url` envoye a LeekPay contient deja les parametres PayOol necessaires:
+
+```text
+payment_provider=leekpay
+order_id=<orderId>
+status=success
+paid_amount=<montant paye>
+currency=<devise>
+```
+
+Le `cancel_url` contient:
+
+```text
+payment_provider=leekpay
+order_id=<orderId>
+status=cancelled
+error=Payment cancelled by user
+```
+
+### Statuts
+
+La documentation LeekPay liste:
+
+```text
+pending, processing, completed, failed, cancelled, expired
+```
+
+L'implementation les mappe vers les statuts internes PayOol:
+
+| LeekPay | PayOol |
+| --- | --- |
+| `completed`, `success`, `paid`, `successful`, `approved` | `success` |
+| `pending`, `processing` | `pending` |
+| `cancelled`, `canceled` | `cancelled` |
+| `failed`, `failure`, `declined`, `rejected`, `expired`, `error` | `failed` |
+
+`PaymentConfirmation.tsx` traite `failed`, `cancelled`, `expired` et valeurs equivalentes comme des echecs.
+
+## Worker LeekPay
+
+Routes ajoutees:
+
+```text
+POST /api/leekpay/checkout
+GET  /api/leekpay/checkout/:checkoutId
+```
+
+Secrets a configurer:
+
+```bash
+wrangler secret put LEEKPAY_SECRET_KEY
+```
+
+Optionnel:
+
+```bash
+wrangler secret put LEEKPAY_WEBHOOK_URL
+```
+
+## Webhooks LeekPay
+
+LeekPay peut envoyer un webhook `payment.success` avec un header `X-LeekPay-Signature`.
+
+Le Worker actuel cree des checkouts et peut verifier un statut, mais il ne traite pas encore les webhooks entrants. Pour une validation de paiement plus robuste, ajouter une route serveur/Worker qui:
+
+1. lit le corps brut de la requete;
+2. verifie `X-LeekPay-Signature`;
+3. compare le montant, la devise et la commande attendue;
+4. marque la commande comme payee;
+5. declenche l'envoi de commande.
 
 ## Utilisation
 
-### Méthode recommandée (nouveau code)
-
-```typescript
+```ts
 import { initiatePayment, PaymentProviderType } from './utils/payment';
 
-// Utiliser le fournisseur par défaut
 await initiatePayment({
-  amount: 1000,
+  amount: 5000,
   currency: 'XAF',
-  description: 'Achat de pièces',
+  description: 'Achat de pieces TikTok',
   orderId: 'TKT-12345',
-  customerName: 'John Doe',
-  customerEmail: 'john@example.com',
-  successUrl: 'https://example.com/success',
-  failureUrl: 'https://example.com/failure',
-  shopName: 'PayOol™'
-});
-
-// Utiliser un fournisseur spécifique
-await initiatePayment(params, PaymentProviderType.BKAPAY);
+  customerName: 'Client PayOol',
+  customerEmail: 'client@example.com',
+  successUrl: 'https://example.com/payment/confirmation?orderId=TKT-12345',
+  failureUrl: 'https://example.com/payment/failure?orderId=TKT-12345',
+  shopName: 'PayOol'
+}, PaymentProviderType.LEEKPAY);
 ```
 
-### Vérifier le statut d'un paiement
+## Tests rapides LeekPay
 
-```typescript
-import { checkPaymentStatus, PaymentProviderType } from './utils/payment';
+1. Configurer `LEEKPAY_SECRET_KEY` sur le Worker.
+2. Deployer le Worker.
+3. Passer temporairement `PaymentProviderType.LEEKPAY` a `enabled: true` pour tester.
+4. Lancer l'application avec `npm run dev`.
+5. Choisir un forfait, puis LeekPay.
+6. Verifier dans la console `[LeekPay] Creating hosted checkout`.
+7. Verifier la redirection vers une URL `https://leekpay.me/...`.
+8. Apres paiement ou annulation, verifier le retour vers PayOol.
 
-const status = await checkPaymentStatus('TKT-12345', PaymentProviderType.BKAPAY);
-console.log(status); // { orderId: 'TKT-12345', status: 'success' }
-```
+## Securite
 
-### Méthode legacy (compatibilité)
-
-```typescript
-import { initiateSoleasPayment } from './utils/payment';
-
-// Fonctionne toujours pour la compatibilité ascendante
-await initiateSoleasPayment({
-  amount: 1000,
-  currency: 'XAF',
-  description: 'Achat de pièces',
-  orderId: 'TKT-12345',
-  customerName: 'John Doe',
-  customerEmail: 'john@example.com',
-  successUrl: 'https://example.com/success',
-  failureUrl: 'https://example.com/failure'
-});
-```
-
-## Ajouter un nouveau fournisseur
-
-### 1. Créer l'implémentation
-
-Créez un nouveau fichier `src/utils/paymentProviders/nouveaufournisseur.ts` :
-
-```typescript
-import { PaymentProvider, PaymentParams, PaymentResponse, PaymentStatusResponse } from './types';
-
-export class NouveauFournisseurProvider implements PaymentProvider {
-  name = 'NouveauFournisseur';
-  private apiKey: string;
-
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-  }
-
-  isConfigured(): boolean {
-    return !!this.apiKey;
-  }
-
-  async initiatePayment(params: PaymentParams): Promise<PaymentResponse> {
-    // Implémentez la logique de paiement
-  }
-
-  async checkPaymentStatus(orderId: string): Promise<PaymentStatusResponse> {
-    // Implémentez la vérification du statut
-  }
-}
-```
-
-### 2. Ajouter le type
-
-Dans `src/utils/paymentProviders/types.ts`, ajoutez :
-
-```typescript
-export enum PaymentProviderType {
-  SOLEASPAY = 'soleaspay',
-  BKAPAY = 'bkapay',
-  NOUVEAUFOURNISSEUR = 'nouveaufournisseur' // Ajoutez ici
-}
-```
-
-### 3. Configurer le fournisseur
-
-Dans `src/utils/paymentProviders/config.ts`, ajoutez :
-
-```typescript
-[PaymentProviderType.NOUVEAUFOURNISSEUR]: {
-  type: PaymentProviderType.NOUVEAUFOURNISSEUR,
-  apiKey: 'VOTRE_CLE_API',
-  enabled: true
-}
-```
-
-### 4. Ajouter à la factory
-
-Dans `src/utils/paymentProviders/factory.ts`, ajoutez le case :
-
-```typescript
-case PaymentProviderType.NOUVEAUFOURNISSEUR:
-  return new NouveauFournisseurProvider(config.apiKey);
-```
-
-### 5. Exporter le nouveau provider
-
-Dans `src/utils/paymentProviders/index.ts`, ajoutez :
-
-```typescript
-export * from './nouveaufournisseur';
-```
-
-## API BkaPay - Détails
-
-### URL de redirection
-
-```
-https://bkapay.com/api-pay/VOTRE_CLE_PUBLIQUE?amount=MONTANT&description=DESCRIPTION&callback=URL_RETOUR
-```
-
-**Paramètres:**
-- `amount`: Montant minimum 200 (XOF, XAF ou CDF selon votre pays)
-- `description`: Description du paiement (optionnel)
-- `callback`: URL de retour après paiement (optionnel)
-
-### Gestion du retour
-
-Après le paiement, le client est redirigé vers votre URL de callback avec les paramètres suivants:
-
-```
-https://votresite.com/success?status=success&transactionId=xxx&amount=5000
-```
-
-- `status`: "success" ou "failed"
-- `transactionId`: Identifiant unique de la transaction
-- `amount`: Montant payé
-
-### Exemple JavaScript pour gérer le retour
-
-```javascript
-const urlParams = new URLSearchParams(window.location.search);
-const status = urlParams.get("status");
-const transactionId = urlParams.get("transactionId");
-const amount = urlParams.get("amount");
-
-if (status === "success") {
-  console.log("Paiement reussi:", transactionId, amount);
-} else {
-  console.log("Paiement echoue");
-}
-```
-
-## Tests
-
-Pour tester un nouveau fournisseur :
-
-1. Configurez la clé API dans `config.ts`
-2. Activez le fournisseur (`enabled: true`)
-3. Utilisez l'application normalement
-4. Vérifiez les logs de la console pour les erreurs
-
-## Sécurité
-
-⚠️ **Important** : Les clés API sont actuellement stockées dans le code source. Pour la production, considérez :
-
-1. Utiliser des variables d'environnement
-2. Stocker les clés côté serveur
-3. Utiliser un backend pour gérer les paiements
+- Ne jamais exposer `sk_live_xxx` dans le frontend.
+- Garder les appels REST LeekPay cote Worker.
+- Ne pas envoyer les mots de passe TikTok dans `customer_name` ou `metadata`.
+- Ne pas confirmer une commande uniquement sur la presence d'une redirection si un webhook ou une verification serveur est disponible.
+- Comparer le montant attendu et le montant paye avant livraison.
 
 ## Support
 
-Pour toute question ou problème :
-- SoleasPay : https://checkout.soleaspay.com
-- BkaPay : https://bkapay.com
+- LeekPay: https://www.leekpay.me/docs
+- SoleasPay: https://checkout.soleaspay.com
+- BkaPay: https://bkapay.com

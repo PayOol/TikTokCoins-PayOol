@@ -6,6 +6,7 @@ compatibility_date = "2024-01-01"
 # These should be set as secrets in Cloudflare Workers dashboard
 # Use: wrangler secret put SEBPAY_API_KEY
 # Use: wrangler secret put SEBPAY_SECRET_KEY
+# Use: wrangler secret put LEEKPAY_SECRET_KEY
 
 [vars]
 # Public variables (if any)

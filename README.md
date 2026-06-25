@@ -14,7 +14,7 @@ Le traitement actuel des commandes est fait cote frontend:
 
 - selection d'un forfait TikTok Coins ou compte TikTok;
 - collecte des informations client via les formulaires React;
-- paiement via LeekPay, SoleasPay ou BkaPay selon la configuration;
+- paiement via AfribaPay, SebPay, LeekPay, SoleasPay ou BkaPay selon la configuration;
 - retour sur les pages de confirmation/succes/echec;
 - envoi de la commande via EmailJS depuis `src/pages/PaymentConfirmation.tsx`;
 - historique local stocke dans le navigateur avec `localStorage`.
@@ -75,9 +75,15 @@ src/utils/paymentProviders/config.ts
 
 Providers presents:
 
-- LeekPay: active
-- SoleasPay: active
+- AfribaPay: actif, recommande, provider par defaut
+- SebPay: actif
+- LeekPay: present mais desactive temporairement; integration REST par Cloudflare Worker prete
+- SoleasPay: present mais desactive
 - BkaPay: present mais desactive
+
+LeekPay cree une session REST cote Cloudflare Worker avec `LEEKPAY_SECRET_KEY`,
+puis redirige le client vers la page hebergee LeekPay. La cle `sk_live_xxx`
+ne doit jamais etre exposee cote navigateur.
 
 La logique commune est dans:
 

@@ -1,5 +1,7 @@
 # Résumé de l'implémentation du système multi-API
 
+> Note 2026-06-25: ce fichier est un resume historique de l'ancienne mise en place SoleasPay/BkaPay. La documentation actuelle des fournisseurs, incluant AfribaPay, SebPay et l'integration LeekPay mise a jour, se trouve dans `PAYMENT_PROVIDERS.md` et `QUICK_REFERENCE.md`.
+
 ## 📋 Vue d'ensemble
 
 Un système multi-API de paiement a été implémenté avec succès, permettant de supporter plusieurs fournisseurs de paiement (SoleasPay et BkaPay) de manière flexible et extensible.

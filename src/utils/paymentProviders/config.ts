@@ -8,8 +8,8 @@ export interface ProviderConfig {
   apiKey: string;
   secretKey?: string;
   enabled: boolean;
-  recommended?: boolean; // Indique si ce provider est recommandé
-  proxyUrl?: string; // URL du proxy pour les providers qui en ont besoin
+  recommended?: boolean; // Marks the provider as recommended in the selector
+  proxyUrl?: string; // Backend proxy URL for providers that need server-side secrets
 }
 
 /**
@@ -18,9 +18,9 @@ export interface ProviderConfig {
 export const paymentProvidersConfig: Record<PaymentProviderType, ProviderConfig> = {
   [PaymentProviderType.AFRIBAPAY]: {
     type: PaymentProviderType.AFRIBAPAY,
-    apiKey: '', // Les identifiants seront stockés dans le proxy Cloudflare Worker
-    enabled: true, // Activé pour affichage dans la liste
-    recommended: true, // Provider recommandé
+    apiKey: '', // Credentials are stored in the Cloudflare Worker proxy
+    enabled: true,
+    recommended: true,
     proxyUrl: 'https://sebpay-proxy.sebpay-proxy.workers.dev/api/afribapay'
   },
   [PaymentProviderType.SEBPAY]: {
@@ -34,18 +34,19 @@ export const paymentProvidersConfig: Record<PaymentProviderType, ProviderConfig>
   [PaymentProviderType.SOLEASPAY]: {
     type: PaymentProviderType.SOLEASPAY,
     apiKey: 'D9flUR0hr0HZF63QKtO2g2-CqQGebos04R-bPRf63K8-AP',
-    enabled: false // Désactivé
+    enabled: false
   },
   [PaymentProviderType.LEEKPAY]: {
     type: PaymentProviderType.LEEKPAY,
-    apiKey: 'pk_live_OlibyiLyNNrzsQjujN6Txhn7Eieorz9Q', // Remplacer par votre clé publique LeekPay
-    enabled: false, // Masqué
-    recommended: false
+    apiKey: 'pk_live_OlibyiLyNNrzsQjujN6Txhn7Eieorz9Q', // Public key is informational; REST checkout uses the Worker secret
+    enabled: false,
+    recommended: false,
+    proxyUrl: 'https://sebpay-proxy.sebpay-proxy.workers.dev/api/leekpay'
   },
   [PaymentProviderType.BKAPAY]: {
     type: PaymentProviderType.BKAPAY,
     apiKey: 'pk_live_0ce8acd1-ee69-4787-993e-180668077821',
-    enabled: false // Désactivé
+    enabled: false
   }
 };
 

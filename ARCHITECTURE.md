@@ -87,6 +87,8 @@ src/utils/paymentProviders/factory.ts
 src/utils/paymentProviders/leekpay.ts
 src/utils/paymentProviders/soleaspay.ts
 src/utils/paymentProviders/bkapay.ts
+src/utils/paymentProviders/sebpay.ts
+src/utils/paymentProviders/afribapay.ts
 ```
 
 Le principe est le suivant:
@@ -103,6 +105,8 @@ PaymentProviderFactory
   +-- LeekPayProvider
   +-- SoleasPayProvider
   +-- BkaPayProvider
+  +-- SebPayProvider
+  +-- AfribaPayProvider
 ```
 
 La configuration des fournisseurs est dans:

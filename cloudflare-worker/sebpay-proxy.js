@@ -14,6 +14,11 @@ export default {
 
     try {
       const url = new URL(request.url);
+
+      // Route to LeekPay proxy
+      if (url.pathname.startsWith('/api/leekpay')) {
+        return await handleLeekPay(request, env);
+      }
       
       // Route to AfribaPay proxy
       if (url.pathname.startsWith('/api/afribapay')) {
@@ -39,6 +44,146 @@ export default {
     }
   }
 };
+
+async function handleLeekPay(request, env) {
+  const url = new URL(request.url);
+  const leekpaySecretKey = env.LEEKPAY_SECRET_KEY;
+  const leekpayBaseUrl = 'https://leekpay.fr/api/v1';
+
+  if (!leekpaySecretKey) {
+    return new Response(
+      JSON.stringify({ error: 'LeekPay secret key is not configured' }),
+      { status: 500, headers: corsHeaders() }
+    );
+  }
+
+  if (request.method === 'POST' && url.pathname.endsWith('/checkout')) {
+    try {
+      const body = await request.json();
+      const apiBody = compactObject({
+        amount: body.amount,
+        currency: body.currency || 'XOF',
+        description: body.description,
+        return_url: body.returnUrl || body.return_url,
+        cancel_url: body.cancelUrl || body.cancel_url,
+        webhook_url: body.webhookUrl || body.webhook_url || env.LEEKPAY_WEBHOOK_URL,
+        customer_email: body.customerEmail || body.customer_email,
+        customer_name: body.customerName || body.customer_name,
+        customer_phone: body.customerPhone || body.customer_phone,
+        metadata: body.metadata
+      });
+
+      if (!apiBody.amount || !apiBody.currency) {
+        return new Response(
+          JSON.stringify({ error: 'LeekPay amount and currency are required' }),
+          { status: 400, headers: corsHeaders() }
+        );
+      }
+
+      const checkoutResponse = await fetch(`${leekpayBaseUrl}/checkout`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${leekpaySecretKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(apiBody)
+      });
+
+      const responseText = await checkoutResponse.text();
+      const checkoutData = parseJsonResponse(responseText);
+
+      if (!checkoutResponse.ok) {
+        return new Response(
+          JSON.stringify({
+            error: extractApiError(checkoutData, `LeekPay checkout failed (${checkoutResponse.status})`),
+            data: checkoutData
+          }),
+          { status: checkoutResponse.status, headers: corsHeaders() }
+        );
+      }
+
+      const checkout = checkoutData?.data || checkoutData;
+      const paymentUrl = checkout?.payment_url || checkout?.paymentUrl;
+      const checkoutId = checkout?.id || checkout?.checkout_id || checkout?.payment_id;
+
+      if (!paymentUrl) {
+        return new Response(
+          JSON.stringify({ error: 'LeekPay did not return a payment URL', data: checkoutData }),
+          { status: 502, headers: corsHeaders() }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          paymentUrl,
+          checkoutId,
+          status: checkout?.status,
+          amount: checkout?.amount,
+          currency: checkout?.currency,
+          data: checkout
+        }),
+        { headers: corsHeaders() }
+      );
+    } catch (error) {
+      return new Response(
+        JSON.stringify({ error: error.message || 'Failed to create LeekPay checkout', message: error.message }),
+        { status: 500, headers: corsHeaders() }
+      );
+    }
+  }
+
+  const statusMatch = url.pathname.match(/\/api\/leekpay\/checkout\/([^/]+)$/);
+  if (request.method === 'GET' && statusMatch) {
+    const checkoutId = decodeURIComponent(statusMatch[1]);
+
+    try {
+      const statusResponse = await fetch(`${leekpayBaseUrl}/checkout/${encodeURIComponent(checkoutId)}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${leekpaySecretKey}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const responseText = await statusResponse.text();
+      const statusData = parseJsonResponse(responseText);
+
+      if (!statusResponse.ok) {
+        return new Response(
+          JSON.stringify({
+            error: extractApiError(statusData, `LeekPay status check failed (${statusResponse.status})`),
+            data: statusData
+          }),
+          { status: statusResponse.status, headers: corsHeaders() }
+        );
+      }
+
+      const checkout = statusData?.data || statusData;
+      const rawStatus = checkout?.status;
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          checkoutId: checkout?.id || checkoutId,
+          status: mapLeekPayStatus(rawStatus),
+          rawStatus,
+          amount: checkout?.amount,
+          currency: checkout?.currency,
+          data: checkout
+        }),
+        { headers: corsHeaders() }
+      );
+    } catch (error) {
+      return new Response(
+        JSON.stringify({ error: 'Failed to retrieve LeekPay checkout status', message: error.message }),
+        { status: 500, headers: corsHeaders() }
+      );
+    }
+  }
+
+  return new Response('Not found', { status: 404, headers: corsHeaders() });
+}
 
 async function handleSebPay(request, env) {
   const url = new URL(request.url);
@@ -349,6 +494,66 @@ function handleCORS() {
       'Access-Control-Max-Age': '86400',
     },
   });
+}
+
+function compactObject(value) {
+  return Object.fromEntries(
+    Object.entries(value).filter(([, entryValue]) => (
+      entryValue !== undefined
+      && entryValue !== null
+      && entryValue !== ''
+    ))
+  );
+}
+
+function parseJsonResponse(responseText) {
+  if (!responseText) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(responseText);
+  } catch (error) {
+    return { raw: responseText };
+  }
+}
+
+function extractApiError(payload, fallback) {
+  if (!payload) {
+    return fallback;
+  }
+
+  if (typeof payload.error === 'string') {
+    return payload.error;
+  }
+
+  if (payload.error && typeof payload.error === 'object') {
+    return payload.error.message || payload.error.status || JSON.stringify(payload.error);
+  }
+
+  return payload.message || payload.raw || fallback;
+}
+
+function mapLeekPayStatus(status) {
+  if (!status) {
+    return 'pending';
+  }
+
+  const normalizedStatus = status.toLowerCase();
+
+  if (['success', 'completed', 'paid', 'successful', 'approved'].includes(normalizedStatus)) {
+    return 'success';
+  }
+
+  if (['cancelled', 'canceled'].includes(normalizedStatus)) {
+    return 'cancelled';
+  }
+
+  if (['failed', 'failure', 'declined', 'rejected', 'expired', 'error'].includes(normalizedStatus)) {
+    return 'failed';
+  }
+
+  return 'pending';
 }
 
 function corsHeaders() {
