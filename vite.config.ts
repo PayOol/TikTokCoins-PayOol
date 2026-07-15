@@ -27,8 +27,8 @@ export default defineConfig({
         'pwa-512x512.png'
       ],
       manifest: {
-        name: 'PayOol Services',
-        short_name: 'PayOol',
+        name: 'PayOol™-Services',
+        short_name: 'PayOol™-Services',
         description: 'Accédez aux services PayOol pour TikTok, les cartes virtuelles et les pièces eFootball.',
         theme_color: '#000000',
         background_color: '#000000',

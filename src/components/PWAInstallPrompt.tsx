@@ -126,7 +126,7 @@ export function PWAInstallPrompt() {
                 {t('installApp', 'Installer l\'application')}
               </h3>
               <p className="text-sm text-[var(--text-secondary)]">
-                PayOol Services
+                PayOol™-Services
               </p>
             </div>
           </div>
