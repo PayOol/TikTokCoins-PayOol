@@ -15,7 +15,7 @@ export function MobileBottomNav() {
 
   return (
     <nav className="mobile-bottom-navigation" aria-label={t('mobileNavigation')}>
-      <div className="mx-auto grid max-w-2xl grid-cols-4">
+      <div className="mobile-bottom-navigation__surface">
         {navItems.map(({ path, labelKey, icon: Icon, aliases }) => {
           const isActive = location.pathname === path || aliases.includes(location.pathname);
 
@@ -26,8 +26,10 @@ export function MobileBottomNav() {
               className={`mobile-bottom-navigation__item ${isActive ? 'is-active' : ''}`}
               aria-current={isActive ? 'page' : undefined}
             >
-              <Icon className="h-5 w-5" aria-hidden="true" />
-              <span>{t(labelKey)}</span>
+              <span className="mobile-bottom-navigation__icon">
+                <Icon aria-hidden="true" />
+              </span>
+              <span className="mobile-bottom-navigation__label">{t(labelKey)}</span>
             </Link>
           );
         })}

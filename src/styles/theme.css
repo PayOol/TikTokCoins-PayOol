@@ -225,7 +225,7 @@
 
 /* Navigation principale sur mobile et dans la PWA */
 .app-shell {
-  padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(7rem + env(safe-area-inset-bottom, 0px));
 }
 
 .mobile-bottom-navigation {
@@ -234,56 +234,139 @@
   bottom: 0;
   left: 0;
   z-index: 45;
-  padding: 0.35rem 0.5rem max(0.35rem, env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid var(--border-dark);
-  background-color: var(--background-elevated);
-  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(14px);
+  pointer-events: none;
+}
+
+.mobile-bottom-navigation__surface {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 100%;
+  padding: 0.35rem max(0.6rem, env(safe-area-inset-left, 0px)) calc(1rem + env(safe-area-inset-bottom, 0px)) max(0.6rem, env(safe-area-inset-right, 0px));
+  overflow: hidden;
+  border-top: 1px solid color-mix(in srgb, var(--border-light) 78%, transparent);
+  border-radius: 1.45rem 1.45rem 0 0;
+  background: var(--background-elevated);
+  background: color-mix(in srgb, var(--background-elevated) 88%, transparent);
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.34),
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  backdrop-filter: blur(22px) saturate(160%);
+  pointer-events: auto;
+}
+
+.mobile-bottom-navigation__surface::before {
+  position: absolute;
+  top: 0;
+  right: 12%;
+  left: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(8, 255, 249, 0.65), rgba(255, 0, 80, 0.65), transparent);
+  content: '';
+  pointer-events: none;
 }
 
 .mobile-bottom-navigation__item {
   position: relative;
   display: flex;
   min-width: 0;
-  min-height: 3.85rem;
+  min-height: 4.2rem;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
-  border-radius: var(--radius-sm);
+  gap: 0.3rem;
+  border-radius: 1.1rem;
   color: var(--text-tertiary);
-  font-size: 0.65rem;
-  font-weight: 600;
+  font-size: 0.64rem;
+  font-weight: 650;
   line-height: 1;
   text-align: center;
-  transition: color var(--transition-fast), background-color var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast),
+    transform var(--transition-fast);
 }
 
-.mobile-bottom-navigation__item:hover,
+.mobile-bottom-navigation__icon {
+  display: flex;
+  width: 2.25rem;
+  height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 0.85rem;
+  background: color-mix(in srgb, var(--background-elevated-2) 64%, transparent);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.mobile-bottom-navigation__icon svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  stroke-width: 2.2;
+}
+
+.mobile-bottom-navigation__label {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
 .mobile-bottom-navigation__item:focus-visible {
   color: var(--text-primary);
-  background-color: var(--background-elevated-2);
+  background-color: color-mix(in srgb, var(--background-elevated-2) 70%, transparent);
   outline: none;
+}
+
+@media (hover: hover) {
+  .mobile-bottom-navigation__item:hover {
+    color: var(--text-primary);
+    background-color: color-mix(in srgb, var(--background-elevated-2) 70%, transparent);
+  }
+}
+
+.mobile-bottom-navigation__item:focus-visible {
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tiktok-blue) 72%, transparent);
+}
+
+.mobile-bottom-navigation__item:active {
+  transform: scale(0.96);
 }
 
 .mobile-bottom-navigation__item.is-active {
   color: var(--text-primary);
-  background-color: var(--background-elevated-2);
+  background: transparent;
 }
 
-.mobile-bottom-navigation__item.is-active svg {
-  color: var(--tiktok-blue);
-  filter: drop-shadow(0 0 6px rgba(8, 255, 249, 0.25));
+.mobile-bottom-navigation__item.is-active .mobile-bottom-navigation__icon {
+  isolation: isolate;
+  overflow: hidden;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.18);
+  background-color: #8264d4;
+  background-image: linear-gradient(135deg, var(--tiktok-blue) 0%, #8264d4 50%, var(--tiktok-red) 100%);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  box-shadow:
+    0 0 14px rgba(255, 0, 80, 0.18),
+    0 0 14px rgba(8, 255, 249, 0.14);
+  transform: none;
 }
 
-.mobile-bottom-navigation__item.is-active::before {
-  position: absolute;
-  top: -0.35rem;
-  width: 2.25rem;
-  height: 0.2rem;
-  border-radius: var(--radius-full);
-  background: var(--tiktok-gradient);
-  content: '';
+.mobile-bottom-navigation__item.is-active .mobile-bottom-navigation__label {
+  color: var(--text-primary);
+  font-weight: 750;
 }
 
 @media (min-width: 1024px) {
@@ -298,7 +381,7 @@
 
 @media (max-width: 1023px) {
   .whatsapp-container {
-    bottom: calc(5.6rem + env(safe-area-inset-bottom, 0px));
+    bottom: calc(7.35rem + env(safe-area-inset-bottom, 0px));
     right: 1rem;
   }
 }
@@ -459,7 +542,7 @@
 /* Responsive pour le bouton WhatsApp */
 @media (max-width: 768px) {
   .whatsapp-container {
-    bottom: calc(5.6rem + env(safe-area-inset-bottom, 0px));
+    bottom: calc(7.35rem + env(safe-area-inset-bottom, 0px));
     right: 1rem;
   }
 
@@ -475,6 +558,26 @@
 
   .whatsapp-tooltip {
     display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .mobile-bottom-navigation__surface {
+    padding-top: 0.4rem;
+    border-radius: 1.25rem 1.25rem 0 0;
+  }
+
+  .mobile-bottom-navigation__item {
+    min-height: 4rem;
+    font-size: 0.59rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-bottom-navigation__item,
+  .mobile-bottom-navigation__icon,
+  .mobile-bottom-navigation__label {
+    transition: none;
   }
 }
 
