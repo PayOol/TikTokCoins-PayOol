@@ -40,6 +40,14 @@ export const PaymentFailure = () => {
       setErrorMessage(t('defaultErrorMessage', "Une erreur est survenue lors du traitement de votre paiement."));
     }
   }, [location.search]);
+
+  const retryPath = purchaseDetails?.serviceType === 'accounts'
+    ? '/comptes-tiktok'
+    : purchaseDetails?.serviceType === 'cards'
+      ? '/cartes-virtuelles'
+      : purchaseDetails?.serviceType === 'efootball'
+        ? '/pieces-efootball'
+        : '/pieces-tiktok';
   
   return (
     <Layout balance={0} hideBalance={true}>
@@ -81,7 +89,7 @@ export const PaymentFailure = () => {
         
         <div className="flex flex-col sm:flex-row gap-4">
           <Link 
-            to="/" 
+            to={retryPath}
             className="flex items-center justify-center gap-2 py-3 px-6 rounded-[var(--radius-md)] bg-[var(--background-elevated)] hover:bg-[var(--background-elevated-2)] transition-colors border border-[var(--border-dark)]"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -89,7 +97,7 @@ export const PaymentFailure = () => {
           </Link>
           
           <Link 
-            to="/" 
+            to={retryPath}
             className="flex items-center justify-center gap-2 py-3 px-6 rounded-[var(--radius-md)] bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] text-white font-medium hover:opacity-90 transition-opacity"
           >
             <RefreshCw className="w-5 h-5" />

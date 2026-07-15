@@ -73,6 +73,7 @@ const translation = {
   "language": "Langue",
   "english": "Anglais",
   "french": "Français",
+  "mobileNavigation": "Navigation des services",
   
   // Custom Package
   "customAmount": "Montant personnalisé",
@@ -128,7 +129,69 @@ const translation = {
   "services": {
     "coins": "Pièces TikTok",
     "accounts": "Compte TikTok Monétisables",
-    "cards": "Cartes Virtuelles"
+    "cards": "Cartes Virtuelles",
+    "efootball": "Pièces eFootball",
+    "coinsShort": "TikTok",
+    "accountsShort": "Comptes",
+    "cardsShort": "Cartes",
+    "efootballShort": "eFootball"
+  },
+
+  "efootball": {
+    "title": "Pièces eFootball",
+    "description": "Profitez des meilleurs tarifs pour recharger vos pièces eFootball dès maintenant !",
+    "availability": "Service disponible 24/7",
+    "delivery": "Livraison rapide et sécurisée",
+    "available": "Disponible",
+    "packages": "forfaits",
+    "quantity": "Quantité",
+    "price": "Tarif",
+    "order": "Continuer vers le paiement",
+    "catalogAriaLabel": "Tarifs des pièces eFootball",
+    "orderAriaLabel": "Commander {{coins}} Coins eFootball pour {{platform}} au tarif de {{price}} F",
+    "platforms": {
+      "mobile": "iOS / Android",
+      "steam": "Comptes Steam"
+    },
+    "serviceTitle": "Service disponible 24/7 • Livraison rapide et sécurisée",
+    "paymentPath": "Sélectionnez un forfait, renseignez vos informations eFootball puis choisissez votre moyen de paiement.",
+    "successMessage": "Votre paiement eFootball a été traité avec succès. Votre commande de pièces est en cours de traitement et PayOol pourra vous contacter sur WhatsApp si nécessaire.",
+    "paymentConfirmation": "Votre commande eFootball est confirmée et sera traitée avec les informations de compte fournies.",
+    "purchasedCoins": "Pièces eFootball achetées",
+    "form": {
+      "title": "Compte eFootball",
+      "subtitle": "Renseignez les informations du compte à recharger",
+      "konamiIdLabel": "ID KONAMI / e-mail",
+      "konamiIdPlaceholder": "Entrez votre ID KONAMI ou votre e-mail",
+      "konamiIdRequired": "L'ID KONAMI ou l'e-mail est requis",
+      "passwordLabel": "Mot de passe",
+      "passwordPlaceholder": "Entrez votre mot de passe",
+      "passwordRequired": "Le mot de passe est requis",
+      "whatsappLabel": "Numéro WhatsApp",
+      "whatsappPlaceholder": "Ex. 658 314 543",
+      "whatsappInvalid": "Entrez un numéro WhatsApp valide (8 à 15 chiffres)",
+      "countryCodeLabel": "Indicatif du pays",
+      "countryCodeDetecting": "Détection de l'indicatif du pays…",
+      "countryCodeDetected": "Indicatif du pays détecté automatiquement"
+    },
+    "trust": {
+      "reliable": {
+        "title": "Fiable",
+        "description": "Transactions 100% sécurisées"
+      },
+      "fast": {
+        "title": "Rapide",
+        "description": "Livraison instantanée"
+      },
+      "support": {
+        "title": "Support",
+        "description": "Assistance dédiée"
+      },
+      "prices": {
+        "title": "Meilleurs prix",
+        "description": "Tarifs compétitifs"
+      }
+    }
   },
 
   // Virtual cards

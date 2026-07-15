@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Layout } from '../components/Layout';
-import { CheckCircle, ArrowLeft, ArrowRight, Coins, CreditCard, Home, Link as LinkIcon, Mail, Printer } from 'lucide-react';
+import { CheckCircle, ArrowLeft, ArrowRight, Coins, CreditCard, Gamepad2, Home, Link as LinkIcon, Mail, Printer } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Confetti } from '../components/Confetti';
@@ -52,12 +52,13 @@ export const PaymentSuccess = () => {
   const searchParams = new URLSearchParams(location.search);
   const orderId = searchParams.get('orderId');
   const urlType = searchParams.get('type');
-  const [serviceType, setServiceType] = useState<'coins' | 'accounts' | 'cards'>(
-    urlType === 'account' ? 'accounts' : urlType === 'card' ? 'cards' : 'coins'
+  const [serviceType, setServiceType] = useState<'coins' | 'accounts' | 'cards' | 'efootball'>(
+    urlType === 'account' ? 'accounts' : urlType === 'card' ? 'cards' : urlType === 'efootball' ? 'efootball' : 'coins'
   );
   const isAccount = serviceType === 'accounts';
   const isCard = serviceType === 'cards';
-  const isNonCoinPurchase = isAccount || isCard;
+  const isEFootball = serviceType === 'efootball';
+  const isNonCoinPurchase = isAccount || isCard || isEFootball;
 
   useEffect(() => {
     if (orderId) {
@@ -71,7 +72,7 @@ export const PaymentSuccess = () => {
         setPurchaseDetails(purchase);
         setServiceType(purchase.serviceType || 'coins');
       } else if (urlType) {
-        setServiceType(urlType === 'account' ? 'accounts' : urlType === 'card' ? 'cards' : 'coins');
+        setServiceType(urlType === 'account' ? 'accounts' : urlType === 'card' ? 'cards' : urlType === 'efootball' ? 'efootball' : 'coins');
       }
     }
 
@@ -238,7 +239,9 @@ export const PaymentSuccess = () => {
               ? t('successMessageAccount', 'Votre paiement a été traité avec succès. Vous recevrez les identifiants de votre compte TikTok par email dans un délai de 2-4h. Si vous ne recevez pas vos identifiants dans ce délai, veuillez contacter notre service client sur WhatsApp.')
               : isCard
                 ? t('successMessageCard', 'Votre paiement a ete traite avec succes. Votre carte virtuelle sera preparee et les informations de livraison seront envoyees par email.')
-                : t('successMessage', 'Votre paiement a été traité avec succès. Vous recevrez vos pièces dans un délai de 10 minutes. Si vous ne recevez pas vos pièces dans ce délai, veuillez contacter notre service client sur WhatsApp.')
+                : isEFootball
+                  ? t('efootball.successMessage')
+                  : t('successMessage', 'Votre paiement a été traité avec succès. Vous recevrez vos pièces dans un délai de 10 minutes. Si vous ne recevez pas vos pièces dans ce délai, veuillez contacter notre service client sur WhatsApp.')
             }
           </p>
           <div className="mb-6 p-4 bg-green-100 border border-green-200 rounded-[var(--radius-md)] text-green-800">
@@ -251,7 +254,9 @@ export const PaymentSuccess = () => {
                 ? t('paymentConfirmationAccount', 'Votre paiement a été traité avec succès. Votre compte TikTok sera créé et les identifiants vous seront envoyés par email.')
                 : isCard
                   ? t('paymentConfirmationCard', 'Votre commande de carte virtuelle est confirmee. PayOol va traiter la livraison apres validation.')
-                  : t('paymentConfirmation', 'Votre paiement a été traité avec succès. Vos pièces seront créditées sur votre compte TikTok dans les prochaines minutes.')
+                  : isEFootball
+                    ? t('efootball.paymentConfirmation')
+                    : t('paymentConfirmation', 'Votre paiement a été traité avec succès. Vos pièces seront créditées sur votre compte TikTok dans les prochaines minutes.')
               }
             </p>
           </div>
@@ -282,12 +287,14 @@ export const PaymentSuccess = () => {
                 <span className="font-medium">{purchaseDetails.id}</span>
               </div>
               
-              {!isNonCoinPurchase && (
+              {!isAccount && !isCard && (
                 <div className="flex justify-between items-center">
-                  <span className="text-[var(--text-secondary)]">{t('purchasedCoins', 'Pièces achetées')}</span>
+                  <span className="text-[var(--text-secondary)]">
+                    {isEFootball ? t('efootball.purchasedCoins') : t('purchasedCoins', 'Pièces achetées')}
+                  </span>
                   <div className="flex items-center gap-2">
                     <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[var(--tiktok-blue)] to-[var(--tiktok-red)] flex items-center justify-center">
-                      <Coins className="w-3 h-3 text-white" />
+                      {isEFootball ? <Gamepad2 className="w-3 h-3 text-white" /> : <Coins className="w-3 h-3 text-white" />}
                     </div>
                     <span className="font-bold">{purchaseDetails.amount.toLocaleString()}</span>
                   </div>
@@ -321,7 +328,7 @@ export const PaymentSuccess = () => {
         
         <div className={`flex gap-4 ${isNonCoinPurchase ? 'justify-center' : 'flex-col sm:flex-row'}`}>
           <Link
-            to={isCard ? '/cartes-virtuelles' : isAccount ? '/comptes-tiktok' : '/'}
+            to={isCard ? '/cartes-virtuelles' : isAccount ? '/comptes-tiktok' : isEFootball ? '/pieces-efootball' : '/'}
             className="flex items-center justify-center gap-2 py-3 px-6 rounded-[var(--radius-md)] bg-[var(--background-elevated)] hover:bg-[var(--background-elevated-2)] transition-colors border border-[var(--border-dark)]"
           >
             <ArrowLeft className="w-5 h-5" />

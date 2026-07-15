@@ -10,7 +10,7 @@ interface Props {
   isLoading?: boolean;
   packageAmount: number;
   packagePrice: number;
-  serviceType?: 'coins' | 'accounts' | 'cards';
+  serviceType?: 'coins' | 'accounts' | 'cards' | 'efootball';
   packageLabel?: string;
   packageTranslationKey?: string;
   defaultEmail?: string;

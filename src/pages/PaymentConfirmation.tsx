@@ -35,6 +35,7 @@ export const PaymentConfirmation = () => {
   const orderId = searchParams.get('orderId');
   const type = searchParams.get('type') || 'coins';
   const username = searchParams.get('username');
+  const konamiId = searchParams.get('konamiId');
   const password = searchParams.get('password');
   const email = searchParams.get('email');
   const whatsapp = searchParams.get('whatsapp');
@@ -42,6 +43,7 @@ export const PaymentConfirmation = () => {
   const priceFromUrl = searchParams.get('price');
   const desiredUsername = searchParams.get('desiredUsername');
   const cardName = searchParams.get('card');
+  const efootballPlatform = searchParams.get('platform');
   
   // Statut renvoye par le fournisseur de paiement.
   const paymentStatus = searchParams.get('status');
@@ -123,11 +125,14 @@ export const PaymentConfirmation = () => {
 
     const isAccountPurchase = type === 'account';
     const isCardPurchase = type === 'card';
+    const isEFootballPurchase = type === 'efootball';
     const hasRequiredParams = isAccountPurchase
       ? (email && whatsapp && orderId)
       : isCardPurchase
         ? (email && orderId)
-        : (username && password && email && whatsapp && orderId);
+        : isEFootballPurchase
+          ? (konamiId && password && email && whatsapp && orderId)
+          : (username && password && email && whatsapp && orderId);
 
     // Vérifier que tous les paramètres sont présents et que l'email n'a pas déjà été envoyé
     if (hasRequiredParams && !hasSentEmail.current) {
@@ -147,7 +152,7 @@ export const PaymentConfirmation = () => {
         }, 2000);
       }
     }
-  }, [username, password, email, whatsapp, orderId, isPaymentFailed, type]);
+  }, [username, konamiId, password, email, whatsapp, orderId, isPaymentFailed, type]);
 
   const sendEmailAutomatically = async () => {
     setIsSending(true);
@@ -164,13 +169,23 @@ export const PaymentConfirmation = () => {
           ? 'Compte TikTok Monétisable'
           : type === 'card'
             ? 'Carte Virtuelle PayOol'
-            : 'TikTok Coins',
-        tiktok_username: username || '—',
+            : type === 'efootball'
+              ? 'Pièces eFootball'
+              : 'TikTok Coins',
+        tiktok_username: konamiId || username || '—',
         tiktok_password: password || '—',
-        desired_username: type === 'card' ? (cardName || '—') : (desiredUsername || '—'),
+        desired_username: type === 'card'
+          ? (cardName || '—')
+          : type === 'efootball'
+            ? (efootballPlatform || '—')
+            : (desiredUsername || '—'),
+        konami_id_or_email: konamiId || '—',
+        efootball_platform: efootballPlatform || '—',
         client_email: email,
         client_whatsapp: whatsapp || '—',
-        coins_amount: type === 'coins' ? (coinsAmount?.toLocaleString() || '—') : '—',
+        coins_amount: type === 'coins' || type === 'efootball'
+          ? (coinsAmount?.toLocaleString() || '—')
+          : '—',
         price: orderPrice?.toLocaleString() || 'Non spécifié',
         date: new Date(orderDate).toLocaleString('fr-FR', {
           dateStyle: 'full',
@@ -229,7 +244,7 @@ export const PaymentConfirmation = () => {
   }
   
   return (
-    <Layout balance={purchaseDetails?.amount || 0} hideBalance={!purchaseDetails || type === 'account' || type === 'card'}>
+    <Layout balance={purchaseDetails?.amount || 0} hideBalance={!purchaseDetails || type === 'account' || type === 'card' || type === 'efootball'}>
       {showConfetti && <Confetti duration={5000} />}
       
       <div className="max-w-2xl mx-auto mt-12 p-8 bg-[var(--card-bg)] rounded-[var(--radius-lg)] shadow-[var(--shadow-md)] border border-[var(--border-dark)]">

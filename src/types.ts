@@ -16,13 +16,13 @@ export type TransactionStatus = 'success' | 'pending' | 'failed';
 
 export interface Purchase {
   id: string;
-  packageId: number;
+  packageId: number | string;
   amount: number;
   price: number;
   date: Date;
   status: TransactionStatus;
   errorMessage?: string;
-  serviceType?: 'coins' | 'accounts' | 'cards';
+  serviceType?: 'coins' | 'accounts' | 'cards' | 'efootball';
   label?: string;
 }
 
@@ -51,6 +51,12 @@ export interface MonetizableAccountForm {
   email: string;
   whatsapp: string;
   desiredUsername?: string;
+}
+
+export interface EFootballCredentials {
+  konamiIdOrEmail: string;
+  password: string;
+  whatsapp: string;
 }
 
 export interface LocalizedText {

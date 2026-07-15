@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Download, X, Smartphone, Monitor, Apple } from 'lucide-react';
+import { Apple, Bell, Download, Monitor, Smartphone, WifiOff, X, Zap } from 'lucide-react';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -118,7 +118,7 @@ export function PWAInstallPrompt() {
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--tiktok-cyan)] to-[var(--tiktok-red)] flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--tiktok-blue)] to-[var(--tiktok-red)] flex items-center justify-center">
               <Download className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -126,13 +126,15 @@ export function PWAInstallPrompt() {
                 {t('installApp', 'Installer l\'application')}
               </h3>
               <p className="text-sm text-[var(--text-secondary)]">
-                PayOol & TikTok Coins
+                PayOol Services
               </p>
             </div>
           </div>
           <button
             onClick={handleClose}
             className="w-8 h-8 rounded-full hover:bg-[var(--background-elevated-2)] flex items-center justify-center transition-colors"
+            type="button"
+            aria-label={t('close', 'Fermer')}
           >
             <X className="w-5 h-5 text-[var(--text-secondary)]" />
           </button>
@@ -152,7 +154,7 @@ export function PWAInstallPrompt() {
                 <span>{t('iosInstructions', 'Instructions pour iPhone/iPad')}</span>
               </div>
               <ol className="text-sm text-[var(--text-secondary)] space-y-2 list-decimal list-inside">
-                <li>{t('iosStep1', 'Appuyez sur le bouton de partage')}<span className="ml-1">⬆️</span></li>
+                <li>{t('iosStep1', 'Appuyez sur le bouton de partage')}</li>
                 <li>{t('iosStep2', 'Faites défiler et appuyez sur "Sur l\'écran d\'accueil"')}</li>
                 <li>{t('iosStep3', 'Appuyez sur "Ajouter"')}</li>
               </ol>
@@ -164,7 +166,7 @@ export function PWAInstallPrompt() {
                 <span>{t('androidInstructions', 'Instructions pour Android')}</span>
               </div>
               <ol className="text-sm text-[var(--text-secondary)] space-y-2 list-decimal list-inside">
-                <li>{t('androidStep1', 'Appuyez sur le menu ⋮ en haut à droite')}</li>
+                <li>{t('androidStep1', 'Appuyez sur le menu en haut à droite')}</li>
                 <li>{t('androidStep2', 'Sélectionnez "Ajouter à l\'écran d\'accueil"')}</li>
                 <li>{t('androidStep3', 'Confirmez en appuyant sur "Ajouter"')}</li>
               </ol>
@@ -185,15 +187,15 @@ export function PWAInstallPrompt() {
         {/* Avantages */}
         <div className="grid grid-cols-3 gap-3 mb-5">
           <div className="text-center p-3 bg-[var(--background-elevated-2)] rounded-[var(--radius-md)]">
-            <div className="text-lg mb-1">⚡</div>
+            <Zap className="mx-auto mb-1 h-5 w-5 text-[var(--tiktok-blue)]" />
             <div className="text-xs text-[var(--text-secondary)]">{t('fastAccess', 'Accès rapide')}</div>
           </div>
           <div className="text-center p-3 bg-[var(--background-elevated-2)] rounded-[var(--radius-md)]">
-            <div className="text-lg mb-1">📴</div>
+            <WifiOff className="mx-auto mb-1 h-5 w-5 text-[var(--tiktok-blue)]" />
             <div className="text-xs text-[var(--text-secondary)]">{t('offlineMode', 'Mode hors ligne')}</div>
           </div>
           <div className="text-center p-3 bg-[var(--background-elevated-2)] rounded-[var(--radius-md)]">
-            <div className="text-lg mb-1">🔔</div>
+            <Bell className="mx-auto mb-1 h-5 w-5 text-[var(--tiktok-blue)]" />
             <div className="text-xs text-[var(--text-secondary)]">{t('notifications', 'Notifications')}</div>
           </div>
         </div>

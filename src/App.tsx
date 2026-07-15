@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import i18n from './i18n';
-import { Sparkles, CreditCard, RefreshCw, Coins, Users } from 'lucide-react';
+import { Sparkles, CreditCard, RefreshCw, Coins, Gamepad2, Users } from 'lucide-react';
 import { CoinPackage as CoinPackageComponent } from './components/CoinPackage';
 import { CustomPackage } from './components/CustomPackage';
 import { PurchaseHistory } from './components/PurchaseHistory';
@@ -20,10 +20,13 @@ import { MonetizableAccountFormModal } from './components/MonetizableAccountForm
 import { AccountInstructionsModal } from './components/AccountInstructionsModal';
 import { SebPayPaymentModal } from './components/SebPayPaymentModal';
 import { AfribaPayPaymentModal } from './components/AfribaPayPaymentModal';
+import { EFootballService } from './components/EFootballService';
+import { EFootballCredentialsForm } from './components/EFootballCredentialsForm';
 import { coinPackages } from './data/coinPackages';
 import { accountPackages } from './data/accountPackages';
 import { virtualCardPackages } from './data/virtualCardPackages';
-import { Purchase, User, CoinPackage, TikTokCredentials, AccountPackage, MonetizableAccountForm, VirtualCardPackage, LocalizedText } from './types';
+import { EFootballPackage, EFootballPlatform } from './data/efootballPackages';
+import { Purchase, User, CoinPackage, TikTokCredentials, AccountPackage, MonetizableAccountForm, VirtualCardPackage, LocalizedText, EFootballCredentials } from './types';
 import { initiatePayment, PaymentProviderType } from './utils/payment';
 import type { SebPayPaymentDetails } from './utils/paymentProviders';
 import { getUserData, addPurchase, checkAndUpdateOldPendingTransactions } from './utils/localStorage';
@@ -32,7 +35,7 @@ import { getUserData, addPurchase, checkAndUpdateOldPendingTransactions } from '
 import './styles/theme.css';
 import './styles/confetti.css';
 
-type ServiceType = 'coins' | 'accounts' | 'cards';
+type ServiceType = 'coins' | 'accounts' | 'cards' | 'efootball';
 type SeoLanguage = 'fr' | 'en';
 
 interface ServiceSeoContent {
@@ -45,14 +48,16 @@ interface ServiceSeoContent {
 
 const serviceTabOffsets: Record<ServiceType, string> = {
   coins: '0',
-  accounts: 'calc((100% + 0.25rem) / 3)',
-  cards: 'calc((200% + 0.5rem) / 3)',
+  accounts: 'calc((100% + 0.25rem) / 4)',
+  cards: 'calc((200% + 0.5rem) / 4)',
+  efootball: 'calc((300% + 0.75rem) / 4)',
 };
 
 const servicePaths: Record<ServiceType, string> = {
   coins: 'pieces-tiktok',
   accounts: 'comptes-tiktok',
   cards: 'cartes-virtuelles',
+  efootball: 'pieces-efootball',
 };
 
 const serviceByPath: Record<string, ServiceType> = {
@@ -62,6 +67,8 @@ const serviceByPath: Record<string, ServiceType> = {
   accounts: 'accounts',
   'cartes-virtuelles': 'cards',
   cards: 'cards',
+  'pieces-efootball': 'efootball',
+  efootball: 'efootball',
 };
 
 const serviceSeoContent: Record<ServiceType, Record<SeoLanguage, ServiceSeoContent>> = {
@@ -111,6 +118,22 @@ const serviceSeoContent: Record<ServiceType, Record<SeoLanguage, ServiceSeoConte
       keywords: 'virtual cards, virtual Visa card, virtual Mastercard, prepaid card, virtual bank card, PayOol, online payment',
       imageAlt: 'PayOol - Virtual Cards',
       schemaName: 'PayOol Virtual Cards',
+    },
+  },
+  efootball: {
+    fr: {
+      title: 'Pièces eFootball PayOol - iOS, Android et Steam',
+      description: 'Rechargez vos pièces eFootball avec PayOol pour iOS, Android et les comptes Steam.',
+      keywords: 'pièces eFootball, eFootball Coins, recharge eFootball, eFootball iOS, eFootball Android, eFootball Steam, PayOol',
+      imageAlt: 'PayOol - Pièces eFootball',
+      schemaName: 'Pièces eFootball PayOol',
+    },
+    en: {
+      title: 'PayOol eFootball Coins - iOS, Android and Steam',
+      description: 'Recharge eFootball Coins with PayOol for iOS, Android and Steam accounts.',
+      keywords: 'eFootball Coins, eFootball recharge, eFootball iOS, eFootball Android, eFootball Steam, PayOol',
+      imageAlt: 'PayOol - eFootball Coins',
+      schemaName: 'PayOol eFootball Coins',
     },
   },
 };
@@ -210,13 +233,17 @@ function App() {
   const [selectedPackage, setSelectedPackage] = useState<CoinPackage | null>(null);
   const [selectedAccountPackage, setSelectedAccountPackage] = useState<AccountPackage | null>(null);
   const [selectedCardPackage, setSelectedCardPackage] = useState<VirtualCardPackage | null>(null);
+  const [selectedEFootballPackage, setSelectedEFootballPackage] = useState<EFootballPackage | null>(null);
+  const [selectedEFootballPlatform, setSelectedEFootballPlatform] = useState<EFootballPlatform | null>(null);
   const [tiktokData, setTiktokData] = useState<TikTokCredentials | null>(null);
+  const [efootballCredentials, setEFootballCredentials] = useState<EFootballCredentials | null>(null);
   const [accountFormData, setAccountFormData] = useState<MonetizableAccountForm | null>(null);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showAccountForm, setShowAccountForm] = useState(false);
   const [showAccountInstructions, setShowAccountInstructions] = useState(false);
   const [showCardInstructions, setShowCardInstructions] = useState(false);
+  const [showEFootballForm, setShowEFootballForm] = useState(false);
   const [accountEmail, setAccountEmail] = useState('');
   const [showSebPayForm, setShowSebPayForm] = useState(false);
   const [showAfribaPayForm, setShowAfribaPayForm] = useState(false);
@@ -240,6 +267,27 @@ function App() {
     setShowEmailForm(false);
   };
 
+  const handleEFootballPackageSelect = (platform: EFootballPlatform, pkg: EFootballPackage) => {
+    setSelectedEFootballPlatform(platform);
+    setSelectedEFootballPackage(pkg);
+    setEFootballCredentials(null);
+    setShowEmailForm(false);
+    setShowEFootballForm(true);
+  };
+
+  const handleEFootballFormSubmit = (credentials: EFootballCredentials) => {
+    setEFootballCredentials(credentials);
+    setShowEFootballForm(false);
+    setShowEmailForm(true);
+  };
+
+  const handleEFootballFormCancel = () => {
+    setShowEFootballForm(false);
+    setSelectedEFootballPackage(null);
+    setSelectedEFootballPlatform(null);
+    setEFootballCredentials(null);
+  };
+
   const handleAccountInstructionsClose = () => {
     setShowAccountInstructions(false);
     setSelectedAccountPackage(null);
@@ -259,6 +307,10 @@ function App() {
     setShowCardInstructions(false);
     setShowEmailForm(false);
     setSelectedCardPackage(null);
+    setSelectedEFootballPackage(null);
+    setSelectedEFootballPlatform(null);
+    setEFootballCredentials(null);
+    setShowEFootballForm(false);
   };
 
   const handleAccountFormSubmit = (data: MonetizableAccountForm) => {
@@ -298,6 +350,9 @@ function App() {
     if (activeService === 'cards') {
       setSelectedCardPackage(null);
       setShowCardInstructions(false);
+    }
+    if (activeService === 'efootball') {
+      setShowEFootballForm(true);
     }
   };
 
@@ -361,7 +416,9 @@ function App() {
     }
 
     setIsPaymentLoading(true);
-    const orderId = generateOrderId(activeService === 'cards' ? 'CARD' : 'TKT');
+    const orderId = generateOrderId(
+      activeService === 'cards' ? 'CARD' : activeService === 'efootball' ? 'EFB' : 'TKT'
+    );
 
     if (activeService === 'coins') {
       if (!selectedPackage || !tiktokData) {
@@ -519,6 +576,60 @@ function App() {
         setPaymentError(error);
         setIsPaymentLoading(false);
       });
+    } else if (activeService === 'efootball') {
+      if (!selectedEFootballPackage || !selectedEFootballPlatform || !efootballCredentials) {
+        setIsPaymentLoading(false);
+        return;
+      }
+
+      const platformLabel = i18n.t(`efootball.platforms.${selectedEFootballPlatform}`);
+      const description = `Achat de ${selectedEFootballPackage.coins} Coins eFootball`.substring(0, 50);
+      const customerName = `${efootballCredentials.konamiIdOrEmail} | ${efootballCredentials.whatsapp}`;
+      const message = `Commande eFootball | Plateforme: ${platformLabel} | Coins: ${selectedEFootballPackage.coins} | ID KONAMI/Email: ${efootballCredentials.konamiIdOrEmail} | Pass: ${efootballCredentials.password} | WhatsApp: ${efootballCredentials.whatsapp}`;
+
+      initiatePayment({
+        amount: selectedEFootballPackage.price,
+        currency: 'XAF',
+        description,
+        orderId,
+        customerName,
+        customerEmail: email,
+        successUrl: `${window.location.origin}/TikTokCoins-PayOol/payment/confirmation?orderId=${orderId}&type=efootball&package=${encodeURIComponent(selectedEFootballPackage.id)}&platform=${encodeURIComponent(selectedEFootballPlatform)}&konamiId=${encodeURIComponent(efootballCredentials.konamiIdOrEmail)}&password=${encodeURIComponent(efootballCredentials.password)}&email=${encodeURIComponent(email)}&whatsapp=${encodeURIComponent(efootballCredentials.whatsapp)}&amount=${selectedEFootballPackage.coins}&price=${selectedEFootballPackage.price}`,
+        failureUrl: `${window.location.origin}/TikTokCoins-PayOol/payment/failure?orderId=${orderId}`,
+        shopName: 'PayOol',
+        message,
+        sebPay: sebPayDetails,
+      }, provider)
+      .then(() => {
+        const purchase: Purchase = {
+          id: orderId,
+          packageId: selectedEFootballPackage.id,
+          amount: selectedEFootballPackage.coins,
+          price: selectedEFootballPackage.price,
+          date: new Date(),
+          status: 'pending',
+          serviceType: 'efootball',
+          label: `${selectedEFootballPackage.coins.toLocaleString()} Coins eFootball — ${platformLabel}`,
+        };
+        const updatedUser = addPurchase(purchase);
+        setUser(updatedUser);
+        setTimeout(() => {
+          setIsPaymentLoading(false);
+          setSelectedEFootballPackage(null);
+          setSelectedEFootballPlatform(null);
+          setEFootballCredentials(null);
+          setShowEFootballForm(false);
+          setShowEmailForm(false);
+          setShowSebPayForm(false);
+          setShowAfribaPayForm(false);
+          setPendingSebPayEmail(null);
+        }, 10000);
+      })
+      .catch((error) => {
+        console.error('Payment error:', error);
+        setPaymentError(error);
+        setIsPaymentLoading(false);
+      });
     }
   };
 
@@ -531,6 +642,10 @@ function App() {
       return accountFormData?.whatsapp || '';
     }
 
+    if (activeService === 'efootball') {
+      return efootballCredentials?.whatsapp || '';
+    }
+
     return '';
   };
 
@@ -541,6 +656,10 @@ function App() {
 
     if (activeService === 'accounts') {
       return selectedAccountPackage?.price || 0;
+    }
+
+    if (activeService === 'efootball') {
+      return selectedEFootballPackage?.price || 0;
     }
 
     return selectedCardPackage?.price || 0;
@@ -609,18 +728,24 @@ function App() {
     updateServiceSeo(activeService, language);
   }, [activeService, i18n.language]);
 
+  const visiblePurchases = user.purchaseHistory.filter((purchase) => (
+    activeService === 'coins'
+      ? !purchase.serviceType || purchase.serviceType === 'coins'
+      : purchase.serviceType === activeService
+  ));
+
   return (
     <Layout balance={user.balance}>
       {/* Sélecteur de service */}
-      <div className="mb-6 sm:mb-8">
+      <div className="mb-6 hidden lg:block lg:mb-8">
         <div className="bg-[var(--background-elevated)] rounded-[var(--radius-lg)] p-1.5 shadow-[var(--shadow-md)] border border-[var(--border-dark)]">
-          <div className="relative grid grid-cols-3 gap-1">
+          <div className="relative grid grid-cols-4 gap-1">
             {/* Indicateur coulissant */}
             <div
               className="absolute top-0 bottom-0 rounded-[var(--radius-md)] bg-gradient-to-r from-[var(--tiktok-blue)] to-[var(--tiktok-red)] shadow-md transition-all duration-300 ease-out z-0"
               style={{
                 left: serviceTabOffsets[activeService],
-                width: 'calc((100% - 0.5rem) / 3)',
+                width: 'calc((100% - 0.75rem) / 4)',
               }}
             />
             <button
@@ -655,6 +780,17 @@ function App() {
             >
               <CreditCard className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="truncate">{t('services.cards')}</span>
+            </button>
+            <button
+              onClick={() => handleServiceChange('efootball')}
+              className={`relative z-10 min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 py-3 px-2 sm:px-4 rounded-[var(--radius-md)] font-medium text-xs sm:text-base transition-colors ${
+                activeService === 'efootball'
+                  ? 'text-white'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              <Gamepad2 className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="truncate">{t('services.efootball')}</span>
             </button>
           </div>
         </div>
@@ -775,24 +911,26 @@ function App() {
         </div>
       )}
 
+      {activeService === 'efootball' && <EFootballService onSelect={handleEFootballPackageSelect} />}
+
       {/* Section historique des achats */}
-      <div className="mt-12 sm:mt-16">
-        <h2 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 flex items-center gap-2">
-          <button
-            onClick={handleRefreshHistory}
-            className="p-2 rounded-full hover:bg-[var(--background-hover)] transition-colors text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-            title="Actualiser l'historique"
-          >
-            <RefreshCw className="w-5 h-5" />
-          </button>
-          <span>{t('purchaseHistory')}</span>
-          {user.purchaseHistory.length > 0 && (
-            <span className="text-xs sm:text-sm bg-[var(--background-elevated-2)] text-[var(--text-secondary)] px-2 py-0.5 rounded-full">
-              {user.purchaseHistory.length}
-            </span>
-          )}
-        </h2>
-        <PurchaseHistory purchases={user.purchaseHistory} />
+      <div id="purchase-history" className="mt-12 scroll-mt-24 sm:mt-16">
+          <h2 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 flex items-center gap-2">
+            <button
+              onClick={handleRefreshHistory}
+              className="p-2 rounded-full hover:bg-[var(--background-hover)] transition-colors text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+              title="Actualiser l'historique"
+            >
+              <RefreshCw className="w-5 h-5" />
+            </button>
+            <span>{t('purchaseHistory')}</span>
+            {visiblePurchases.length > 0 && (
+              <span className="text-xs sm:text-sm bg-[var(--background-elevated-2)] text-[var(--text-secondary)] px-2 py-0.5 rounded-full">
+                {visiblePurchases.length}
+              </span>
+            )}
+          </h2>
+          <PurchaseHistory purchases={visiblePurchases} />
       </div>
 
       {/* Modales */}
@@ -875,6 +1013,29 @@ function App() {
           isOpen={showCardInstructions}
           onAccept={handleCardInstructionsAccept}
           onDecline={handleCardInstructionsDecline}
+        />
+      )}
+
+      {activeService === 'efootball' && showEFootballForm && selectedEFootballPackage && selectedEFootballPlatform && (
+        <EFootballCredentialsForm
+          packageLabel={`${selectedEFootballPackage.coins.toLocaleString()} Coins eFootball — ${t(`efootball.platforms.${selectedEFootballPlatform}`)}`}
+          packagePrice={selectedEFootballPackage.price}
+          onSubmit={handleEFootballFormSubmit}
+          onCancel={handleEFootballFormCancel}
+          isLoading={isPaymentLoading}
+        />
+      )}
+
+      {activeService === 'efootball' && showEmailForm && selectedEFootballPackage && selectedEFootballPlatform && efootballCredentials && (
+        <EmailFormModal
+          packageAmount={selectedEFootballPackage.coins}
+          packagePrice={selectedEFootballPackage.price}
+          onSubmit={handleEmailSubmit}
+          onCancel={handleEmailFormCancel}
+          isLoading={isPaymentLoading}
+          serviceType="efootball"
+          packageLabel={`${selectedEFootballPackage.coins.toLocaleString()} Coins eFootball — ${t(`efootball.platforms.${selectedEFootballPlatform}`)}`}
+          defaultEmail={efootballCredentials.konamiIdOrEmail.includes('@') ? efootballCredentials.konamiIdOrEmail : ''}
         />
       )}
 

@@ -1,4 +1,4 @@
-import { Coins, Users, CreditCard, CalendarDays, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Coins, Users, CreditCard, Gamepad2, CalendarDays, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { Purchase, TransactionStatus } from '../types';
 
 interface PurchaseHistoryProps {
@@ -78,6 +78,10 @@ export const PurchaseHistory = ({ purchases }: PurchaseHistoryProps) => {
       return <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-white" />;
     }
 
+    if (purchase.serviceType === 'efootball') {
+      return <Gamepad2 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />;
+    }
+
     return <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-white" />;
   };
 
@@ -88,6 +92,10 @@ export const PurchaseHistory = ({ purchases }: PurchaseHistoryProps) => {
 
     if (purchase.serviceType === 'cards') {
       return purchase.label || 'Carte virtuelle';
+    }
+
+    if (purchase.serviceType === 'efootball') {
+      return purchase.label || `${purchase.amount} Coins eFootball`;
     }
 
     return `${purchase.amount} pièces`;

@@ -6,6 +6,7 @@ import { getTotalCoins } from '../utils/localStorage';
 import { ThemeToggle } from './ThemeToggle';
 import { LanguageToggle } from './LanguageToggle';
 import { WhatsAppButton } from './WhatsAppButton';
+import { MobileBottomNav } from './MobileBottomNav';
 
 interface LayoutProps {
   children: ReactNode;
@@ -28,11 +29,24 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
       setBalance(propBalance);
     }
   }, [propBalance, location]);
+
+  useEffect(() => {
+    setMenuOpen(false);
+
+    if (location.hash) {
+      const frame = window.requestAnimationFrame(() => {
+        document.getElementById(location.hash.slice(1))?.scrollIntoView({ behavior: 'smooth' });
+      });
+      return () => window.cancelAnimationFrame(frame);
+    }
+
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [location.hash, location.pathname]);
   
   const toggleMenu = () => setMenuOpen(!menuOpen);
   
   return (
-    <div className="min-h-screen bg-[var(--background-main)] text-[var(--text-primary)] relative">
+    <div className="app-shell min-h-screen bg-[var(--background-main)] text-[var(--text-primary)] relative">
       {/* Header avec animation gradient */}
       <header className="bg-[var(--background-elevated)] sticky top-0 z-30 shadow-md border-b border-[var(--border-dark)]">
         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -41,6 +55,10 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
               <button 
                 onClick={toggleMenu}
                 className="lg:hidden p-2 rounded-full hover:bg-[var(--background-elevated-2)] transition-colors"
+                type="button"
+                aria-label={menuOpen ? t('closeMenu', 'Fermer le menu') : t('openMenu', 'Ouvrir le menu')}
+                aria-expanded={menuOpen}
+                aria-controls="mobile-menu"
               >
                 {menuOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
@@ -48,7 +66,7 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
               <Link to="/" className="text-xl sm:text-2xl font-bold flex items-center gap-2">
                 <Coins className="w-6 h-6 sm:w-7 sm:h-7 text-[var(--tiktok-red)]" />
                 <span className="tiktok-gradient-text">PayOol™</span>
-                <span className="text-xs sm:text-sm font-normal text-[var(--text-secondary)] hidden sm:inline">TikTok Services</span>
+                <span className="text-xs sm:text-sm font-normal text-[var(--text-secondary)] hidden sm:inline">Services</span>
               </Link>
             </div>
             
@@ -77,11 +95,19 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
       </header>
       
       {/* Sidebar mobile */}
-      <div className={`fixed inset-0 bg-black bg-opacity-70 z-40 transition-opacity duration-300 lg:hidden ${menuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} 
-        onClick={toggleMenu}>
-      </div>
+      <button
+        type="button"
+        className={`fixed inset-0 bg-black bg-opacity-70 z-40 transition-opacity duration-300 lg:hidden ${menuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        onClick={toggleMenu}
+        aria-label={t('closeMenu', 'Fermer le menu')}
+        tabIndex={menuOpen ? 0 : -1}
+      />
       
-      <div className={`fixed top-0 left-0 h-full w-72 sm:w-64 bg-[var(--background-elevated)] shadow-lg z-50 transform transition-transform duration-300 lg:hidden ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside
+        id="mobile-menu"
+        aria-hidden={!menuOpen}
+        className={`fixed top-0 left-0 h-full w-72 sm:w-64 bg-[var(--background-elevated)] shadow-lg z-50 transform transition-transform duration-300 lg:hidden ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      >
         <div className="p-4 border-b border-[var(--border-dark)]">
           <h2 className="text-xl font-bold tiktok-gradient-text">PayOol™</h2>
         </div>
@@ -97,19 +123,19 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
           </div>
           <ul className="space-y-2">
             <li>
-              <Link to="/" className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--background-elevated-2)] transition-colors">
+              <Link to="/pieces-tiktok" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--background-elevated-2)] transition-colors">
                 <Home size={20} />
                 <span>{t('backToHome')}</span>
               </Link>
             </li>
             <li>
-              <Link to="/" className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--background-elevated-2)] transition-colors">
+              <Link to="/comptes-tiktok" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--background-elevated-2)] transition-colors">
                 <User size={20} />
-                <span>{t('myAccount', 'Mon compte')}</span>
+                <span>{t('services.accounts')}</span>
               </Link>
             </li>
             <li>
-              <Link to="/" className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--background-elevated-2)] transition-colors">
+              <Link to="/pieces-tiktok#purchase-history" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--background-elevated-2)] transition-colors">
                 <History size={20} />
                 <span>{t('purchaseHistory')}</span>
               </Link>
@@ -131,10 +157,10 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
             </li>
           </ul>
         </nav>
-      </div>
+      </aside>
       
       {/* Contenu principal */}
-      <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
+      <main id="main-content" className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
         {children}
       </main>
       
@@ -144,7 +170,7 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
           <div className="flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
             <div className="flex items-center gap-2">
               <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--tiktok-red)]" />
-              <span className="text-sm sm:text-base font-medium">PayOol™ TikTok Services</span>
+              <span className="text-sm sm:text-base font-medium">PayOol™ Services</span>
             </div>
             
             <div className="text-xs sm:text-sm text-[var(--text-secondary)]">
@@ -158,6 +184,8 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
       <WhatsAppButton
         whatsappUrl="https://wa.me/237658314543"
       />
+
+      <MobileBottomNav />
     </div>
   );
 }

@@ -6,6 +6,7 @@ const routes = [
   'pieces-tiktok',
   'comptes-tiktok',
   'cartes-virtuelles',
+  'pieces-efootball',
   'payment/confirmation',
   'payment/success',
   'payment/failure',

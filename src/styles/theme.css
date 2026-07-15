@@ -223,6 +223,86 @@
   border: 1px solid currentColor;
 }
 
+/* Navigation principale sur mobile et dans la PWA */
+.app-shell {
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+}
+
+.mobile-bottom-navigation {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 45;
+  padding: 0.35rem 0.5rem max(0.35rem, env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--border-dark);
+  background-color: var(--background-elevated);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(14px);
+}
+
+.mobile-bottom-navigation__item {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 3.85rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  font-size: 0.65rem;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.mobile-bottom-navigation__item:hover,
+.mobile-bottom-navigation__item:focus-visible {
+  color: var(--text-primary);
+  background-color: var(--background-elevated-2);
+  outline: none;
+}
+
+.mobile-bottom-navigation__item.is-active {
+  color: var(--text-primary);
+  background-color: var(--background-elevated-2);
+}
+
+.mobile-bottom-navigation__item.is-active svg {
+  color: var(--tiktok-blue);
+  filter: drop-shadow(0 0 6px rgba(8, 255, 249, 0.25));
+}
+
+.mobile-bottom-navigation__item.is-active::before {
+  position: absolute;
+  top: -0.35rem;
+  width: 2.25rem;
+  height: 0.2rem;
+  border-radius: var(--radius-full);
+  background: var(--tiktok-gradient);
+  content: '';
+}
+
+@media (min-width: 1024px) {
+  .app-shell {
+    padding-bottom: 0;
+  }
+
+  .mobile-bottom-navigation {
+    display: none;
+  }
+}
+
+@media (max-width: 1023px) {
+  .whatsapp-container {
+    bottom: calc(5.6rem + env(safe-area-inset-bottom, 0px));
+    right: 1rem;
+  }
+}
+
 /* Bouton WhatsApp flottant - Container */
 .whatsapp-container {
   position: fixed;
@@ -379,8 +459,8 @@
 /* Responsive pour le bouton WhatsApp */
 @media (max-width: 768px) {
   .whatsapp-container {
-    bottom: 20px;
-    right: 20px;
+    bottom: calc(5.6rem + env(safe-area-inset-bottom, 0px));
+    right: 1rem;
   }
 
   .whatsapp-float-button {

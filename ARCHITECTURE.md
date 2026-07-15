@@ -49,6 +49,10 @@ src/App.tsx
 `src/main.tsx` configure le router:
 
 - `/`
+- `/pieces-tiktok`
+- `/comptes-tiktok`
+- `/cartes-virtuelles`
+- `/pieces-efootball`
 - `/payment/confirmation`
 - `/payment/success`
 - `/payment/failure`
@@ -63,17 +67,29 @@ src/App.tsx
 
 ## Services proposes
 
-Deux services sont geres par l'interface:
+Quatre services sont geres par l'interface:
 
 - `coins`: achat de TikTok Coins;
-- `accounts`: achat de forfaits de comptes TikTok.
+- `accounts`: achat de forfaits de comptes TikTok;
+- `cards`: achat de cartes virtuelles;
+- `efootball`: achat de pieces eFootball pour iOS, Android et Steam.
 
 Les forfaits sont declares dans:
 
 ```text
 src/data/coinPackages.ts
 src/data/accountPackages.ts
+src/data/virtualCardPackages.ts
+src/data/efootballPackages.ts
 ```
+
+La page eFootball est rendue par `src/components/EFootballService.tsx`. Le
+choix d'un forfait ouvre un formulaire dedie (ID KONAMI ou e-mail, mot de passe
+et numero WhatsApp), puis rejoint la selection de fournisseur de paiement, la
+confirmation EmailJS et l'historique communs aux autres services.
+
+La navigation mobile et PWA est partagee par toutes les pages utilisant
+`Layout` via `src/components/MobileBottomNav.tsx`.
 
 ## Paiements
 

@@ -73,6 +73,7 @@ const translation = {
   "language": "Language",
   "english": "English",
   "french": "French",
+  "mobileNavigation": "Services navigation",
   
   // Custom Package
   "customAmount": "Custom Amount",
@@ -128,7 +129,69 @@ const translation = {
   "services": {
     "coins": "TikTok Coins",
     "accounts": "Monetizable TikTok Accounts",
-    "cards": "Virtual Cards"
+    "cards": "Virtual Cards",
+    "efootball": "eFootball Coins",
+    "coinsShort": "TikTok",
+    "accountsShort": "Accounts",
+    "cardsShort": "Cards",
+    "efootballShort": "eFootball"
+  },
+
+  "efootball": {
+    "title": "eFootball Coins",
+    "description": "Enjoy the best rates to recharge your eFootball Coins now!",
+    "availability": "Service available 24/7",
+    "delivery": "Fast and secure delivery",
+    "available": "Available",
+    "packages": "packages",
+    "quantity": "Quantity",
+    "price": "Rate",
+    "order": "Continue to payment",
+    "catalogAriaLabel": "eFootball Coins rates",
+    "orderAriaLabel": "Order {{coins}} eFootball Coins for {{platform}} at {{price}} F",
+    "platforms": {
+      "mobile": "iOS / Android",
+      "steam": "Steam Accounts"
+    },
+    "serviceTitle": "Service available 24/7 • Fast and secure delivery",
+    "paymentPath": "Select a package, enter your eFootball account information, then choose your payment method.",
+    "successMessage": "Your eFootball payment was processed successfully. Your Coins order is being processed and PayOol may contact you on WhatsApp if needed.",
+    "paymentConfirmation": "Your eFootball order is confirmed and will be processed using the account information provided.",
+    "purchasedCoins": "eFootball Coins purchased",
+    "form": {
+      "title": "eFootball Account",
+      "subtitle": "Enter the account information to recharge",
+      "konamiIdLabel": "KONAMI ID / email",
+      "konamiIdPlaceholder": "Enter your KONAMI ID or email",
+      "konamiIdRequired": "KONAMI ID or email is required",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "passwordRequired": "Password is required",
+      "whatsappLabel": "WhatsApp number",
+      "whatsappPlaceholder": "E.g. 658 314 543",
+      "whatsappInvalid": "Enter a valid WhatsApp number (8 to 15 digits)",
+      "countryCodeLabel": "Country calling code",
+      "countryCodeDetecting": "Detecting your country calling code…",
+      "countryCodeDetected": "Country calling code detected automatically"
+    },
+    "trust": {
+      "reliable": {
+        "title": "Reliable",
+        "description": "100% secure transactions"
+      },
+      "fast": {
+        "title": "Fast",
+        "description": "Instant delivery"
+      },
+      "support": {
+        "title": "Support",
+        "description": "Dedicated assistance"
+      },
+      "prices": {
+        "title": "Best prices",
+        "description": "Competitive rates"
+      }
+    }
   },
 
   // Virtual cards
