@@ -9,7 +9,7 @@ import { virtualCardPackages } from '../data/virtualCardPackages';
 import { getPurchaseHistory, updateTransactionStatus } from '../utils/localStorage';
 
 const CARD_ACCOUNT_URL = 'https://prismcard.net/r/RGBY2OC6';
-const SUPPORT_WHATSAPP_URL = 'https://wa.me/237658314543';
+const SUPPORT_WHATSAPP_URL = 'https://wa.me/237654870372';
 
 const getLocalizedText = (value: { fr: string; en: string }, language: string) => (
   language.startsWith('fr') ? value.fr : value.en
@@ -260,21 +260,6 @@ export const PaymentSuccess = () => {
               }
             </p>
           </div>
-          
-          <a 
-            href="https://short.prismcard.net/r/whatsapp" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 text-sm bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-full transition-colors mb-6 max-w-xs mx-auto"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" />
-              <path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1Z" />
-              <path d="M14 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1Z" />
-              <path d="M9.5 13.5c.5 1 1.5 1 2.5 1s2-.5 2.5-1" />
-            </svg>
-            <span>{t('contactSupport', 'Contacter le service client')}</span>
-          </a>
         </div>
         
         {purchaseDetails && (
