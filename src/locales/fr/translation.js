@@ -57,6 +57,12 @@ const translation = {
   "coinsAdded": "Vos pièces ont été ajoutées à votre compte TikTok.",
   "successMessage": "Si vous avez saisi les identifiants réels de votre compte TikTok, vous recevrez vos pièces dans un délai de 10 minutes. Si vous ne recevez pas vos pièces dans ce délai, veuillez contacter notre service client sur WhatsApp.",
   "contactSupport": "Contacter le service client",
+  "whatsappSupport": {
+    "open": "Contacter sur WhatsApp",
+    "needHelp": "Besoin d'aide ?",
+    "chooseService": "Choisissez un service client",
+    "service": "Service client {{number}}"
+  },
   "transactionDetails": "Détails de la transaction",
   "orderNumber": "Numéro de commande",
   "purchasedCoins": "Pièces achetées",

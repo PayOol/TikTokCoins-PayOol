@@ -57,6 +57,12 @@ const translation = {
   "coinsAdded": "Your coins have been added to your TikTok account.",
   "successMessage": "If you entered your real TikTok account credentials, you will receive your coins within 10 minutes. If you do not receive your coins within this time, please contact our customer service on WhatsApp.",
   "contactSupport": "Contact Customer Support",
+  "whatsappSupport": {
+    "open": "Contact us on WhatsApp",
+    "needHelp": "Need help?",
+    "chooseService": "Choose customer support",
+    "service": "Customer support {{number}}"
+  },
   "transactionDetails": "Transaction Details",
   "orderNumber": "Order Number",
   "purchasedCoins": "Purchased Coins",

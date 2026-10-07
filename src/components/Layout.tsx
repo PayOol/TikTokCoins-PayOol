@@ -183,6 +183,7 @@ export function Layout({ children, balance: propBalance, hideBalance = false }: 
       {/* Bouton WhatsApp flottant */}
       <WhatsAppButton
         whatsappUrl="https://wa.me/237654870372"
+        secondaryWhatsappUrl="https://wa.me/237683350742"
       />
 
       <MobileBottomNav />
