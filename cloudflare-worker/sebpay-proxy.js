@@ -244,9 +244,15 @@ async function handleAfribaPay(request, env) {
     );
   }
 
-  const baseApiUrl = apiEnv === 'sandbox' 
-    ? 'https://api-sandbox.afribapay.com/v1' 
-    : 'https://api.afribapay.com/v1';
+  // AfribaPay n'accepte que des IP autorisées et un Worker n'a pas d'IP fixe :
+  // si AFRIBAPAY_RELAY_URL est défini, les appels passent par le relais nginx du VPS
+  // (IP fixe), qui les retransmet tels quels à AfribaPay. Les clés restent ici.
+  const relayUrl = (env.AFRIBAPAY_RELAY_URL || '').replace(/\/+$/, '');
+  const baseApiUrl = relayUrl
+    ? `${relayUrl}/${apiEnv === 'sandbox' ? 'afribapay-sandbox' : 'afribapay'}/v1`
+    : apiEnv === 'sandbox'
+      ? 'https://api-sandbox.afribapay.com/v1'
+      : 'https://api.afribapay.com/v1';
 
   // Helper to fetch access token
   async function getAccessToken() {

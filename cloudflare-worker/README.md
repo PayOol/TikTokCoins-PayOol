@@ -26,6 +26,16 @@ wrangler secret put AFRIBAPAY_AGENT_ID
 wrangler secret put AFRIBAPAY_ENVIRONMENT
 ```
 
+Relais AfribaPay (IP fixe) :
+
+AfribaPay n'accepte que des adresses IP autorisées, et un Worker Cloudflare n'a pas d'IP fixe.
+La variable `AFRIBAPAY_RELAY_URL` (dans `wrangler.toml`) fait passer les appels AfribaPay par le
+relais nginx du VPS `srv563641.hstgr.cloud` (IPv4 `185.97.144.133`, à autoriser chez AfribaPay).
+Le relais ne stocke aucune clé : il retransmet `/afribapay/v1/*` vers `api.afribapay.com/v1/*`
+(et `/afribapay-sandbox/v1/*` vers le sandbox) et n'accepte que les IP Cloudflare.
+Configuration : `/etc/nginx/sites-available/afribapay-relay` sur le VPS.
+Pour revenir à l'appel direct, supprimer `AFRIBAPAY_RELAY_URL` et redéployer.
+
 LeekPay:
 
 ```bash

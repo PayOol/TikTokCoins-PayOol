@@ -8,8 +8,13 @@ compatibility_date = "2024-01-01"
 # Use: wrangler secret put SEBPAY_SECRET_KEY
 # Use: wrangler secret put LEEKPAY_SECRET_KEY
 
+# Conserver les variables définies dans le tableau de bord Cloudflare lors d'un déploiement
+keep_vars = true
+
 [vars]
-# Public variables (if any)
+# Relais AfribaPay sur le VPS (IP fixe 185.97.144.133 autorisée chez AfribaPay)
+# Configuration nginx : /etc/nginx/sites-available/afribapay-relay
+AFRIBAPAY_RELAY_URL = "https://srv563641.hstgr.cloud"
 
 # Production environment
 [env.production]
