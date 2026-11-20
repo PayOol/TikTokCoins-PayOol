@@ -130,3 +130,7 @@ Pour utiliser un domaine propre au lieu de `workers.dev`:
 3. Selectionner le worker.
 4. Ouvrir Settings -> Triggers -> Custom Domains.
 5. Ajouter le domaine, par exemple `api.votredomaine.com`.
+
+## Déploiement automatique
+
+Le Worker est relié au dépôt GitHub (Cloudflare Workers Builds) : chaque push sur `main` le redéploie depuis `cloudflare-worker/` avec `npx wrangler deploy`.
