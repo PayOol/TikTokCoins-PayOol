@@ -19,6 +19,20 @@ function mapStatus(raw) {
   return null;
 }
 
+// Messages AfribaPay fréquents, expliqués en français.
+const KNOWN_ERRORS = [
+  [/payment type not allowed/i, 'type de paiement non autorisé. Le payout n’est pas activé sur votre compte AfribaPay pour ce pays ou cet opérateur : demandez son activation à AfribaPay.'],
+  [/insufficient|solde insuffisant|not enough/i, 'solde payout insuffisant (le montant plus les frais dépasse le solde disponible).'],
+  [/invalid phone|phone.*invalid|numéro.*invalide/i, 'numéro de téléphone invalide pour cet opérateur.'],
+  [/operator.*not|opérateur/i, 'opérateur non disponible pour ce pays.'],
+  [/ip.*not authorized|ip address/i, 'l’IP du serveur (185.97.144.133) n’est pas autorisée pour les payouts dans votre compte AfribaPay.'],
+  [/merchant.?key/i, 'clé marchand incorrecte (menu Paramètres).']
+];
+export function explainError(message) {
+  const found = KNOWN_ERRORS.find(([re]) => re.test(message));
+  return found ? `${found[1]} (AfribaPay : « ${message} »)` : message;
+}
+
 const num = (v) => (v == null || v === '' || Number.isNaN(Number(v)) ? null : Number(v));
 
 // Valide un formulaire de payout par rapport à la liste des pays/opérateurs AfribaPay.
@@ -95,15 +109,26 @@ export function createPayoutService({ db, afribapay, audit, publicUrl }) {
         p = applyRemote(p, data, 'PENDING');
         audit(admin, 'payout.reponse', `${orderId} : ${p.status}${p.transaction_id ? ` (${p.transaction_id})` : ''}`, ip);
       } catch (error) {
-        // Une erreur HTTP ne prouve pas que le payout a échoué : on vérifie le statut.
+        // Une erreur HTTP ne prouve pas à elle seule que le payout a échoué : on vérifie le statut.
         const message = error instanceof AfribaPayError ? error.message : String(error.message || error);
-        update.run('TO_CHECK', null, null, null, null, message, p.id);
+        const readable = explainError(message);
+        update.run('TO_CHECK', null, null, null, null, readable, p.id);
         p = byId.get(p.id);
         audit(admin, 'payout.erreur', `${orderId} : ${message}`, ip);
+        // Refus explicite (HTTP 4xx, hors authentification/limite) : la demande a été lue et rejetée.
+        const rejected = error instanceof AfribaPayError && error.httpStatus >= 400 && error.httpStatus < 500 && ![401, 408, 429].includes(error.httpStatus);
         try {
           const data = await afribapay.status({ orderId });
           if (mapStatus(data.status)) p = applyRemote(p, data);
-        } catch { /* statut introuvable : le payout reste « À vérifier » */ }
+        } catch (statusError) {
+          const notFound = statusError instanceof AfribaPayError && statusError.httpStatus === 404;
+          if (rejected && notFound) {
+            // Refusé ET inconnu d'AfribaPay : aucun payout n'a été créé, rien n'a été débité.
+            update.run('FAILED', null, null, null, null, `Refusé par AfribaPay : ${readable} Aucun montant n’a été débité.`, p.id);
+            p = byId.get(p.id);
+            audit(admin, 'payout.statut', `${orderId} : TO_CHECK → FAILED (refus AfribaPay, payout non créé)`, ip);
+          }
+        }
       }
       return { payout: p, duplicate: false };
     },
@@ -115,10 +140,13 @@ export function createPayoutService({ db, afribapay, audit, publicUrl }) {
         if (mapStatus(data.status)) return applyRemote(p, data);
         touch.run(p.error, p.id);
       } catch (error) {
+        // On garde le message d'origine (raison du refus) et on précise le résultat de la vérification.
         const notFound = error instanceof AfribaPayError && error.httpStatus === 404;
-        touch.run(notFound
+        const original = String(p.error || '').split(' — ')[0];
+        const note = notFound
           ? 'AfribaPay ne trouve pas ce payout : il n’a probablement pas été créé. Vérifiez dans votre tableau de bord AfribaPay avant de renvoyer.'
-          : `Vérification impossible : ${error.message}`, p.id);
+          : `Vérification impossible : ${error.message}`;
+        touch.run(original ? `${original} — ${note}` : note, p.id);
       }
       return byId.get(p.id);
     },
