@@ -13,7 +13,7 @@ keep_vars = true
 
 [vars]
 # Relais AfribaPay sur le VPS (IP fixe 185.97.144.133 autorisée chez AfribaPay)
-# Configuration nginx : /etc/nginx/sites-available/afribapay-relay
+# Configuration nginx : /etc/nginx/sites-available/srv563641.hstgr.cloud
 AFRIBAPAY_RELAY_URL = "https://srv563641.hstgr.cloud"
 
 # Production environment

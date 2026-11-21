@@ -34,7 +34,10 @@ un double clic ou une coupure ne peut pas provoquer deux envois.
 - Conteneur `tiktokcoins_admin`, `127.0.0.1:8093`, système de fichiers en lecture seule.
 - Données : `/root/TikTokCoins-data` (base SQLite + clé de chiffrement) — **à sauvegarder**,
   hors dépôt.
-- nginx de l’hôte : `deploy/nginx-host.conf` et `deploy/nginx-proxy-snippet.conf`.
+- Adresse : **https://srv563641.hstgr.cloud** (nom d’hôte du VPS, aucun DNS à gérer).
+- nginx de l’hôte : `/etc/nginx/sites-available/srv563641.hstgr.cloud` (copie : `deploy/nginx-host.conf`),
+  avec les snippets `tiktokcoins-admin-proxy.conf` et `cloudflare-only.conf` (copies dans `deploy/`).
+  Le même site sert le relais AfribaPay du Worker (`/afribapay/…`, réservé à Cloudflare).
 
 Installation : au premier démarrage, un **code d’installation** est écrit dans les
 journaux (`docker logs tiktokcoins_admin`). Il permet de créer le premier
