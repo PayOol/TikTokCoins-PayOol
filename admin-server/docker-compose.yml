@@ -1,0 +1,31 @@
+# Production de l'admin TikTok Coins (VPS). Le site client reste sur GitHub Pages.
+# Base SQLite et clé de chiffrement : /root/TikTokCoins-data (hors dépôt, à sauvegarder).
+# N'écoute que sur 127.0.0.1:8093 ; nginx de l'hôte fait le HTTPS (voir deploy/nginx-host.conf).
+name: tiktokcoins-admin
+services:
+  admin:
+    build: .
+    image: tiktokcoins-admin:node24
+    container_name: tiktokcoins_admin
+    init: true
+    restart: unless-stopped
+    ports: ["127.0.0.1:8093:3000"]
+    volumes:
+      - /root/TikTokCoins-data:/data
+    environment:
+      PORT: "3000"
+      ADMIN_DB_PATH: /data/tiktokcoins_admin.db
+      PUBLIC_URL: ${PUBLIC_URL:-https://srv563641.hstgr.cloud}
+    read_only: true
+    tmpfs: ["/tmp"]
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 256m
+    cpus: 0.5
+    pids_limit: 64
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging: { driver: json-file, options: { max-size: 5m, max-file: "3" } }
