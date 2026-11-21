@@ -247,8 +247,22 @@ route('GET', '/', async (ctx, res) => {
   if (configured) {
     try { balances = await afribapay.balance(); } catch (e) { balanceError = errMsg(e); }
   }
-  const recent = db.prepare('SELECT * FROM payouts ORDER BY id DESC LIMIT 10').all();
-  sendHtml(res, 200, V.dashboardPage(ctx, { balances, balanceError, recent, configured }));
+  const recent = db.prepare('SELECT * FROM payouts ORDER BY id DESC LIMIT 8').all();
+  // « Aujourd'hui » en heure GMT (Afrique de l'Ouest).
+  const sums = (where) => db.prepare(`SELECT currency, SUM(amount) AS total, COUNT(*) AS n FROM payouts WHERE ${where} GROUP BY currency ORDER BY total DESC`).all();
+  const count = (where) => db.prepare(`SELECT COUNT(*) AS n FROM payouts WHERE ${where}`).get().n;
+  const today = sums("date(created_at) = date('now') AND status != 'FAILED'");
+  const success30Sums = sums("status = 'SUCCESS' AND created_at > datetime('now', '-30 days')");
+  const stats = {
+    today,
+    todayCount: today.reduce((n, r) => n + r.n, 0),
+    success30: success30Sums.reduce((n, r) => n + r.n, 0),
+    success30Sums,
+    pending: count("status IN ('PENDING', 'SUBMITTING')"),
+    toCheck: count("status = 'TO_CHECK'"),
+    failed30: count("status = 'FAILED' AND created_at > datetime('now', '-30 days')")
+  };
+  sendHtml(res, 200, V.dashboardPage(ctx, { balances, balanceError, recent, configured, stats }));
 });
 
 // Liste des payouts
@@ -271,24 +285,29 @@ route('GET', '/payouts', (ctx, res) => {
 async function loadCountries() {
   try { return { countries: await afribapay.countries(), countriesError: null }; } catch (e) { return { countries: {}, countriesError: errMsg(e) }; }
 }
+// Formulaire de payout : pays/opérateurs + soldes payout (le solde est indicatif, une erreur est ignorée).
+async function loadPayoutForm() {
+  const [c, balances] = await Promise.all([loadCountries(), afribapay.balance().catch(() => [])]);
+  return { ...c, balances, maxAmount: maxAmount() };
+}
 
 route('GET', '/payouts/new', async (ctx, res) => {
-  sendHtml(res, 200, V.newPayoutPage(ctx, { ...(await loadCountries()), maxAmount: maxAmount() }));
+  sendHtml(res, 200, V.newPayoutPage(ctx, await loadPayoutForm()));
 });
 
 route('POST', '/payouts/edit', async (ctx, res, req) => {
   const form = await readForm(req);
   requireCsrf(ctx, form);
-  sendHtml(res, 200, V.newPayoutPage(ctx, { ...(await loadCountries()), values: form, maxAmount: maxAmount() }));
+  sendHtml(res, 200, V.newPayoutPage(ctx, { ...(await loadPayoutForm()), values: form }));
 });
 
 route('POST', '/payouts/preview', async (ctx, res, req) => {
   const form = await readForm(req);
   requireCsrf(ctx, form);
-  const { countries, countriesError } = await loadCountries();
-  if (countriesError) return sendHtml(res, 502, V.newPayoutPage(ctx, { countries, countriesError, values: form, maxAmount: maxAmount() }));
-  const v = validatePayout(form, countries, maxAmount());
-  if (v.error) return sendHtml(res, 400, V.newPayoutPage(ctx, { countries, values: form, error: v.error, maxAmount: maxAmount() }));
+  const formData = await loadPayoutForm();
+  if (formData.countriesError) return sendHtml(res, 502, V.newPayoutPage(ctx, { ...formData, values: form }));
+  const v = validatePayout(form, formData.countries, maxAmount());
+  if (v.error) return sendHtml(res, 400, V.newPayoutPage(ctx, { ...formData, values: form, error: v.error }));
   sendHtml(res, 200, V.confirmPayoutPage(ctx, { ...v, p: { ...v.payout, order_id: newOrderId() }, needsTotp: Boolean(ctx.admin.totp_enabled) }));
 });
 
@@ -303,7 +322,7 @@ route('POST', '/payouts', async (ctx, res, req) => {
   const { countries, countriesError } = await loadCountries();
   if (countriesError) throw new HttpError(502, countriesError);
   const v = validatePayout(form, countries, maxAmount());
-  if (v.error) return sendHtml(res, 400, V.newPayoutPage(ctx, { countries, values: form, error: v.error, maxAmount: maxAmount() }));
+  if (v.error) return sendHtml(res, 400, V.newPayoutPage(ctx, { ...(await loadPayoutForm()), values: form, error: v.error }));
   const retry = (error) => sendHtml(res, 401, V.confirmPayoutPage(ctx, { ...v, p: { ...v.payout, order_id: form.order_id }, needsTotp: Boolean(ctx.admin.totp_enabled), error }));
 
   const key = `sensitive:${ctx.admin.id}`;
